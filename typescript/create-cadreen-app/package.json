@@ -1,0 +1,13 @@
+{
+  "name": "create-cadreen-app",
+  "version": "0.1.0",
+  "description": "Scaffold a new Cadreen integration project in seconds",
+  "bin": {
+    "create-cadreen-app": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "template/"
+  ],
+  "license": "MIT"
+}
