@@ -23,7 +23,7 @@ func (c *Client) ListConnections(ctx context.Context, opts ...RequestOption) (*L
 
 func (c *Client) ListCapabilities(ctx context.Context, opts ...RequestOption) (*ListCapabilitiesResponse, error) {
 	var result ListCapabilitiesResponse
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/connections/capabilities", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/capabilities", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("list capabilities: %w", err)
 	}
 	return &result, nil

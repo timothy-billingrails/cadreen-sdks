@@ -12,18 +12,22 @@ type AssessRequest struct {
 
 func (c *Client) Assess(ctx context.Context, task string, opts ...RequestOption) (*Assessment, error) {
 	req := AssessRequest{Task: task}
-	var result Assessment
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/assess", req, &result, opts...); err != nil {
+	var wrapper struct {
+		Assessment Assessment `json:"assessment"`
+	}
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/assess", req, &wrapper, opts...); err != nil {
 		return nil, fmt.Errorf("assess: %w", err)
 	}
-	return &result, nil
+	return &wrapper.Assessment, nil
 }
 
 func (c *Client) AssessWithDomain(ctx context.Context, task, domain string, opts ...RequestOption) (*Assessment, error) {
 	req := AssessRequest{Task: task, Domain: domain}
-	var result Assessment
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/assess", req, &result, opts...); err != nil {
+	var wrapper2 struct {
+		Assessment Assessment `json:"assessment"`
+	}
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/assess", req, &wrapper2, opts...); err != nil {
 		return nil, fmt.Errorf("assess: %w", err)
 	}
-	return &result, nil
+	return &wrapper2.Assessment, nil
 }

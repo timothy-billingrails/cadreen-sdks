@@ -183,8 +183,8 @@ func (c *Client) do(ctx context.Context, method, path string, body, result any, 
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		if attempt > 0 {
 			backoff := 1 << uint(attempt-1)
-			if backoff > 10 {
-				backoff = 10
+			if backoff > 8 {
+				backoff = 8
 			}
 			delay := time.Duration(backoff) * time.Second
 			select {

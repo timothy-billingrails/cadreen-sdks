@@ -57,7 +57,7 @@ var defaultIntelligence = &IntelligenceMeta{
 	Memory:     MemoryTrace{Healthy: true},
 	Governance: GovernanceTrace{Active: false},
 	Humility:   HumilityTrace{},
-	Process:    ProcessTrace{StartedAt: "", StepsTaken: 0, DurationMs: 0},
+	Process:    ProcessTrace{StartedAt: "", DurationMs: 0},
 	FieldStability: FieldStability{
 		Stable:   []string{},
 		Evolving: []string{},
@@ -185,6 +185,9 @@ type IntentEvent struct {
 }
 
 func (c *Client) IntentStream(ctx context.Context, req IntentRequest) (<-chan IntentEvent, error) {
+	if c.config.Sandbox {
+		return nil, fmt.Errorf("streaming is not available in sandbox mode")
+	}
 	req.Stream = true
 
 	bodyBytes, err := json.Marshal(req)
@@ -276,5 +279,6 @@ func sendSSEToChan(ctx context.Context, ch chan<- IntentEvent, eventType string,
 	select {
 	case ch <- IntentEvent{Type: eventType, Data: parsed}:
 	case <-ctx.Done():
+		return
 	}
 }

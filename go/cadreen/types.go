@@ -372,7 +372,6 @@ type HumilityTrace struct {
 
 type ProcessTrace struct {
 	StartedAt  string          `json:"started_at"`
-	StepsTaken int             `json:"steps_taken"`
 	DurationMs int64           `json:"duration_ms"`
 	Components map[string]bool `json:"components,omitempty"`
 }
