@@ -482,6 +482,47 @@ class IntelligenceStats:
 
 
 @dataclass
+class ReplayResult:
+    trace_id: str
+    mode: str
+    domain: str
+    original_gate: str
+    original_confidence: float
+    current_gate: str
+    current_confidence: float
+    gate_changed: bool
+    change_summary: str
+    current_capability: dict[str, Any]
+    current_memory: dict[str, Any]
+    current_gaps: dict[str, Any]
+    replay_note: str
+
+
+@dataclass
+class HandoffPacket:
+    trace_id: str
+    domain: str
+    created_at: str
+    governance: dict[str, Any]
+    what_the_system_knew: dict[str, Any]
+    what_the_system_didnt_know: dict[str, Any]
+    what_happened: dict[str, Any]
+    suggested_actions: list[dict[str, Any]]
+    next_action: dict[str, Any]
+    trace_url: str
+
+
+@dataclass
+class PromoteResult:
+    id: str
+    kind: str
+    status: str
+    tool_name: Optional[str] = None
+    tool_sequence: Optional[list[str]] = None
+    source_trace_id: str
+
+
+@dataclass
 class IntentMessage:
     role: Literal["user", "assistant", "system"]
     content: str

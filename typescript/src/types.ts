@@ -363,6 +363,44 @@ export interface IntelligenceStats {
   governance_decisions: Record<string, number>;
 }
 
+export interface ReplayResult {
+  trace_id: string;
+  mode: string;
+  domain: string;
+  original_gate: string;
+  original_confidence: number;
+  current_gate: string;
+  current_confidence: number;
+  gate_changed: boolean;
+  change_summary: string;
+  current_capability: Record<string, unknown>;
+  current_memory: Record<string, unknown>;
+  current_gaps: Record<string, unknown>;
+  replay_note: string;
+}
+
+export interface HandoffPacket {
+  trace_id: string;
+  domain: string;
+  created_at: string;
+  governance: Record<string, unknown>;
+  what_the_system_knew: Record<string, unknown>;
+  what_the_system_didnt_know: Record<string, unknown>;
+  what_happened: Record<string, unknown>;
+  suggested_actions: Record<string, unknown>[];
+  next_action: Record<string, unknown>;
+  trace_url: string;
+}
+
+export interface PromoteResult {
+  id: string;
+  kind: string;
+  status: string;
+  tool_name?: string;
+  tool_sequence?: string[];
+  source_trace_id: string;
+}
+
 export interface IntentMessage {
   role: "user" | "assistant" | "system";
   content: string;

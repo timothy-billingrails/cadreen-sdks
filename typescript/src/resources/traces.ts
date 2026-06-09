@@ -3,6 +3,9 @@ import type {
   ListIntelligenceResponse,
   IntelligenceStats,
   TraceExplain,
+  ReplayResult,
+  HandoffPacket,
+  PromoteResult,
 } from "../types";
 import { HttpClient } from "../client";
 
@@ -66,5 +69,22 @@ export class TracesResource {
 
   async stats(): Promise<IntelligenceStats> {
     return this.client.get<IntelligenceStats>("/api/v1/cadreen/intelligence/stats");
+  }
+
+  async replay(id: string, mode?: "current" | "historical"): Promise<ReplayResult> {
+    return this.client.post<ReplayResult>(`/api/v1/cadreen/intelligence/${encodeURIComponent(id)}/replay`, {
+      mode: mode || "current",
+    });
+  }
+
+  async handoff(id: string): Promise<HandoffPacket> {
+    return this.client.get<HandoffPacket>(`/api/v1/cadreen/intelligence/${encodeURIComponent(id)}/handoff`);
+  }
+
+  async promote(id: string, kind: "healing" | "memory" | "procedure", name?: string): Promise<PromoteResult> {
+    return this.client.post<PromoteResult>(`/api/v1/cadreen/intelligence/${encodeURIComponent(id)}/promote`, {
+      kind,
+      name,
+    });
   }
 }
