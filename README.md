@@ -8,6 +8,7 @@ Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs)
 |----------|---------|---------|
 | TypeScript | `@cadreen/sdk` | `npm install @cadreen/sdk` |
 | Python | `cadreen-sdk` | `pip install cadreen-sdk` |
+| Go | `cadreen` | `go get github.com/timothy-billingrails/cadreen-sdks/go@latest` |
 | Scaffold | `create-cadreen-app` | `npx create-cadreen-app my-project` |
 
 ## Quick Start
@@ -60,6 +61,50 @@ async def main():
     print(result.explain())
 
 asyncio.run(main())
+```
+
+### Go
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	cadreen "github.com/timothy-billingrails/cadreen-sdks/go/cadreen"
+)
+
+func main() {
+	c := cadreen.NewClient(cadreen.CadreenConfig{
+		APIKey: os.Getenv("CADREEN_API_KEY"),
+	})
+
+	result, err := c.IntentInvoke(context.Background(), cadreen.IntentRequest{
+		Messages: []cadreen.IntentMessage{
+			{Role: "user", Content: "Handle refund for invoice inv_123"},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	switch result.Type {
+	case cadreen.IntentResultDirect:
+		fmt.Println(result.Message.Content)
+	case cadreen.IntentResultExecution:
+		fmt.Println("Execution started:", result.Execution.ID)
+	case cadreen.IntentResultBlocked:
+		fmt.Printf("Blocked by %s: %s\n", result.PolicyID, result.ReasonCode)
+	case cadreen.IntentResultClarify:
+		for _, q := range result.Questions {
+			fmt.Println(q.Question)
+		}
+	case cadreen.IntentResultConnectRequired:
+		fmt.Println("Connect:", result.Connection.Endpoint)
+	}
+}
 ```
 
 ## Documentation

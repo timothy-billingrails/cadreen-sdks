@@ -4,3 +4,9 @@ dist/
 __pycache__/
 .env
 .DS_Store
+# Go
+go/bin/
+go/pkg/
+*.exe
+*.test
+*.out
