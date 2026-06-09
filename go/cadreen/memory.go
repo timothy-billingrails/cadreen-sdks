@@ -57,3 +57,27 @@ func (c *Client) Search(ctx context.Context, query string, options *SearchMemory
 	}
 	return &result, nil
 }
+
+func (c *Client) GetAtom(ctx context.Context, id string, opts ...RequestOption) (*Atom, error) {
+	var result Atom
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/"+id, nil, &result, opts...); err != nil {
+		return nil, fmt.Errorf("get atom: %w", err)
+	}
+	return &result, nil
+}
+
+func (c *Client) Profile(ctx context.Context, userID string, opts ...RequestOption) (*MemoryProfileResponse, error) {
+	var result MemoryProfileResponse
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/profile/"+userID, nil, &result, opts...); err != nil {
+		return nil, fmt.Errorf("profile: %w", err)
+	}
+	return &result, nil
+}
+
+func (c *Client) MemoryTypes(ctx context.Context, opts ...RequestOption) (*MemoryTypesResponse, error) {
+	var result MemoryTypesResponse
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/types", nil, &result, opts...); err != nil {
+		return nil, fmt.Errorf("memory types: %w", err)
+	}
+	return &result, nil
+}

@@ -150,6 +150,41 @@ type SearchMemoryResponse struct {
 	Count   int    `json:"count"`
 }
 
+type AtomCategory string
+
+const (
+	AtomCategoryReference  AtomCategory = "reference"
+	AtomCategoryPreference AtomCategory = "preference"
+	AtomCategoryEpisode    AtomCategory = "episode"
+	AtomCategoryPrecedent  AtomCategory = "precedent"
+	AtomCategoryNote       AtomCategory = "note"
+	AtomCategoryProject    AtomCategory = "project"
+)
+
+func AllAtomCategories() []AtomCategory {
+	return []AtomCategory{
+		AtomCategoryReference,
+		AtomCategoryPreference,
+		AtomCategoryEpisode,
+		AtomCategoryPrecedent,
+		AtomCategoryNote,
+		AtomCategoryProject,
+	}
+}
+
+type MemoryTypesResponse struct {
+	TypeValues  []string `json:"type_values"`
+	KindValues  []string `json:"kind_values"`
+	Description string   `json:"description"`
+}
+
+type MemoryProfileResponse struct {
+	UserID     string         `json:"user_id"`
+	TotalAtoms int            `json:"total_atoms"`
+	Domains    map[string]int `json:"domains"`
+	Atoms      []Atom         `json:"atoms"`
+}
+
 type Policy struct {
 	ID            string `json:"id"`
 	Name          string `json:"name"`
