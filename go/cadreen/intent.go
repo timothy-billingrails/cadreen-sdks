@@ -160,16 +160,10 @@ func mapIntentResponse(raw unifiedIntentResponse, traceID string) *IntentResult 
 
 	case "connect_required":
 		result.Type = IntentResultConnectRequired
-		result.Connection = &ConnectRequiredDetail{
-			Endpoint: "/api/v1/cadreen/connections",
-			Reason:   "connection required",
-		}
-		if nextAction != nil {
-			if nextAction.Endpoint != "" {
-				result.Connection.Endpoint = nextAction.Endpoint
-			}
-			if nextAction.Label != "" {
-				result.Connection.Reason = nextAction.Label
+		if result.NextAction == nil {
+			result.NextAction = &NextAction{
+				Endpoint: "/api/v1/cadreen/connections",
+				Reason:   "connection required",
 			}
 		}
 

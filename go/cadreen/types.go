@@ -473,11 +473,6 @@ func (q *ClarificationQuestions) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type ConnectRequiredDetail struct {
-	Endpoint string `json:"endpoint"`
-	Reason   string `json:"reason"`
-}
-
 type IntentResult struct {
 	Type           IntentResultType              `json:"type"`
 	Status         string                        `json:"status"`
@@ -489,7 +484,6 @@ type IntentResult struct {
 	Execution      *ResponseExecution            `json:"execution,omitempty"`
 	ReasonCode     string                        `json:"reason_code,omitempty"`
 	PolicyID       string                        `json:"policy_id,omitempty"`
-	Connection     *ConnectRequiredDetail        `json:"connection,omitempty"`
 	Intelligence   *IntelligenceMeta             `json:"intelligence,omitempty"`
 }
 

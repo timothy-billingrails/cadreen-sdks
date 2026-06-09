@@ -37,7 +37,7 @@
 //		case cadreen.IntentResultBlocked:
 //			fmt.Printf("Blocked: %s (policy %s)\n", result.ReasonCode, result.PolicyID)
 //		case cadreen.IntentResultConnectRequired:
-//			fmt.Printf("Connect required: %s\n", result.Connection.Endpoint)
+//			fmt.Printf("Connect required: %s\n", result.NextAction.Endpoint)
 //		}
 //	}
 //
