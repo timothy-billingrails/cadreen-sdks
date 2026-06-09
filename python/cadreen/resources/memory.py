@@ -8,6 +8,7 @@ from ..types import (
     CreateMemoryResponse,
     SearchMemoryRequest,
     SearchMemoryResponse,
+    MemoryTypesResponse,
     Atom,
     AtomContent,
 )
@@ -125,3 +126,11 @@ class MemoryResource:
     async def get(self, id: str) -> Atom:
         raw = await self._client.get(f"/api/v1/cadreen/memory/{id}")
         return _parse_atom(raw)
+
+    async def types(self) -> MemoryTypesResponse:
+        raw = await self._client.get("/api/v1/cadreen/memory/types")
+        return MemoryTypesResponse(
+            type_values=raw.get("type_values", []),
+            kind_values=raw.get("kind_values", []),
+            description=raw.get("description", ""),
+        )

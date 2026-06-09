@@ -5,7 +5,8 @@ export type TransportType = "http" | "sse" | "stdio";
 export type EscalationStatus = "pending" | "resolved" | "rejected";
 export type CredentialType = "api_key" | "bearer" | "basic" | "oauth2" | "session";
 export type AtomScope = "tenant" | "global" | "personal";
-export type AtomType = "policy" | "procedure" | "precedent" | "decision" | "fact" | "metric" | "constraint" | "event" | "observation" | "error" | "mission" | "module" | "answer" | "image" | "video" | "audio" | "visualization" | "code" | "test" | "dataset" | "document" | "research" | "prompt" | "billing_event" | "opinion" | "instruction" | "definition" | "question" | "tool_invocation" | "tool_failure_pattern";
+export type AtomCategory = "reference" | "preference" | "episode" | "precedent" | "note" | "project";
+export type AtomType = AtomCategory | "policy" | "procedure" | "decision" | "fact" | "metric" | "constraint" | "event" | "observation" | "error" | "mission" | "module" | "answer" | "image" | "video" | "audio" | "visualization" | "code" | "test" | "dataset" | "document" | "research" | "prompt" | "billing_event" | "opinion" | "instruction" | "definition" | "question" | "tool_invocation" | "tool_failure_pattern";
 export type ErrorCategory = "auth" | "network" | "resource" | "logic" | "config" | "dependency" | "capability" | "rate_limit" | "timeout" | "validation" | "parsing" | "external" | "unknown";
 export type RecoveryStrategyType = "retry" | "sub_execution" | "human_handoff" | "skip" | "reconfigure" | "regenerate" | "coerce" | "repair" | "re_decide" | "try_alternative" | "none";
 export type StackItemSource = "user_data" | "cadreen" | "connector" | "gap" | "detected" | "built_in";
@@ -87,6 +88,12 @@ export interface CreateMemoryResponse {
 export interface SearchMemoryResponse {
   results: Atom[];
   count: number;
+}
+
+export interface MemoryTypesResponse {
+  type_values: AtomCategory[];
+  kind_values: AtomType[];
+  description: string;
 }
 
 export interface Policy {
@@ -400,8 +407,8 @@ export type IntentResult =
   | { type: "direct"; message: ResponseMessage; intelligence: IntelligenceMeta; traceId: string }
   | { type: "clarify"; questions: ClarificationQuestion[]; conversationId: string; intelligence: IntelligenceMeta; traceId: string }
   | { type: "execution"; execution: ResponseExecution; intelligence: IntelligenceMeta; traceId: string }
-  | { type: "blocked"; policy: { name: string; reason: string }; intelligence: IntelligenceMeta; traceId: string }
-  | { type: "connect_required"; connection: { endpoint: string; reason: string }; intelligence: IntelligenceMeta; traceId: string };
+  | { type: "blocked"; reason_code?: string; policy_id?: string; intelligence: IntelligenceMeta; traceId: string }
+  | { type: "connect_required"; endpoint?: string; reason?: string; intelligence: IntelligenceMeta; traceId: string };
 
 export interface IntentStatus {
   ready: boolean;
@@ -436,14 +443,14 @@ export function intentStatus(result: IntentResult): IntentStatus {
     case "blocked":
       return {
         ready: false,
-        needs: [`resolve policy: ${result.policy.name} — ${result.policy.reason}`],
-        next: "resolve policy block",
+        needs: [`blocked: ${result.reason_code || result.intelligence?.governance?.reason_code || "governance gate"}`],
+        next: result.policy_id ? `policy: ${result.policy_id}` : "resolve policy block",
       };
     case "connect_required":
       return {
         ready: false,
-        needs: [`connect ${result.connection.endpoint}`],
-        next: result.connection.endpoint,
+        needs: [`connect ${result.endpoint || "required tool"}`],
+        next: result.endpoint || "",
       };
   }
 }

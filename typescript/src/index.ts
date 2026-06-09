@@ -112,6 +112,8 @@ export type {
   CredentialType,
   AtomScope,
   AtomType,
+  AtomCategory,
+  MemoryTypesResponse,
   ErrorCategory,
   RecoveryStrategyType,
   StackItemSource,

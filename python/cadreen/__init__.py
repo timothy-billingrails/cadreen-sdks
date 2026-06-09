@@ -9,6 +9,8 @@ from .types import (
     CredentialType,
     AtomScope,
     AtomType,
+    AtomCategory,
+    MemoryTypesResponse,
     ErrorCategory,
     RecoveryStrategyType,
     StackItemSource,

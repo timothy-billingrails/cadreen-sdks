@@ -11,8 +11,10 @@ TransportType = Literal["http", "sse", "stdio"]
 EscalationStatus = Literal["pending", "resolved", "rejected"]
 CredentialType = Literal["api_key", "bearer", "basic", "oauth2", "session"]
 AtomScope = Literal["tenant", "global", "personal"]
+AtomCategory = Literal["reference", "preference", "episode", "precedent", "note", "project"]
 AtomType = Literal[
-    "policy", "procedure", "precedent", "decision", "fact", "metric",
+    "reference", "preference", "episode", "precedent", "note", "project",
+    "policy", "procedure", "decision", "fact", "metric",
     "constraint", "event", "observation", "error", "mission", "module",
     "answer", "image", "video", "audio", "visualization", "code", "test",
     "dataset", "document", "research", "prompt", "billing_event", "opinion",
@@ -120,6 +122,13 @@ class CreateMemoryResponse:
 class SearchMemoryResponse:
     results: list[Atom]
     count: int
+
+
+@dataclass
+class MemoryTypesResponse:
+    type_values: list[str]
+    kind_values: list[str]
+    description: str
 
 
 @dataclass
@@ -710,12 +719,14 @@ class ExecutionResult:
 @dataclass
 class BlockedResult:
     type: Literal["blocked"]
-    policy: object
+    reason_code: Optional[str] = None
+    policy_id: Optional[str] = None
     intelligence: IntelligenceMeta
     trace_id: str
+    status: str = ""
 
     def explain(self) -> str:
-        return f"Blocked by policy: {self.policy['reason']}"
+        return self.status or f"Blocked by policy: {self.reason_code or 'governance gate'}"
 
     @property
     def ready(self) -> bool:
@@ -723,24 +734,25 @@ class BlockedResult:
 
     @property
     def needs(self) -> list[str]:
-        name = self.policy.get("name", "unknown") if isinstance(self.policy, dict) else "unknown"
-        reason = self.policy.get("reason", "") if isinstance(self.policy, dict) else ""
-        return [f"resolve policy: {name} — {reason}"]
+        return [f"blocked: {self.reason_code or 'governance gate'}"]
 
     @property
     def next(self) -> str:
-        return "resolve policy block"
+        return self.policy_id or "resolve policy block"
 
 
 @dataclass
 class ConnectRequiredResult:
     type: Literal["connect_required"]
-    connection: object
+    endpoint: Optional[str] = None
+    reason: Optional[str] = None
     intelligence: IntelligenceMeta
     trace_id: str
+    status: str = ""
+    next_action: Optional[dict] = None
 
     def explain(self) -> str:
-        return f"Connection required: {self.connection['endpoint']}"
+        return self.status or f"Connection required: {self.endpoint}"
 
     @property
     def ready(self) -> bool:
@@ -748,13 +760,11 @@ class ConnectRequiredResult:
 
     @property
     def needs(self) -> list[str]:
-        endpoint = self.connection.get("endpoint", "") if isinstance(self.connection, dict) else ""
-        return [f"connect {endpoint}"] if endpoint else []
+        return [f"connect {self.endpoint}"] if self.endpoint else []
 
     @property
     def next(self) -> str:
-        endpoint = self.connection.get("endpoint", "") if isinstance(self.connection, dict) else ""
-        return endpoint
+        return self.endpoint or ""
 
 
 IntentResult = Union[DirectResult, ClarifyResult, ExecutionResult, BlockedResult, ConnectRequiredResult]

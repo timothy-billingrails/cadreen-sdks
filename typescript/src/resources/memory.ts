@@ -3,6 +3,7 @@ import type {
   CreateMemoryResponse,
   SearchMemoryRequest,
   SearchMemoryResponse,
+  MemoryTypesResponse,
   Atom,
 } from "../types";
 import { HttpClient } from "../client";
@@ -33,5 +34,9 @@ export class MemoryResource {
 
   async get(id: string): Promise<Atom> {
     return this.client.get<Atom>(`/api/v1/cadreen/memory/${encodeURIComponent(id)}`);
+  }
+
+  async types(): Promise<MemoryTypesResponse> {
+    return this.client.get<MemoryTypesResponse>("/api/v1/cadreen/memory/types");
   }
 }
