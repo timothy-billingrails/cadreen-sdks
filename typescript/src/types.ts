@@ -289,6 +289,9 @@ export interface GovernanceTrace {
   active: boolean;
   decision?: string;
   confidence?: number;
+  reason_code?: string;
+  policy_id?: string;
+  next_actions?: NextAction[];
 }
 
 export interface HumilityTrace {
@@ -298,7 +301,6 @@ export interface HumilityTrace {
 
 export interface ProcessTrace {
   started_at: string;
-  steps_taken: number;
   duration_ms: number;
   components?: Record<string, boolean>;
 }

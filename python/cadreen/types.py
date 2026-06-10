@@ -347,6 +347,9 @@ class GovernanceTrace:
     active: bool
     decision: Optional[str] = None
     confidence: Optional[float] = None
+    reason_code: Optional[str] = None
+    policy_id: Optional[str] = None
+    next_actions: Optional[list] = None
 
 
 @dataclass
@@ -358,7 +361,6 @@ class HumilityTrace:
 @dataclass
 class ProcessTrace:
     started_at: str
-    steps_taken: int
     duration_ms: int
     components: Optional[dict[str, bool]] = None
 
@@ -517,9 +519,9 @@ class PromoteResult:
     id: str
     kind: str
     status: str
+    source_trace_id: str
     tool_name: Optional[str] = None
     tool_sequence: Optional[list[str]] = None
-    source_trace_id: str
 
 
 @dataclass
@@ -760,10 +762,10 @@ class ExecutionResult:
 @dataclass
 class BlockedResult:
     type: Literal["blocked"]
-    reason_code: Optional[str] = None
-    policy_id: Optional[str] = None
     intelligence: IntelligenceMeta
     trace_id: str
+    reason_code: Optional[str] = None
+    policy_id: Optional[str] = None
     status: str = ""
 
     def explain(self) -> str:
@@ -785,10 +787,10 @@ class BlockedResult:
 @dataclass
 class ConnectRequiredResult:
     type: Literal["connect_required"]
-    endpoint: Optional[str] = None
-    reason: Optional[str] = None
     intelligence: IntelligenceMeta
     trace_id: str
+    endpoint: Optional[str] = None
+    reason: Optional[str] = None
     status: str = ""
     next_action: Optional[dict] = None
 

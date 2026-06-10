@@ -23,7 +23,7 @@ function mapIntentResponse(raw: {
     memory: { healthy: true },
     governance: { active: false },
     humility: {},
-    process: { started_at: "", steps_taken: 0, duration_ms: 0 },
+    process: { started_at: "", duration_ms: 0 },
     field_stability: { stable: [], evolving: [], internal: [] },
   };
 
@@ -60,22 +60,19 @@ function mapIntentResponse(raw: {
         traceId,
       };
     case "blocked":
+      const gov = raw.meta?.governance || {};
       return {
         type: "blocked",
-        policy: {
-          name: raw.meta?.governance?.decision || "policy",
-          reason: raw.meta?.governance?.reason || "blocked by policy",
-        },
+        reason_code: gov.decision || raw.type,
+        policy_id: gov.reason,
         intelligence,
         traceId,
       };
     case "connect_required":
       return {
         type: "connect_required",
-        connection: {
-          endpoint: raw.mission?.stream_url || "",
-          reason: raw.meta?.governance?.reason || "connection required",
-        },
+        endpoint: raw.mission?.stream_url || "",
+        reason: raw.meta?.governance?.reason || "connection required",
         intelligence,
         traceId,
       };

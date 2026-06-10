@@ -33,7 +33,7 @@ def _default_intelligence() -> IntelligenceMeta:
         memory=MemoryTrace(healthy=True),
         governance=GovernanceTrace(active=False),
         humility=HumilityTrace(),
-        process=ProcessTrace(started_at="", steps_taken=0, duration_ms=0),
+        process=ProcessTrace(started_at="", duration_ms=0),
         field_stability=FieldStability(stable=[], evolving=[], internal=[]),
     )
 
@@ -94,7 +94,8 @@ def _map_intent_response(raw: dict[str, Any]) -> IntentResult:
         gov = raw.get("meta", {}).get("governance", {})
         return BlockedResult(
             type="blocked",
-            policy={"name": gov.get("decision", "policy"), "reason": gov.get("reason", "blocked by policy")},
+            reason_code=gov.get("decision"),
+            policy_id=gov.get("reason"),
             intelligence=intelligence,
             trace_id=trace_id,
         )
@@ -104,7 +105,8 @@ def _map_intent_response(raw: dict[str, Any]) -> IntentResult:
         gov = raw.get("meta", {}).get("governance", {})
         return ConnectRequiredResult(
             type="connect_required",
-            connection={"endpoint": mission.get("stream_url", ""), "reason": gov.get("reason", "connection required")},
+            endpoint=mission.get("stream_url", ""),
+            reason=gov.get("reason", "connection required"),
             intelligence=intelligence,
             trace_id=trace_id,
         )
@@ -139,6 +141,9 @@ def _parse_intelligence(raw: dict[str, Any]) -> IntelligenceMeta:
             active=raw.get("governance", {}).get("active", False),
             decision=raw.get("governance", {}).get("decision"),
             confidence=raw.get("governance", {}).get("confidence"),
+            reason_code=raw.get("governance", {}).get("reason_code"),
+            policy_id=raw.get("governance", {}).get("policy_id"),
+            next_actions=raw.get("governance", {}).get("next_actions"),
         ),
         humility=HumilityTrace(
             gaps_detected=raw.get("humility", {}).get("gaps_detected"),
@@ -146,7 +151,6 @@ def _parse_intelligence(raw: dict[str, Any]) -> IntelligenceMeta:
         ),
         process=ProcessTrace(
             started_at=raw.get("process", {}).get("started_at", ""),
-            steps_taken=raw.get("process", {}).get("steps_taken", 0),
             duration_ms=raw.get("process", {}).get("duration_ms", 0),
             components=raw.get("process", {}).get("components"),
         ),
