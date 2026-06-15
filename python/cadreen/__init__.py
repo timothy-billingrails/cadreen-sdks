@@ -100,6 +100,7 @@ from .types import (
     SetupCredentialResult,
     SetupMemoryResult,
     SetupPolicyResult,
+    SetupProposal,
 )
 
 from .client import HttpClient
@@ -185,6 +186,14 @@ class Cadreen:
 
     async def setup(self, request: SetupRequest) -> SetupResult:
         payload: dict = {}
+        if request.workspace_id:
+            payload["workspace_id"] = request.workspace_id
+        if request.purpose:
+            payload["purpose"] = request.purpose
+        if request.examples:
+            payload["examples"] = request.examples
+        if request.constraints:
+            payload["constraints"] = request.constraints
         if request.connections:
             payload["connections"] = [{"capability": c.capability} for c in request.connections]
         if request.credentials:
@@ -210,4 +219,10 @@ class Cadreen:
         creds = [SetupCredentialResult(provider=c["provider"], name=c.get("name", ""), status=c["status"], id=c.get("id"), error=c.get("error")) for c in resp.get("credentials", [])]
         mems = [SetupMemoryResult(id=m["id"], type=m["type"], classified=m["classified"], status=m["status"], kind=m.get("kind"), error=m.get("error")) for m in resp.get("memory", [])]
         pols = [SetupPolicyResult(name=p["name"], status=p["status"], id=p.get("id"), error=p.get("error")) for p in resp.get("policies", [])]
-        return SetupResult(connections=conns, credentials=creds, memory=mems, policies=pols, applied=resp["applied"], failed=resp["failed"])
+        props = [SetupProposal(type=p["type"], description=p["description"], detail=p["detail"]) for p in resp.get("proposals", [])]
+        return SetupResult(
+            connections=conns, credentials=creds, memory=mems, policies=pols,
+            applied=resp["applied"], failed=resp["failed"],
+            workspace_id=resp.get("workspace_id"),
+            proposals=props or None,
+        )

@@ -548,6 +548,7 @@ type SetupPolicy struct {
 }
 
 type SetupRequest struct {
+	WorkspaceID string            `json:"workspace_id,omitempty"`
 	Purpose     string            `json:"purpose,omitempty"`
 	Examples    []string          `json:"examples,omitempty"`
 	Constraints []string          `json:"constraints,omitempty"`
@@ -596,6 +597,7 @@ type SetupPolicyResult struct {
 }
 
 type SetupResult struct {
+	WorkspaceID string                    `json:"workspace_id,omitempty"`
 	Connections []SetupConnectionResult `json:"connections"`
 	Credentials []SetupCredentialResult `json:"credentials"`
 	Memory      []SetupMemoryResult     `json:"memory"`

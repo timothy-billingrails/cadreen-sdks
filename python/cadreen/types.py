@@ -895,11 +895,23 @@ class SetupPolicy:
 
 
 @dataclass
+class SetupProposal:
+    type: str
+    description: str
+    detail: str
+
+
+@dataclass
 class SetupRequest:
     connections: Optional[list[SetupConnection]] = None
     credentials: Optional[list[SetupCredential]] = None
     memory: Optional[list[SetupMemory]] = None
     policies: Optional[list[SetupPolicy]] = None
+    workspace_id: Optional[str] = None
+    purpose: Optional[str] = None
+    examples: Optional[list[str]] = None
+    constraints: Optional[list[str]] = None
+    confirm: Optional[bool] = None
 
 
 @dataclass
@@ -945,3 +957,5 @@ class SetupResult:
     policies: list[SetupPolicyResult]
     applied: int
     failed: int
+    workspace_id: Optional[str] = None
+    proposals: Optional[list[SetupProposal]] = None

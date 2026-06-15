@@ -642,17 +642,24 @@ export interface ConnectUnknownDetail {
 }
 
 export interface SetupRequest {
+  workspace_id?: string;
+  purpose?: string;
+  examples?: string[];
+  constraints?: string[];
   connections?: Array<{ capability: string }>;
   credentials?: Array<{ provider: string; name?: string; key_data: Record<string, unknown> }>;
   memory?: Array<{ type?: string; content: Record<string, unknown>; domain?: string; tags?: string[]; authority?: number }>;
   policies?: Array<{ name: string; description?: string; rule: string; severity?: string }>;
+  confirm?: boolean;
 }
 
 export interface SetupResult {
+  workspace_id?: string;
   connections: Array<SetupConnectionResult>;
   credentials: Array<SetupCredentialResult>;
   memory: Array<SetupMemoryResult>;
   policies: Array<SetupPolicyResult>;
+  proposals?: Array<SetupProposal>;
   applied: number;
   failed: number;
 }
