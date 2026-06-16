@@ -750,8 +750,6 @@ func (e *APIError) Error() string {
 
 // ---------------------------------------------------------------------------
 // Abstraction rename: Atom → MemoryItem
-// The public API uses "memory item" terminology. Old names kept as aliases
-// for backward compatibility.
 // ---------------------------------------------------------------------------
 
 // MemoryItemContent is the content of a memory item.
@@ -845,8 +843,9 @@ type InstallComposioResponse struct {
 }
 
 type SearchComposioResponse struct {
-	Results []ComposioToolkit `json:"results"`
-	Count   int               `json:"count"`
+	Toolkits []ComposioToolkit `json:"toolkits"`
+	Count    int               `json:"count"`
+	Query    string            `json:"query,omitempty"`
 }
 
 type ComposioToolkit struct {

@@ -982,6 +982,7 @@ class CatalogIntegration:
     auth_type: str
     install_time: str
     capabilities: Optional[list[str]] = None
+    tags: Optional[list[str]] = None
     popularity: int = 0
     featured: bool = False
 
@@ -1023,8 +1024,9 @@ class InstallComposioResponse:
 
 @dataclass
 class SearchComposioResponse:
-    results: list[ComposioToolkit]
+    toolkits: list[ComposioToolkit]
     count: int
+    query: str = ""
 
 
 @dataclass

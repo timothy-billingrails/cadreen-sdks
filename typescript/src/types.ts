@@ -717,6 +717,7 @@ export interface CatalogIntegration {
   name: string;
   description: string;
   capabilities?: string[];
+  tags?: string[];
   provider: string;
   status: string;
   auth_type: string;
@@ -757,8 +758,9 @@ export interface InstallComposioResponse {
 }
 
 export interface SearchComposioResponse {
-  results: ComposioToolkit[];
+  toolkits: ComposioToolkit[];
   count: number;
+  query?: string;
 }
 
 export interface ComposioToolkit {

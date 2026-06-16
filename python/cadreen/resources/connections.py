@@ -25,6 +25,7 @@ from ..types import (
     CatalogCategory,
     CatalogIntegration,
     InstallResponse,
+    ComposioToolkit,
 )
 
 
@@ -230,7 +231,7 @@ class ConnectionsResource:
 
     async def search_composio(self, query: str) -> SearchComposioResponse:
         raw = await self._client.post("/api/v1/cadreen/connections/composio/search", {"query": query})
-        results = [
+        toolkits = [
             ComposioToolkit(
                 slug=t["slug"],
                 name=t["name"],
@@ -239,9 +240,9 @@ class ConnectionsResource:
                 tools=t.get("tools"),
                 is_installed=t.get("is_installed", False),
             )
-            for t in raw.get("results", [])
+            for t in raw.get("toolkits", [])
         ]
-        return SearchComposioResponse(results=results, count=raw.get("count", len(results)))
+        return SearchComposioResponse(toolkits=toolkits, count=raw.get("count", len(toolkits)), query=raw.get("query", ""))
 
     async def composio_status(self, toolkit: str | None = None, user_id: str | None = None) -> ComposioStatusResponse:
         params: dict[str, Any] = {}
