@@ -20,9 +20,8 @@ cadreen = Cadreen(api_key="sk_cadreen_...")
 
 async def main():
     # Intent — the main entry point
-    result = await cadreen.intent(
+    result = await cadreen.ask(
         "Handle a refund request for invoice inv_123",
-        domain="support",
     )
     print(result.explain())
 
@@ -37,9 +36,9 @@ async def main():
             async for event in cadreen.executions.stream(result.execution["id"]):
                 print(event.type, event.data)
         case "blocked":
-            print(result.policy["reason"])
+            print(result.reason_code)
         case "connect_required":
-            print(result.connection["endpoint"])
+            print(result.endpoint)
 
 asyncio.run(main())
 ```
@@ -94,7 +93,7 @@ await cadreen.memory.remember(
 )
 
 # Search
-results = await cadreen.memory.search("data deletion rules")
+results = await cadreen.memory.search(SearchMemoryRequest(query="data deletion rules"))
 
 # Get by ID
 item = await cadreen.memory.get("mem_abc123")
@@ -156,8 +155,7 @@ stats = await cadreen.traces.stats()
 ### v0.3.0
 - Added `catalog()` — browse the unified integration marketplace
 - Added `install(integration_id)` — one-click install with OAuth flow
-- Typed Composio methods (was `dict[str, Any]`)
-- Added `CatalogResponse`, `InstallResponse`, `InstallComposioResponse`, `SearchComposioResponse`, `ComposioStatusResponse` types
+- Added `CatalogResponse`, `InstallResponse` types
 
 ### v0.2.1
 - Initial public release

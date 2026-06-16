@@ -4,10 +4,6 @@ import type {
   RegisterMCPRequest,
   RegisterMCPResponse,
   ListConnectionsResponse,
-  InstallComposioRequest,
-  InstallComposioResponse,
-  SearchComposioResponse,
-  ComposioStatusResponse,
   ConnectResult,
   CatalogResponse,
   InstallResponse,
@@ -39,24 +35,6 @@ export class ConnectionsResource {
 
   async registerMCP(request: RegisterMCPRequest): Promise<RegisterMCPResponse> {
     return this.client.post<RegisterMCPResponse>("/api/v1/cadreen/connections/mcp", request);
-  }
-
-  async installComposio(request: InstallComposioRequest): Promise<InstallComposioResponse> {
-    return this.client.post<InstallComposioResponse>("/api/v1/cadreen/connections/composio/install", {
-      toolkit: request.toolkit,
-      user_id: request.user_id,
-    });
-  }
-
-  async searchComposio(query: string): Promise<SearchComposioResponse> {
-    return this.client.post<SearchComposioResponse>("/api/v1/cadreen/connections/composio/search", { query });
-  }
-
-  async composioStatus(toolkit?: string, userId?: string): Promise<ComposioStatusResponse> {
-    const params: Record<string, string | undefined> = {};
-    if (toolkit) params.toolkit = toolkit;
-    if (userId) params.user_id = userId;
-    return this.client.get<ComposioStatusResponse>("/api/v1/cadreen/connections/composio/status", params);
   }
 
   async list(): Promise<ListConnectionsResponse> {

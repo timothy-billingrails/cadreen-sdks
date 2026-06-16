@@ -9,9 +9,6 @@ from ..types import (
     RegisterMCPRequest,
     RegisterMCPResponse,
     ListConnectionsResponse,
-    InstallComposioResponse,
-    SearchComposioResponse,
-    ComposioStatusResponse,
     ConnectionGroup,
     Pathway,
     Pagination,
@@ -25,7 +22,6 @@ from ..types import (
     CatalogCategory,
     CatalogIntegration,
     InstallResponse,
-    ComposioToolkit,
 )
 
 
@@ -181,11 +177,13 @@ class ConnectionsResource:
                     id=i["id"],
                     name=i["name"],
                     description=i.get("description", ""),
+                    category=i.get("category", ""),
                     provider=i.get("provider", ""),
                     status=i.get("status", ""),
                     auth_type=i.get("auth_type", ""),
                     install_time=i.get("install_time", ""),
                     capabilities=i.get("capabilities"),
+                    tags=i.get("tags"),
                     popularity=i.get("popularity", 0),
                     featured=i.get("featured", False),
                 )
@@ -210,50 +208,4 @@ class ConnectionsResource:
             provider=raw.get("provider", ""),
             auth_url=raw.get("auth_url"),
             estimated_time=raw.get("estimated_time"),
-        )
-
-    # ---------------------------------------------------------------------------
-    # Provider-specific (advanced)
-    # ---------------------------------------------------------------------------
-
-    async def install_composio(self, toolkit: str, *, user_id: str | None = None) -> InstallComposioResponse:
-        body: dict[str, Any] = {"toolkit": toolkit}
-        if user_id is not None:
-            body["user_id"] = user_id
-        raw = await self._client.post("/api/v1/cadreen/connections/composio/install", body)
-        return InstallComposioResponse(
-            toolkit=raw.get("toolkit", toolkit),
-            status=raw.get("status", ""),
-            auth_url=raw.get("auth_url"),
-            session_id=raw.get("session_id"),
-            tools_registered=raw.get("tools_registered"),
-        )
-
-    async def search_composio(self, query: str) -> SearchComposioResponse:
-        raw = await self._client.post("/api/v1/cadreen/connections/composio/search", {"query": query})
-        toolkits = [
-            ComposioToolkit(
-                slug=t["slug"],
-                name=t["name"],
-                description=t.get("description", ""),
-                category=t.get("category"),
-                tools=t.get("tools"),
-                is_installed=t.get("is_installed", False),
-            )
-            for t in raw.get("toolkits", [])
-        ]
-        return SearchComposioResponse(toolkits=toolkits, count=raw.get("count", len(toolkits)), query=raw.get("query", ""))
-
-    async def composio_status(self, toolkit: str | None = None, user_id: str | None = None) -> ComposioStatusResponse:
-        params: dict[str, Any] = {}
-        if toolkit is not None:
-            params["toolkit"] = toolkit
-        if user_id is not None:
-            params["user_id"] = user_id
-        raw = await self._client.get("/api/v1/cadreen/connections/composio/status", params)
-        return ComposioStatusResponse(
-            toolkit=raw.get("toolkit", ""),
-            status=raw.get("status", ""),
-            tools_registered=raw.get("tools_registered"),
-            credential_id=raw.get("credential_id"),
         )

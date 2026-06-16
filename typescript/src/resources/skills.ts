@@ -9,8 +9,6 @@ import type {
   RegisterOpenAPIResponse,
   RegisterMCPRequest,
   RegisterMCPResponse,
-  InstallComposioRequest,
-  InstallComposioResponse,
 } from "../types";
 import { IntentResource } from "./intent";
 import { MemoryResource } from "./memory";
@@ -60,7 +58,7 @@ export class SkillsResource {
     });
   }
 
-  /** Store a memory atom. */
+  /** Store a memory item. */
   async remember(request: RememberRequest): Promise<CreateMemoryResponse> {
     return this.memory.remember(request);
   }
@@ -78,10 +76,5 @@ export class SkillsResource {
   /** Register an MCP connector. */
   async connectMCP(request: RegisterMCPRequest): Promise<RegisterMCPResponse> {
     return this.connections.registerMCP(request);
-  }
-
-  /** Install a Composio integration. */
-  async connectComposio(request: InstallComposioRequest): Promise<InstallComposioResponse> {
-    return this.connections.installComposio(request);
   }
 }

@@ -76,7 +76,6 @@ from .types import (
     RegisterOpenAPIResponse,
     RegisterMCPRequest,
     RegisterMCPResponse,
-    InstallComposioRequest,
     SearchMemoryRequest,
     RememberRequest,
     CreatePolicyRequest,
@@ -214,7 +213,7 @@ class Cadreen:
             payload["memory"] = mem_items
         if request.policies:
             payload["policies"] = [{"name": p.name, "rule": p.rule, "description": p.description, "severity": p.severity} for p in request.policies]
-        resp = await self._client.post("/api/v1/cadreen/setup", json=payload)
+        resp = await self._client.post("/api/v1/cadreen/setup", payload)
         conns = [SetupConnectionResult(capability=c["capability"], status=c["status"], detail=c.get("detail"), error=c.get("error")) for c in resp.get("connections", [])]
         creds = [SetupCredentialResult(provider=c["provider"], name=c.get("name", ""), status=c["status"], id=c.get("id"), error=c.get("error")) for c in resp.get("credentials", [])]
         mems = [SetupMemoryResult(id=m["id"], type=m["type"], classified=m["classified"], status=m["status"], kind=m.get("kind"), error=m.get("error")) for m in resp.get("memory", [])]

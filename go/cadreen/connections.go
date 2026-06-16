@@ -39,7 +39,7 @@ func (c *Client) Catalog(ctx context.Context, opts ...RequestOption) (*CatalogRe
 }
 
 // Install starts a one-click install flow for an integration from the catalog.
-// Returns an OAuth URL for Composio/Nango integrations.
+// Returns an OAuth URL for marketplace integrations.
 func (c *Client) Install(ctx context.Context, integrationID string, opts ...RequestOption) (*InstallResponse, error) {
 	var result InstallResponse
 	body := map[string]string{"integration_id": integrationID}
@@ -54,38 +54,6 @@ func (c *Client) RegisterMCP(ctx context.Context, req RegisterMCPRequest, opts .
 	var result RegisterMCPResponse
 	if err := c.do(ctx, "POST", "/api/v1/cadreen/connections/mcp", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("register mcp: %w", err)
-	}
-	return &result, nil
-}
-
-// InstallComposio installs a Composio toolkit (provider-specific, advanced).
-func (c *Client) InstallComposio(ctx context.Context, req InstallComposioRequest, opts ...RequestOption) (*InstallComposioResponse, error) {
-	var result InstallComposioResponse
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/connections/composio/install", req, &result, opts...); err != nil {
-		return nil, fmt.Errorf("install composio: %w", err)
-	}
-	return &result, nil
-}
-
-// SearchComposio searches the Composio toolkit catalog (provider-specific, advanced).
-func (c *Client) SearchComposio(ctx context.Context, query string, opts ...RequestOption) (*SearchComposioResponse, error) {
-	var result SearchComposioResponse
-	body := map[string]string{"query": query}
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/connections/composio/search", body, &result, opts...); err != nil {
-		return nil, fmt.Errorf("search composio: %w", err)
-	}
-	return &result, nil
-}
-
-// ComposioStatus checks the connection status of a Composio toolkit.
-func (c *Client) ComposioStatus(ctx context.Context, toolkit string, opts ...RequestOption) (*ComposioStatusResponse, error) {
-	var result ComposioStatusResponse
-	path := "/api/v1/cadreen/connections/composio/status"
-	if toolkit != "" {
-		path += "?toolkit=" + toolkit
-	}
-	if err := c.do(ctx, "GET", path, nil, &result, opts...); err != nil {
-		return nil, fmt.Errorf("composio status: %w", err)
 	}
 	return &result, nil
 }

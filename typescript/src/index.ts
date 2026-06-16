@@ -169,7 +169,6 @@ export type {
   RegisterOpenAPIResponse,
   RegisterMCPRequest,
   RegisterMCPResponse,
-  InstallComposioRequest,
   SearchMemoryRequest,
   RememberRequest,
   CreatePolicyRequest,

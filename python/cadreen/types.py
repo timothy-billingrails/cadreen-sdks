@@ -623,12 +623,6 @@ class RegisterMCPResponse:
 
 
 @dataclass
-class InstallComposioRequest:
-    toolkit: str
-    user_id: Optional[str] = None
-
-
-@dataclass
 class SearchMemoryRequest:
     query: str
     domain: Optional[str] = None
@@ -977,6 +971,7 @@ class CatalogIntegration:
     id: str
     name: str
     description: str
+    category: str
     provider: str
     status: str
     auth_type: str
@@ -1007,41 +1002,3 @@ class InstallResponse:
     provider: str
     auth_url: Optional[str] = None
     estimated_time: Optional[str] = None
-
-
-# ---------------------------------------------------------------------------
-# Composio types (previously untyped)
-# ---------------------------------------------------------------------------
-
-@dataclass
-class InstallComposioResponse:
-    toolkit: str
-    status: str
-    auth_url: Optional[str] = None
-    session_id: Optional[str] = None
-    tools_registered: Optional[int] = None
-
-
-@dataclass
-class SearchComposioResponse:
-    toolkits: list[ComposioToolkit]
-    count: int
-    query: str = ""
-
-
-@dataclass
-class ComposioToolkit:
-    slug: str
-    name: str
-    description: str
-    category: Optional[str] = None
-    tools: Optional[list[str]] = None
-    is_installed: bool = False
-
-
-@dataclass
-class ComposioStatusResponse:
-    toolkit: str
-    status: str
-    tools_registered: Optional[int] = None
-    credential_id: Optional[str] = None

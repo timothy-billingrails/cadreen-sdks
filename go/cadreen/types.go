@@ -777,7 +777,9 @@ type CatalogIntegration struct {
 	ID           string   `json:"id"`
 	Name         string   `json:"name"`
 	Description  string   `json:"description"`
+	Category     string   `json:"category"`
 	Capabilities []string `json:"capabilities,omitempty"`
+	Tags         []string `json:"tags,omitempty"`
 	Provider     string   `json:"provider"`
 	Status       string   `json:"status"`
 	AuthType     string   `json:"auth_type"`
@@ -823,45 +825,6 @@ type RegisterMCPResponse struct {
 	Status    string `json:"status"`
 	Transport string `json:"transport,omitempty"`
 	URL       string `json:"url,omitempty"`
-}
-
-// ---------------------------------------------------------------------------
-// Composio types
-// ---------------------------------------------------------------------------
-
-type InstallComposioRequest struct {
-	Toolkit string `json:"toolkit"`
-	UserID  string `json:"user_id,omitempty"`
-}
-
-type InstallComposioResponse struct {
-	Toolkit        string `json:"toolkit"`
-	Status         string `json:"status"`
-	AuthURL        string `json:"auth_url,omitempty"`
-	SessionID      string `json:"session_id,omitempty"`
-	ToolsRegistered int   `json:"tools_registered,omitempty"`
-}
-
-type SearchComposioResponse struct {
-	Toolkits []ComposioToolkit `json:"toolkits"`
-	Count    int               `json:"count"`
-	Query    string            `json:"query,omitempty"`
-}
-
-type ComposioToolkit struct {
-	Slug        string   `json:"slug"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Category    string   `json:"category,omitempty"`
-	Tools       []string `json:"tools,omitempty"`
-	IsInstalled bool     `json:"is_installed,omitempty"`
-}
-
-type ComposioStatusResponse struct {
-	Toolkit         string `json:"toolkit"`
-	Status          string `json:"status"`
-	ToolsRegistered int    `json:"tools_registered,omitempty"`
-	CredentialID    string `json:"credential_id,omitempty"`
 }
 
 // ---------------------------------------------------------------------------

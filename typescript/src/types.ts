@@ -529,11 +529,6 @@ export interface RegisterMCPResponse {
   status: string;
 }
 
-export interface InstallComposioRequest {
-  toolkit: string;
-  user_id?: string;
-}
-
 export interface SearchMemoryRequest {
   query: string;
   domain?: string;
@@ -716,6 +711,7 @@ export interface CatalogIntegration {
   id: string;
   name: string;
   description: string;
+  category: string;
   capabilities?: string[];
   tags?: string[];
   provider: string;
@@ -743,38 +739,4 @@ export interface InstallResponse {
   auth_url?: string;
   provider: string;
   estimated_time?: string;
-}
-
-// ---------------------------------------------------------------------------
-// Composio types (previously untyped)
-// ---------------------------------------------------------------------------
-
-export interface InstallComposioResponse {
-  toolkit: string;
-  status: string;
-  auth_url?: string;
-  session_id?: string;
-  tools_registered?: number;
-}
-
-export interface SearchComposioResponse {
-  toolkits: ComposioToolkit[];
-  count: number;
-  query?: string;
-}
-
-export interface ComposioToolkit {
-  slug: string;
-  name: string;
-  description: string;
-  category?: string;
-  tools?: string[];
-  is_installed?: boolean;
-}
-
-export interface ComposioStatusResponse {
-  toolkit: string;
-  status: string;
-  tools_registered?: number;
-  credential_id?: string;
 }

@@ -35,10 +35,10 @@ switch (result.type) {
     }
     break;
   case "blocked":
-    console.log(result.policy.reason);
+    console.log(result.reason_code);
     break;
   case "connect_required":
-    console.log(result.connection.endpoint);
+    console.log(result.endpoint);
     break;
 }
 ```
@@ -72,7 +72,7 @@ const audit = new Cadreen({ apiKey: "...", profile: "audit" });
 
 ## Marketplace
 
-Browse and install integrations without knowing which provider (Composio, Nango, MCP, OpenAPI) powers them:
+Browse and install integrations without knowing which provider powers them:
 
 ```ts
 // Browse available integrations
@@ -187,7 +187,7 @@ try {
 | `cadreen.intent` | `invoke(request)` |
 | `cadreen.memory` | `remember(request)`, `search(request)`, `get(id)` |
 | `cadreen.policies` | `create(request)`, `evaluate(request)`, `confirm(id)`, `list()`, `get(id)`, `requireApproval(desc)` |
-| `cadreen.connections` | `catalog()`, `install(id)`, `registerOpenAPI(request)`, `registerMCP(request)`, `installComposio(request)`, `searchComposio(query)`, `composioStatus(...)`, `list()`, `delete(id)` |
+| `cadreen.connections` | `catalog()`, `install(id)`, `registerOpenAPI(request)`, `registerMCP(request)`, `list()`, `delete(id)` |
 | `cadreen.traces` | `get(id)`, `list(options?)`, `stats()` |
 | `cadreen.executions` | `stream(id)`, `getStatus(id)` |
 
@@ -200,8 +200,7 @@ try {
 ### v0.3.0
 - Added `catalog()` — browse the unified integration marketplace
 - Added `install(integrationId)` — one-click install with OAuth flow
-- Typed Composio methods (was `Record<string, unknown>`)
-- Added `CatalogResponse`, `InstallResponse`, `InstallComposioResponse`, `SearchComposioResponse`, `ComposioStatusResponse` types
+- Added `CatalogResponse`, `InstallResponse` types
 
 ### v0.2.0
 - Initial public release
