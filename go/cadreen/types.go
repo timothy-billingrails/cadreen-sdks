@@ -747,3 +747,130 @@ type APIError struct {
 func (e *APIError) Error() string {
 	return e.Message
 }
+
+// ---------------------------------------------------------------------------
+// Abstraction rename: Atom → MemoryItem
+// The public API uses "memory item" terminology. Old names kept as aliases
+// for backward compatibility.
+// ---------------------------------------------------------------------------
+
+// MemoryItemContent is the content of a memory item.
+type MemoryItemContent = AtomContent
+
+// MemoryType is a user-writable memory type category.
+type MemoryType = AtomCategory
+
+const (
+	MemoryTypeReference  = AtomCategoryReference
+	MemoryTypePreference = AtomCategoryPreference
+	MemoryTypeEpisode    = AtomCategoryEpisode
+	MemoryTypePrecedent  = AtomCategoryPrecedent
+	MemoryTypeNote       = AtomCategoryNote
+	MemoryTypeProject    = AtomCategoryProject
+)
+
+func AllMemoryTypes() []AtomCategory { return AllAtomCategories() }
+
+// ---------------------------------------------------------------------------
+// Marketplace catalog types
+// ---------------------------------------------------------------------------
+
+type CatalogIntegration struct {
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	Description  string   `json:"description"`
+	Capabilities []string `json:"capabilities,omitempty"`
+	Provider     string   `json:"provider"`
+	Status       string   `json:"status"`
+	AuthType     string   `json:"auth_type"`
+	InstallTime  string   `json:"install_time"`
+	Popularity   int      `json:"popularity,omitempty"`
+	Featured     bool     `json:"featured,omitempty"`
+}
+
+type CatalogCategory struct {
+	Name         string              `json:"name"`
+	Description  string              `json:"description"`
+	Integrations []CatalogIntegration `json:"integrations"`
+}
+
+type CatalogResponse struct {
+	Categories     []CatalogCategory `json:"categories"`
+	Installed      []string          `json:"installed"`
+	TotalAvailable int               `json:"total_available"`
+}
+
+type InstallResponse struct {
+	Status        string `json:"status"`
+	AuthURL       string `json:"auth_url,omitempty"`
+	Provider      string `json:"provider"`
+	EstimatedTime string `json:"estimated_time,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// MCP registration types
+// ---------------------------------------------------------------------------
+
+type RegisterMCPRequest struct {
+	Name      string            `json:"name"`
+	URL       string            `json:"url"`
+	Transport string            `json:"transport,omitempty"`
+	Headers   map[string]string `json:"headers,omitempty"`
+}
+
+type RegisterMCPResponse struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Status    string `json:"status"`
+	Transport string `json:"transport,omitempty"`
+	URL       string `json:"url,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// Composio types
+// ---------------------------------------------------------------------------
+
+type InstallComposioRequest struct {
+	Toolkit string `json:"toolkit"`
+	UserID  string `json:"user_id,omitempty"`
+}
+
+type InstallComposioResponse struct {
+	Toolkit        string `json:"toolkit"`
+	Status         string `json:"status"`
+	AuthURL        string `json:"auth_url,omitempty"`
+	SessionID      string `json:"session_id,omitempty"`
+	ToolsRegistered int   `json:"tools_registered,omitempty"`
+}
+
+type SearchComposioResponse struct {
+	Results []ComposioToolkit `json:"results"`
+	Count   int               `json:"count"`
+}
+
+type ComposioToolkit struct {
+	Slug        string   `json:"slug"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Category    string   `json:"category,omitempty"`
+	Tools       []string `json:"tools,omitempty"`
+	IsInstalled bool     `json:"is_installed,omitempty"`
+}
+
+type ComposioStatusResponse struct {
+	Toolkit         string `json:"toolkit"`
+	Status          string `json:"status"`
+	ToolsRegistered int    `json:"tools_registered,omitempty"`
+	CredentialID    string `json:"credential_id,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// Connect result (discriminated union)
+// ---------------------------------------------------------------------------
+
+type ConnectResult struct {
+	Type       string         `json:"type"`
+	Capability string         `json:"capability,omitempty"`
+	Detail     map[string]any `json:"detail,omitempty"`
+}

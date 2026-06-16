@@ -10,6 +10,7 @@ import type {
   RegisterMCPRequest,
   RegisterMCPResponse,
   InstallComposioRequest,
+  InstallComposioResponse,
 } from "../types";
 import { IntentResource } from "./intent";
 import { MemoryResource } from "./memory";
@@ -80,7 +81,7 @@ export class SkillsResource {
   }
 
   /** Install a Composio integration. */
-  async connectComposio(request: InstallComposioRequest): Promise<Record<string, unknown>> {
+  async connectComposio(request: InstallComposioRequest): Promise<InstallComposioResponse> {
     return this.connections.installComposio(request);
   }
 }

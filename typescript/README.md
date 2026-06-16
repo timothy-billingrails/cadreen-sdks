@@ -1,6 +1,8 @@
 # @cadreen/sdk
 
-TypeScript SDK for Cadreen — Intelligence as a Service.
+TypeScript SDK for [Cadreen](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
+
+Cadreen is a cognitive operating system. Send messages describing what you want done, and Cadreen reasons, connects tools, recalls knowledge, governs actions, and escalates to humans when needed. The SDK handles authentication, retries, idempotency, streaming, and error classification.
 
 ## Install
 
@@ -39,37 +41,17 @@ switch (result.type) {
     console.log(result.connection.endpoint);
     break;
 }
-
-// Memory — remember things
-await cadreen.memory.remember({
-  type: "reference",
-  content: { text: "GDPR Article 17...", title: "GDPR Art. 17" },
-  authority: 10,
-});
-
-// Policies — require approval
-await cadreen.policies.requireApproval("Refunds over $500 require human approval");
-
-// Traces — inspect what happened
-const trace = await cadreen.traces.get(result.traceId);
-console.log(trace.explain());
-
-// Connections — connect tools
-await cadreen.connections.registerOpenAPI({
-  name: "internal-erp",
-  specUrl: "https://erp.example.com/openapi.json",
-});
 ```
 
 ## Configuration
 
 ```ts
 const cadreen = new Cadreen({
-  apiKey: "cadreen_...",                    // required
-  baseUrl: "https://accomplishanything.today", // optional, default shown
-  maxRetries: 2,                             // optional, default 2
-  timeout: 30000,                            // optional, default 30s
-  profile: "lean",                           // optional: "lean" | "audit" | "full" (default "full")
+  apiKey: "sk_cadreen_...",                       // required
+  baseUrl: "https://accomplishanything.today",    // optional, default shown
+  maxRetries: 2,                                  // optional, default 2
+  timeout: 30000,                                 // optional, default 30s
+  profile: "lean",                                // optional: "lean" | "audit" | "full" (default "full")
 });
 ```
 
@@ -84,11 +66,102 @@ Control how much intelligence metadata you get back:
 | `"lean"` | No envelope. `trace_id` in body + `X-Cadreen-Trace-ID` header | Hot-looping, minimal payload |
 
 ```ts
-// Lean: skip the envelope entirely
 const lean = new Cadreen({ apiKey: "...", profile: "lean" });
-
-// Audit: just the action-bearing fields
 const audit = new Cadreen({ apiKey: "...", profile: "audit" });
+```
+
+## Marketplace
+
+Browse and install integrations without knowing which provider (Composio, Nango, MCP, OpenAPI) powers them:
+
+```ts
+// Browse available integrations
+const catalog = await cadreen.connections.catalog();
+for (const category of catalog.categories) {
+  console.log(`${category.name}: ${category.integrations.length} integrations`);
+}
+
+// One-click install (returns OAuth URL)
+const install = await cadreen.connections.install("slack");
+if (install.status === "pending_auth") {
+  console.log(`Authenticate at: ${install.auth_url}`);
+}
+
+// Check what's installed
+console.log(catalog.installed); // ["stripe", "github"]
+```
+
+## Memory
+
+Store and retrieve knowledge:
+
+```ts
+// Remember something
+await cadreen.memory.remember({
+  type: "reference",
+  content: { text: "GDPR Article 17: Right to erasure", title: "GDPR Art. 17" },
+  authority: 10,
+});
+
+// Search knowledge
+const results = await cadreen.memory.search({ query: "data deletion rules" });
+
+// Get by ID
+const item = await cadreen.memory.get("mem_abc123");
+```
+
+## Policies
+
+Set governance guardrails:
+
+```ts
+// Create a policy
+await cadreen.policies.create({
+  name: "refund_threshold",
+  rules: [{ condition: "refund_amount > 500", action: "require_approval" }],
+});
+
+// Evaluate an action against policies
+const evaluation = await cadreen.policies.evaluate({
+  action: "Process $750 refund for order 456",
+});
+```
+
+## Connections
+
+Register external tools:
+
+```ts
+// Register from OpenAPI spec
+await cadreen.connections.registerOpenAPI({
+  name: "internal-erp",
+  specUrl: "https://erp.example.com/openapi.json",
+});
+
+// Register MCP server
+await cadreen.connections.registerMCP({
+  name: "my-mcp-server",
+  url: "https://mcp.example.com/sse",
+  transport: "sse",
+});
+
+// List installed connections
+const connections = await cadreen.connections.list();
+```
+
+## Traces
+
+Inspect what happened:
+
+```ts
+const trace = await cadreen.traces.get(result.traceId);
+console.log(trace.explain()); // human-readable summary
+
+// List recent traces
+const recent = await cadreen.traces.list({ limit: 10 });
+
+// Aggregated stats
+const stats = await cadreen.traces.stats();
 ```
 
 ## Error Handling
@@ -114,13 +187,24 @@ try {
 | `cadreen.intent` | `invoke(request)` |
 | `cadreen.memory` | `remember(request)`, `search(request)`, `get(id)` |
 | `cadreen.policies` | `create(request)`, `evaluate(request)`, `confirm(id)`, `list()`, `get(id)`, `requireApproval(desc)` |
-| `cadreen.connections` | `registerOpenAPI(request)`, `registerMCP(request)`, `installComposio(request)`, `searchComposio(query)`, `composioStatus(...)`, `list()`, `delete(id)` |
+| `cadreen.connections` | `catalog()`, `install(id)`, `registerOpenAPI(request)`, `registerMCP(request)`, `installComposio(request)`, `searchComposio(query)`, `composioStatus(...)`, `list()`, `delete(id)` |
 | `cadreen.traces` | `get(id)`, `list(options?)`, `stats()` |
 | `cadreen.executions` | `stream(id)`, `getStatus(id)` |
 
 ## Shorthand
 
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
+
+## Changelog
+
+### v0.3.0
+- Added `catalog()` — browse the unified integration marketplace
+- Added `install(integrationId)` — one-click install with OAuth flow
+- Typed Composio methods (was `Record<string, unknown>`)
+- Added `CatalogResponse`, `InstallResponse`, `InstallComposioResponse`, `SearchComposioResponse`, `ComposioStatusResponse` types
+
+### v0.2.0
+- Initial public release
 
 ## License
 

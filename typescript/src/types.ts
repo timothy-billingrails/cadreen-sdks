@@ -653,6 +653,12 @@ export interface SetupRequest {
   confirm?: boolean;
 }
 
+export interface SetupProposal {
+  type: string;
+  description: string;
+  detail: string;
+}
+
 export interface SetupResult {
   workspace_id?: string;
   connections: Array<SetupConnectionResult>;
@@ -693,4 +699,80 @@ export interface SetupPolicyResult {
   id?: string;
   status: "created" | "failed";
   error?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Abstraction aliases: Atom → MemoryItem
+// ---------------------------------------------------------------------------
+
+/** @deprecated Use AtomCategory instead */
+export type MemoryType = AtomCategory;
+
+// ---------------------------------------------------------------------------
+// Marketplace catalog types
+// ---------------------------------------------------------------------------
+
+export interface CatalogIntegration {
+  id: string;
+  name: string;
+  description: string;
+  capabilities?: string[];
+  provider: string;
+  status: string;
+  auth_type: string;
+  install_time: string;
+  popularity?: number;
+  featured?: boolean;
+}
+
+export interface CatalogCategory {
+  name: string;
+  description: string;
+  integrations: CatalogIntegration[];
+}
+
+export interface CatalogResponse {
+  categories: CatalogCategory[];
+  installed: string[];
+  total_available: number;
+}
+
+export interface InstallResponse {
+  status: string;
+  auth_url?: string;
+  provider: string;
+  estimated_time?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Composio types (previously untyped)
+// ---------------------------------------------------------------------------
+
+export interface InstallComposioResponse {
+  toolkit: string;
+  status: string;
+  auth_url?: string;
+  session_id?: string;
+  tools_registered?: number;
+}
+
+export interface SearchComposioResponse {
+  results: ComposioToolkit[];
+  count: number;
+}
+
+export interface ComposioToolkit {
+  slug: string;
+  name: string;
+  description: string;
+  category?: string;
+  tools?: string[];
+  is_installed?: boolean;
+}
+
+export interface ComposioStatusResponse {
+  toolkit: string;
+  status: string;
+  tools_registered?: number;
+  credential_id?: string;
 }

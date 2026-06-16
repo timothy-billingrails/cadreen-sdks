@@ -959,3 +959,87 @@ class SetupResult:
     failed: int
     workspace_id: Optional[str] = None
     proposals: Optional[list[SetupProposal]] = None
+
+
+# ---------------------------------------------------------------------------
+# Abstraction aliases: Atom → MemoryItem
+# ---------------------------------------------------------------------------
+
+MemoryType = AtomCategory
+
+
+# ---------------------------------------------------------------------------
+# Marketplace catalog types
+# ---------------------------------------------------------------------------
+
+@dataclass
+class CatalogIntegration:
+    id: str
+    name: str
+    description: str
+    provider: str
+    status: str
+    auth_type: str
+    install_time: str
+    capabilities: Optional[list[str]] = None
+    popularity: int = 0
+    featured: bool = False
+
+
+@dataclass
+class CatalogCategory:
+    name: str
+    description: str
+    integrations: list[CatalogIntegration]
+
+
+@dataclass
+class CatalogResponse:
+    categories: list[CatalogCategory]
+    installed: list[str]
+    total_available: int
+
+
+@dataclass
+class InstallResponse:
+    status: str
+    provider: str
+    auth_url: Optional[str] = None
+    estimated_time: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Composio types (previously untyped)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class InstallComposioResponse:
+    toolkit: str
+    status: str
+    auth_url: Optional[str] = None
+    session_id: Optional[str] = None
+    tools_registered: Optional[int] = None
+
+
+@dataclass
+class SearchComposioResponse:
+    results: list[ComposioToolkit]
+    count: int
+
+
+@dataclass
+class ComposioToolkit:
+    slug: str
+    name: str
+    description: str
+    category: Optional[str] = None
+    tools: Optional[list[str]] = None
+    is_installed: bool = False
+
+
+@dataclass
+class ComposioStatusResponse:
+    toolkit: str
+    status: str
+    tools_registered: Optional[int] = None
+    credential_id: Optional[str] = None

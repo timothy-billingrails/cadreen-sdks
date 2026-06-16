@@ -4,23 +4,13 @@ Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs)
 
 ## Packages
 
-| Language | Package | Install |
-|----------|---------|---------|
-| TypeScript | `@cadreen/sdk` | `npm install @cadreen/sdk` |
-| Python | `cadreen-sdk` | `pip install cadreen-sdk` |
-| Go | `cadreen` | `go get github.com/timothy-billingrails/cadreen-sdks/go@latest` |
-| Scaffold | `create-cadreen-app` | `npx create-cadreen-app my-project` |
+| Language | Package | Version | Install |
+|----------|---------|---------|---------|
+| TypeScript | `@cadreen/sdk` | 0.3.0 | `npm install @cadreen/sdk` |
+| Python | `cadreen-sdk` | 0.3.0 | `pip install cadreen-sdk` |
+| Go | `cadreen` | 0.3.0 | `go get github.com/timothy-billingrails/cadreen-sdks/go/cadreen@latest` |
 
 ## Quick Start
-
-### One command
-
-```bash
-npx create-cadreen-app my-project
-cd my-project
-# Set CADREEN_API_KEY in .env
-npm run dev
-```
 
 ### TypeScript
 
@@ -107,10 +97,33 @@ func main() {
 }
 ```
 
+## Marketplace
+
+All three SDKs support the unified integration marketplace:
+
+```ts
+// TypeScript
+const catalog = await cadreen.connections.catalog();
+const install = await cadreen.connections.install("slack");
+```
+
+```python
+# Python
+catalog = await cadreen.connections.catalog()
+install = await cadreen.connections.install("slack")
+```
+
+```go
+// Go
+catalog, _ := c.Catalog(ctx)
+install, _ := c.Install(ctx, "slack")
+```
+
 ## Documentation
 
 - [API Docs](https://accomplishanything.today/infra/docs)
 - [OpenAPI Spec](https://accomplishanything.today/api/v1/cadreen/docs/openapi.json)
+- [Cadreen API Reference](https://accomplishanything.today/cadreen-api.md)
 
 ## License
 
