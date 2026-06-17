@@ -39,6 +39,53 @@ export class CadreenError extends Error {
   }
 }
 
+export class CadreenBlockedError extends CadreenError {
+  public readonly reason_code?: string;
+  public readonly policy_id?: string;
+  public readonly traceId: string;
+  public readonly intelligence: unknown;
+
+  constructor(params: {
+    reason_code?: string;
+    policy_id?: string;
+    intelligence: unknown;
+    traceId: string;
+  }) {
+    super(
+      403,
+      params.reason_code || "blocked_by_policy",
+      "blocked",
+      `Action blocked by governance policy${params.policy_id ? `: ${params.policy_id}` : ""}`
+    );
+    this.name = "CadreenBlockedError";
+    this.reason_code = params.reason_code;
+    this.policy_id = params.policy_id;
+    this.intelligence = params.intelligence;
+    this.traceId = params.traceId;
+  }
+}
+
+export class CadreenClarifyError extends CadreenError {
+  public readonly questions: Array<{ id: string; question: string; type: string; required: boolean }>;
+  public readonly conversationId: string;
+  public readonly traceId: string;
+  public readonly intelligence: unknown;
+
+  constructor(params: {
+    questions: Array<{ id: string; question: string; type: string; required: boolean }>;
+    conversationId: string;
+    intelligence: unknown;
+    traceId: string;
+  }) {
+    super(422, "needs_input", "clarify", "System needs clarification before proceeding");
+    this.name = "CadreenClarifyError";
+    this.questions = params.questions;
+    this.conversationId = params.conversationId;
+    this.intelligence = params.intelligence;
+    this.traceId = params.traceId;
+  }
+}
+
 const DEFAULT_BASE_URL = "https://accomplishanything.today";
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_TIMEOUT = 30000;

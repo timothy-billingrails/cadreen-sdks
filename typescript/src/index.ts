@@ -8,6 +8,7 @@ import { ExecutionsResource } from "./resources/executions";
 import { GuardrailsResource } from "./resources/guardrails";
 import { SkillsResource } from "./resources/skills";
 import { FailuresResource } from "./resources/failures";
+import { WebhooksResource } from "./resources/webhooks";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -22,7 +23,7 @@ import type {
   SetupResult,
 } from "./types";
 
-export { CadreenError } from "./client";
+export { CadreenError, CadreenBlockedError, CadreenClarifyError } from "./client";
 export { requiresHuman, handoffReason, explainTrace, redactTrace, redactMessages, redactResult } from "./intelligence_helpers";
 export { intentStatus } from "./types";
 export type { RedactOptions } from "./intelligence_helpers";
@@ -39,6 +40,7 @@ export class Cadreen {
   public readonly guardrails: GuardrailsResource;
   public readonly skills: SkillsResource;
   public readonly failures: FailuresResource;
+  public readonly webhooks: WebhooksResource;
 
   private readonly client: HttpClient;
 
@@ -53,6 +55,7 @@ export class Cadreen {
     this.guardrails = new GuardrailsResource(this.policies);
     this.skills = new SkillsResource(this.intent, this.memory, this.connections);
     this.failures = new FailuresResource(this.traces);
+    this.webhooks = new WebhooksResource();
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -205,3 +208,4 @@ export type {
 } from "./types";
 
 export { GuardrailsResource } from "./resources/guardrails";
+export { WebhooksResource } from "./resources/webhooks";

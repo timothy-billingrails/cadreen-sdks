@@ -5,7 +5,7 @@ import type {
   IntelligenceMeta,
   ClarificationQuestion,
 } from "../types";
-import { HttpClient } from "../client";
+import { HttpClient, CadreenBlockedError, CadreenClarifyError } from "../client";
 
 function mapIntentResponse(raw: {
   id: string;
@@ -89,7 +89,7 @@ function mapIntentResponse(raw: {
 export class IntentResource {
   constructor(private client: HttpClient) {}
 
-  async invoke(request: IntentRequest): Promise<IntentResult> {
+  private async rawInvoke(request: IntentRequest): Promise<IntentResult> {
     const raw = await this.client.post<{
       id: string;
       type: string;
@@ -102,5 +102,64 @@ export class IntentResource {
     }>("/api/v1/cadreen/intent", request);
 
     return mapIntentResponse(raw);
+  }
+
+  /**
+   * Invoke intent and throw on blocked/clarify outcomes.
+   *
+   * Throws:
+   * - CadreenBlockedError when governance blocks the action
+   * - CadreenClarifyError when the system needs clarification
+   *
+   * Use try/catch to handle governed outcomes:
+   * ```ts
+   * try {
+   *   const result = await cadreen.intent.invoke({ messages: [...] });
+   *   // result is always type "direct" or "execution"
+   * } catch (err) {
+   *   if (err instanceof CadreenBlockedError) {
+   *     // show user the block reason and escalation path
+   *   } else if (err instanceof CadreenClarifyError) {
+   *     // present err.questions to the user
+   *   }
+   * }
+   * ```
+   */
+  async invoke(request: IntentRequest): Promise<IntentResult> {
+    const result = await this.rawInvoke(request);
+
+    if (result.type === "blocked") {
+      throw new CadreenBlockedError({
+        reason_code: result.reason_code,
+        policy_id: result.policy_id,
+        intelligence: result.intelligence,
+        traceId: result.traceId,
+      });
+    }
+
+    if (result.type === "clarify") {
+      throw new CadreenClarifyError({
+        questions: result.questions.map((q) => ({
+          id: q.id || "",
+          question: q.question || "",
+          type: q.type || "open",
+          required: q.required ?? false,
+        })),
+        conversationId: result.conversationId,
+        intelligence: result.intelligence,
+        traceId: result.traceId,
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Invoke intent and return the full result without throwing.
+   * Use this when you want to handle all outcome types (direct, clarify,
+   * execution, blocked, connect_required) as data rather than errors.
+   */
+  async invokeResult(request: IntentRequest): Promise<IntentResult> {
+    return this.rawInvoke(request);
   }
 }
