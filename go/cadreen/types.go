@@ -784,8 +784,8 @@ type CatalogIntegration struct {
 	Status       string   `json:"status"`
 	AuthType     string   `json:"auth_type"`
 	InstallTime  string   `json:"install_time"`
-	Popularity   int      `json:"popularity,omitempty"`
-	Featured     bool     `json:"featured,omitempty"`
+	Popularity   int      `json:"popularity"`
+	Featured     bool     `json:"featured"`
 }
 
 type CatalogCategory struct {

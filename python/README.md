@@ -93,7 +93,7 @@ await cadreen.memory.remember(
 )
 
 # Search
-results = await cadreen.memory.search(SearchMemoryRequest(query="data deletion rules"))
+results = await cadreen.memory.search("data deletion rules")
 
 # Get by ID
 item = await cadreen.memory.get("mem_abc123")

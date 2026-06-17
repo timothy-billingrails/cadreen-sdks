@@ -100,6 +100,10 @@ from .types import (
     SetupMemoryResult,
     SetupPolicyResult,
     SetupProposal,
+    CatalogResponse,
+    CatalogCategory,
+    CatalogIntegration,
+    InstallResponse,
 )
 
 from .client import HttpClient
@@ -177,8 +181,8 @@ class Cadreen:
     ) -> CreateMemoryResponse:
         return await self.memory.remember(type, content, domain=domain, scope=scope, authority=authority, tags=tags)
 
-    async def context(self, request: SearchMemoryRequest) -> SearchMemoryResponse:
-        return await self.memory.search(request)
+    async def context(self, query: str, *, domain: str | None = None, tag: str | None = None, limit: int | None = None) -> SearchMemoryResponse:
+        return await self.memory.search(query, domain=domain, tag=tag, limit=limit)
 
     async def connect(self, capability: str) -> ConnectResult:
         return await self.connections.connect(capability)

@@ -6,7 +6,6 @@ from ..client import HttpClient
 from ..types import (
     RememberRequest,
     CreateMemoryResponse,
-    SearchMemoryRequest,
     SearchMemoryResponse,
     MemoryTypesResponse,
     Atom,
@@ -108,14 +107,21 @@ class MemoryResource:
         raw = await self._client.post("/api/v1/cadreen/memory", body)
         return _parse_create_response(raw)
 
-    async def search(self, request: SearchMemoryRequest) -> SearchMemoryResponse:
-        params: dict[str, Any] = {"query": request.query}
-        if request.domain is not None:
-            params["domain"] = request.domain
-        if request.tag is not None:
-            params["tag"] = request.tag
-        if request.limit is not None:
-            params["limit"] = request.limit
+    async def search(
+        self,
+        query: str,
+        *,
+        domain: str | None = None,
+        tag: str | None = None,
+        limit: int | None = None,
+    ) -> SearchMemoryResponse:
+        params: dict[str, Any] = {"query": query}
+        if domain is not None:
+            params["domain"] = domain
+        if tag is not None:
+            params["tag"] = tag
+        if limit is not None:
+            params["limit"] = limit
 
         raw = await self._client.get("/api/v1/cadreen/memory/search", params)
         return SearchMemoryResponse(

@@ -4,10 +4,8 @@ from typing import Any
 
 from ..client import HttpClient
 from ..types import (
-    CreatePolicyRequest,
     CreatePolicyResponse,
     ConfirmPolicyResponse,
-    EvaluatePolicyRequest,
     EvaluatePolicyResponse,
     ListPoliciesResponse,
     PolicyBundle,
@@ -20,14 +18,21 @@ class PoliciesResource:
     def __init__(self, client: HttpClient) -> None:
         self._client = client
 
-    async def create(self, request: CreatePolicyRequest) -> CreatePolicyResponse:
-        body: dict[str, Any] = {"name": request.name}
-        if request.rules is not None:
-            body["rules"] = request.rules
-        if request.domain is not None:
-            body["domain"] = request.domain
-        if request.auto_draft is not None:
-            body["auto_draft"] = request.auto_draft
+    async def create(
+        self,
+        name: str,
+        *,
+        rules: list[dict[str, object]] | None = None,
+        domain: str | None = None,
+        auto_draft: bool | None = None,
+    ) -> CreatePolicyResponse:
+        body: dict[str, Any] = {"name": name}
+        if rules is not None:
+            body["rules"] = rules
+        if domain is not None:
+            body["domain"] = domain
+        if auto_draft is not None:
+            body["auto_draft"] = auto_draft
 
         raw = await self._client.post("/api/v1/cadreen/policies", body)
         return CreatePolicyResponse(
@@ -39,12 +44,18 @@ class PoliciesResource:
             approve_url=raw.get("approve_url"),
         )
 
-    async def evaluate(self, request: EvaluatePolicyRequest) -> EvaluatePolicyResponse:
-        body: dict[str, Any] = {"action": request.action}
-        if request.domain is not None:
-            body["domain"] = request.domain
-        if request.context is not None:
-            body["context"] = request.context
+    async def evaluate(
+        self,
+        action: str,
+        *,
+        domain: str | None = None,
+        context: dict[str, object] | None = None,
+    ) -> EvaluatePolicyResponse:
+        body: dict[str, Any] = {"action": action}
+        if domain is not None:
+            body["domain"] = domain
+        if context is not None:
+            body["context"] = context
 
         raw = await self._client.post("/api/v1/cadreen/policies/evaluate", body)
         gov = raw.get("result", {})
@@ -113,4 +124,4 @@ class PoliciesResource:
         )
 
     async def require_approval(self, description: str) -> CreatePolicyResponse:
-        return await self.create(CreatePolicyRequest(name=description, auto_draft=True))
+        return await self.create(description, auto_draft=True)

@@ -169,6 +169,10 @@ export type {
   RegisterOpenAPIResponse,
   RegisterMCPRequest,
   RegisterMCPResponse,
+  CatalogResponse,
+  CatalogCategory,
+  CatalogIntegration,
+  InstallResponse,
   SearchMemoryRequest,
   RememberRequest,
   CreatePolicyRequest,
@@ -194,6 +198,10 @@ export type {
   SetupCredentialResult,
   SetupMemoryResult,
   SetupPolicyResult,
+  SetupProposal,
+  ReplayResult,
+  HandoffPacket,
+  PromoteResult,
 } from "./types";
 
 export { GuardrailsResource } from "./resources/guardrails";
