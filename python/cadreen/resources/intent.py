@@ -90,6 +90,21 @@ def _map_intent_response(raw: dict[str, Any]) -> IntentResult:
             trace_id=trace_id,
         )
 
+    if result_type == "execution":
+        execution = raw.get("execution", {})
+        mission = raw.get("mission", {})
+        return ExecutionResult(
+            type="execution",
+            execution={
+                "id": execution.get("id") or mission.get("id", ""),
+                "status": execution.get("status") or mission.get("status", ""),
+                "stream_url": execution.get("stream_url") or mission.get("stream_url"),
+                "poll_url": execution.get("poll_url") or mission.get("poll_url"),
+            },
+            intelligence=intelligence,
+            trace_id=trace_id,
+        )
+
     if result_type == "blocked":
         gov = raw.get("meta", {}).get("governance", {})
         return BlockedResult(

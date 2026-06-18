@@ -13,6 +13,7 @@ function mapIntentResponse(raw: {
   trace_id?: string;
   message?: ResponseMessage;
   mission?: { id: string; status: string; stream_url?: string; poll_url?: string };
+  execution?: { id: string; status: string; stream_url?: string; poll_url?: string };
   clarification?: { questions?: ClarificationQuestion[]; conversation_id?: string };
   meta?: { governance?: { decision?: string; reason?: string } };
   intelligence?: IntelligenceMeta;
@@ -59,6 +60,18 @@ function mapIntentResponse(raw: {
         intelligence,
         traceId,
       };
+    case "execution":
+      return {
+        type: "execution",
+        execution: {
+          id: raw.execution?.id || raw.mission?.id || "",
+          status: raw.execution?.status || raw.mission?.status || "",
+          stream_url: raw.execution?.stream_url || raw.mission?.stream_url,
+          poll_url: raw.execution?.poll_url || raw.mission?.poll_url,
+        },
+        intelligence,
+        traceId,
+      };
     case "blocked":
       const gov = raw.meta?.governance || {};
       return {
@@ -96,6 +109,7 @@ export class IntentResource {
       trace_id?: string;
       message?: ResponseMessage;
       mission?: { id: string; status: string; stream_url?: string; poll_url?: string };
+      execution?: { id: string; status: string; stream_url?: string; poll_url?: string };
       clarification?: { questions?: ClarificationQuestion[]; conversation_id?: string };
       meta?: { governance?: { decision?: string; reason?: string } };
       intelligence?: IntelligenceMeta;
