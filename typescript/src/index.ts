@@ -9,6 +9,7 @@ import { GuardrailsResource } from "./resources/guardrails";
 import { SkillsResource } from "./resources/skills";
 import { FailuresResource } from "./resources/failures";
 import { WebhooksResource } from "./resources/webhooks";
+import { ChatResource } from "./resources/chat";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -41,6 +42,7 @@ export class Cadreen {
   public readonly skills: SkillsResource;
   public readonly failures: FailuresResource;
   public readonly webhooks: WebhooksResource;
+  public readonly chat: ChatResource;
 
   private readonly client: HttpClient;
 
@@ -56,6 +58,7 @@ export class Cadreen {
     this.skills = new SkillsResource(this.intent, this.memory, this.connections);
     this.failures = new FailuresResource(this.traces);
     this.webhooks = new WebhooksResource();
+    this.chat = new ChatResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -209,3 +212,21 @@ export type {
 
 export { GuardrailsResource } from "./resources/guardrails";
 export { WebhooksResource } from "./resources/webhooks";
+export { ChatResource } from "./resources/chat";
+export type {
+  ChatMessage,
+  ChatToolCall,
+  ChatFunctionCall,
+  ChatToolDefinition,
+  ChatFunctionDefinition,
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+  ChatChoice,
+  ChatUsage,
+  ChatCompletionChunk,
+  ChatChunkChoice,
+  ChatDelta,
+  ChatStreamEvent,
+  ToolEntry,
+  ListToolsResponse,
+} from "./resources/chat";

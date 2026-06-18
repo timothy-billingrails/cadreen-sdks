@@ -262,6 +262,23 @@ export class HttpClient {
     return this.request<T>("POST", path, body, options);
   }
 
+  async postStream(path: string, body?: unknown): Promise<Response> {
+    const url = `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.apiKey}`,
+      Accept: "text/event-stream",
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    return response;
+  }
+
   async put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>("PUT", path, body, options);
   }
