@@ -114,6 +114,23 @@ from .resources.connections import ConnectionsResource
 from .resources.traces import TracesResource
 from .resources.executions import ExecutionsResource
 from .resources.guardrails import GuardrailsResource
+from .resources.chat import ChatResource
+from .resources.chat import (
+    ChatMessage,
+    ChatToolCall,
+    ChatFunctionCall,
+    ChatToolDefinition,
+    ChatFunctionDefinition,
+    ChatCompletionRequest,
+    ChatCompletionResponse,
+    ChatChoice,
+    ChatUsage,
+    ChatCompletionChunk,
+    ChatChunkChoice,
+    ChatDelta,
+    ToolEntry,
+    ListToolsResponse,
+)
 from .redaction import redact_string, redact_trace, redact_messages, RedactOptions
 from .telemetry import TelemetryProvider, TelemetrySpan, TelemetryMeter, OpenTelemetryAdapter, NoOpProvider
 
@@ -129,6 +146,7 @@ class Cadreen:
         self.traces = TracesResource(self._client)
         self.executions = ExecutionsResource(self._client)
         self.guardrails = GuardrailsResource(self.policies)
+        self.chat = ChatResource(self._client)
 
     async def invoke(self, request: IntentRequest) -> IntentResult:
         return await self.intent.invoke(request)
