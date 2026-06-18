@@ -50,11 +50,12 @@ type ChatFunctionDefinition struct {
 
 // ChatCompletionRequest is the request for POST /v1/chat/completions.
 type ChatCompletionRequest struct {
-	Model    string               `json:"model"`
-	Messages []ChatMessage        `json:"messages"`
-	Stream   bool                 `json:"stream,omitempty"`
-	Tools    []ChatToolDefinition `json:"tools,omitempty"`
-	Context  map[string]any       `json:"context,omitempty"`
+	Model          string               `json:"model"`
+	Messages       []ChatMessage        `json:"messages"`
+	Stream         bool                 `json:"stream,omitempty"`
+	Tools          []ChatToolDefinition `json:"tools,omitempty"`
+	Context        map[string]any       `json:"context,omitempty"`
+	ConversationID string               `json:"conversation_id,omitempty"`
 }
 
 // ChatCompletionResponse is the response from POST /v1/chat/completions.

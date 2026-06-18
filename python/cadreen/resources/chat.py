@@ -52,6 +52,7 @@ class ChatCompletionRequest:
     stream: bool = False
     tools: Optional[list[ChatToolDefinition]] = None
     context: Optional[dict[str, Any]] = None
+    conversation_id: Optional[str] = None
 
 
 @dataclass
@@ -264,6 +265,8 @@ class ChatResource:
             body["tools"] = [_tool_def_to_dict(t) for t in request.tools]
         if request.context:
             body["context"] = request.context
+        if request.conversation_id:
+            body["conversation_id"] = request.conversation_id
 
         raw = await self._client.post("/v1/chat/completions", body)
         return _parse_chat_response(raw)
@@ -282,6 +285,8 @@ class ChatResource:
             body["tools"] = [_tool_def_to_dict(t) for t in request.tools]
         if request.context:
             body["context"] = request.context
+        if request.conversation_id:
+            body["conversation_id"] = request.conversation_id
 
         url = f"{self._client._base_url}/v1/chat/completions"
         headers = {

@@ -38,6 +38,7 @@ export interface ChatCompletionRequest {
   stream?: boolean;
   tools?: ChatToolDefinition[];
   context?: Record<string, unknown>;
+  conversation_id?: string;
 }
 
 export interface ChatCompletionResponse {
