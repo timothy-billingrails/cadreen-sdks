@@ -50,7 +50,7 @@ type ChatFunctionDefinition struct {
 
 // ChatCompletionRequest is the request for POST /v1/chat/completions.
 type ChatCompletionRequest struct {
-	Model          string               `json:"model"`
+	Model          string               `json:"model,omitempty"`
 	Messages       []ChatMessage        `json:"messages"`
 	Stream         bool                 `json:"stream,omitempty"`
 	Tools          []ChatToolDefinition `json:"tools,omitempty"`

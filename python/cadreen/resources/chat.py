@@ -306,7 +306,9 @@ class ChatResource:
                     try:
                         data = json.loads(event.data)
                         yield _parse_chat_chunk(data)
-                    except Exception:
+                    except Exception as e:
+                        import logging
+                        logging.getLogger("cadreen").warning("Failed to parse SSE chunk: %s", e)
                         continue
 
     async def list_tools(self) -> ListToolsResponse:
