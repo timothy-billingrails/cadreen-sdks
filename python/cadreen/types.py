@@ -1,7 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Optional, TypedDict, Union
+
+
+class ExecutionData(TypedDict, total=False):
+    """Typed dict for execution data in IntentResult."""
+    id: str
+    status: str
+    stream_url: Optional[str]
+    poll_url: Optional[str]
 
 
 HealthStatus = Literal["healthy", "degraded", "unhealthy", "unknown", "latent"]
@@ -730,7 +738,7 @@ class ClarifyResult:
 @dataclass
 class ExecutionResult:
     type: Literal["execution"]
-    execution: object
+    execution: ExecutionData
     intelligence: IntelligenceMeta
     trace_id: str
 

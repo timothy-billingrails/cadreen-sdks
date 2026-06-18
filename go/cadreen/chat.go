@@ -48,7 +48,7 @@ type ChatFunctionDefinition struct {
 	Parameters  any    `json:"parameters"` // JSON Schema
 }
 
-// ChatCompletionRequest is the request for POST /v1/chat/completions.
+// ChatCompletionRequest is the request for POST /api/v1/chat/completions.
 type ChatCompletionRequest struct {
 	Model          string               `json:"model,omitempty"`
 	Messages       []ChatMessage        `json:"messages"`
@@ -58,7 +58,7 @@ type ChatCompletionRequest struct {
 	ConversationID string               `json:"conversation_id,omitempty"`
 }
 
-// ChatCompletionResponse is the response from POST /v1/chat/completions.
+// ChatCompletionResponse is the response from POST /api/v1/chat/completions.
 type ChatCompletionResponse struct {
 	ID      string             `json:"id"`
 	Object  string             `json:"object"`
@@ -82,7 +82,7 @@ type ChatUsage struct {
 	TotalTokens      int `json:"total_tokens"`
 }
 
-// ChatCompletionChunk is a streaming chunk from POST /v1/chat/completions.
+// ChatCompletionChunk is a streaming chunk from POST /api/v1/chat/completions.
 type ChatCompletionChunk struct {
 	ID      string        `json:"id"`
 	Object  string        `json:"object"`
@@ -114,13 +114,13 @@ type ChatStreamEvent struct {
 
 // ── Tool Discovery Types ──
 
-// ToolEntry represents a tool from GET /v1/tools.
+// ToolEntry represents a tool from GET /api/v1/tools.
 type ToolEntry struct {
 	Type     string               `json:"type"`
 	Function ChatFunctionDefinition `json:"function"`
 }
 
-// ListToolsResponse is the response from GET /v1/tools.
+// ListToolsResponse is the response from GET /api/v1/tools.
 type ListToolsResponse struct {
 	Object string     `json:"object"`
 	Data   []ToolEntry `json:"data"`
@@ -133,7 +133,7 @@ type ListToolsResponse struct {
 func (c *Client) ChatCompletions(ctx context.Context, req ChatCompletionRequest, opts ...RequestOption) (*ChatCompletionResponse, error) {
 	req.Stream = false
 	var resp ChatCompletionResponse
-	if err := c.do(ctx, "POST", "/v1/chat/completions", req, &resp, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/chat/completions", req, &resp, opts...); err != nil {
 		return nil, fmt.Errorf("chat completions: %w", err)
 	}
 	return &resp, nil
@@ -152,7 +152,7 @@ func (c *Client) ChatCompletionsStream(ctx context.Context, req ChatCompletionRe
 		return nil, fmt.Errorf("marshal chat request: %w", err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", c.config.BaseURL+"/v1/chat/completions", bytes.NewReader(bodyBytes))
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", c.config.BaseURL+"/api/v1/chat/completions", bytes.NewReader(bodyBytes))
 	if err != nil {
 		return nil, fmt.Errorf("create stream request: %w", err)
 	}
@@ -229,7 +229,7 @@ func readChatSSEStream(ctx context.Context, resp *http.Response, ch chan<- ChatS
 // ListTools returns the available tools as OpenAI-compatible function definitions.
 func (c *Client) ListTools(ctx context.Context, opts ...RequestOption) (*ListToolsResponse, error) {
 	var resp ListToolsResponse
-	if err := c.do(ctx, "GET", "/v1/tools", nil, &resp, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/tools", nil, &resp, opts...); err != nil {
 		return nil, fmt.Errorf("list tools: %w", err)
 	}
 	return &resp, nil

@@ -222,3 +222,53 @@ class IntentResource:
 
         raw = await self._client.post("/api/v1/cadreen/intent", body)
         return _map_intent_response(raw)
+
+    async def invoke_stream(
+        self,
+        request: IntentRequest,
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Stream intent processing via SSE. Yields events as they arrive."""
+        import json as _json
+
+        body: dict[str, Any] = {
+            "messages": [{"role": m.role, "content": m.content} for m in request.messages],
+            "stream": True,
+        }
+        if request.conversation_id:
+            body["conversation_id"] = request.conversation_id
+        if request.context:
+            ctx: dict[str, Any] = {}
+            if request.context.existing_connectors is not None:
+                ctx["existing_connectors"] = request.context.existing_connectors
+            if request.context.constraints is not None:
+                ctx["constraints"] = request.context.constraints
+            if request.context.domain is not None:
+                ctx["domain"] = request.context.domain
+            body["context"] = ctx
+        if request.mode:
+            body["mode"] = request.mode
+
+        url = f"{self._client._base_url}/api/v1/cadreen/intent"
+        async with self._client._session.post(
+            url,
+            json=body,
+            headers={
+                "Authorization": f"Bearer {self._client._api_key}",
+                "Accept": "text/event-stream",
+            },
+        ) as resp:
+            resp.raise_for_status()
+            current_event = "message"
+            async for line in resp.content:
+                line_str = line.decode("utf-8").rstrip("\r\n")
+                if line_str.startswith("event:"):
+                    current_event = line_str[6:].strip()
+                elif line_str.startswith("data:"):
+                    data = line_str[5:].strip()
+                    if data == "[DONE]":
+                        return
+                    try:
+                        yield {"type": current_event, "data": _json.loads(data)}
+                    except _json.JSONDecodeError:
+                        yield {"type": current_event, "data": {"raw": data}}
+                    current_event = "message"

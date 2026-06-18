@@ -176,4 +176,46 @@ export class IntentResource {
   async invokeResult(request: IntentRequest): Promise<IntentResult> {
     return this.rawInvoke(request);
   }
+
+  /**
+   * Stream intent processing via SSE.
+   * Yields events as they arrive from the server.
+   */
+  async *invokeStream(request: IntentRequest): AsyncGenerator<{ type: string; data: Record<string, unknown> }> {
+    const response = await this.client.postStream("/api/v1/cadreen/intent", {
+      ...request,
+      stream: true,
+    });
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("No response body");
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let currentEvent = "message";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (line.startsWith("event:")) {
+            currentEvent = line.slice(6).trim();
+          } else if (line.startsWith("data:")) {
+            const data = line.slice(5).trim();
+            if (data === "[DONE]") return;
+            try {
+              yield { type: currentEvent, data: JSON.parse(data) };
+            } catch {
+              yield { type: currentEvent, data: { raw: data } };
+            }
+            currentEvent = "message";
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
 }
