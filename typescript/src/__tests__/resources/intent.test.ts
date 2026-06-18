@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { IntentResource } from "../../resources/intent";
 import { HttpClient, CadreenBlockedError, CadreenClarifyError } from "../../client";
-import type { IntentResult, IntelligenceMeta } from "../../types";
+import type { IntelligenceMeta } from "../../types";
 
 function baseIntelligence(): IntelligenceMeta {
   return {
@@ -25,12 +25,6 @@ function buildClient(fixtures: Record<string, unknown>) {
 
 describe("IntentResource invoke() with direct result", () => {
   it("returns direct result", async () => {
-    const fixture: IntentResult & { type: "direct" } = {
-      type: "direct",
-      message: { role: "assistant", content: "Hello, how can I help?" },
-      intelligence: baseIntelligence(),
-      traceId: "trace-direct-1",
-    };
     const raw = {
       id: "resp-1",
       type: "direct",

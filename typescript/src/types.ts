@@ -302,7 +302,7 @@ export interface HumilityTrace {
 export interface ProcessTrace {
   started_at: string;
   duration_ms: number;
-  components?: Record<string, boolean>;
+  components?: Record<string, unknown>;
 }
 
 export interface NextAction {

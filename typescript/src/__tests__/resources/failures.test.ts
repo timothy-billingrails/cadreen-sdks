@@ -105,9 +105,9 @@ describe("FailuresResource why()", () => {
   });
 
   it("extracts info from generic error object", () => {
-    const err = new Error("Network timeout");
-    (err as Record<string, unknown>).code = "timeout";
-    (err as Record<string, unknown>).trace_id = "trace-timeout";
+    const err = new Error("Network timeout") as unknown as Record<string, unknown>;
+    err.code = "timeout";
+    err.trace_id = "trace-timeout";
     const result = failures.why(err);
     expect(result.summary).toBe("timeout: Network timeout");
     expect(result.traceId).toBe("trace-timeout");
@@ -115,8 +115,8 @@ describe("FailuresResource why()", () => {
   });
 
   it("handles rate_limited error code", () => {
-    const err = new Error("Too many requests");
-    (err as Record<string, unknown>).code = "rate_limited";
+    const err = new Error("Too many requests") as unknown as Record<string, unknown>;
+    err.code = "rate_limited";
     const result = failures.why(err);
     expect(result.recommendation).toContain("Back off and retry");
   });

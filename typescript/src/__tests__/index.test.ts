@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Cadreen } from "../index";
-import type { IntelligenceMeta, IntentResult } from "../types";
+import type { IntelligenceMeta } from "../types";
 
 function baseIntelligence(): IntelligenceMeta {
   return {

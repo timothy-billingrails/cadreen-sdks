@@ -29,16 +29,16 @@ export interface SpanOptions {
 }
 
 export class NoOpSpan implements TelemetrySpan {
-  setName() {}
-  setAttribute() {}
-  setStatus() {}
+  setName(_name: string) {}
+  setAttribute(_key: string, _value: string | number | boolean) {}
+  setStatus(_status: "ok" | "error") {}
   end() {}
 }
 
 export class NoOpMeter implements TelemetryMeter {
-  recordRequest() {}
-  recordRetry() {}
-  recordStreamEvent() {}
+  recordRequest(_method: string, _path: string, _status: number, _durationMs: number) {}
+  recordRetry(_method: string, _path: string, _attempt: number) {}
+  recordStreamEvent(_eventType: string) {}
 }
 
 export class NoOpProvider implements TelemetryProvider {
