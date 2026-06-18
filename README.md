@@ -12,9 +12,10 @@ Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs)
 
 ## Quick Start
 
-### TypeScript
+### Intent — the primary door
 
 ```ts
+// TypeScript
 import { Cadreen } from "@cadreen/sdk";
 
 const cadreen = new Cadreen({ apiKey: process.env.CADREEN_API_KEY });
@@ -38,9 +39,8 @@ switch (result.type) {
 }
 ```
 
-### Python
-
 ```python
+# Python
 import asyncio
 from cadreen import Cadreen
 
@@ -53,48 +53,84 @@ async def main():
 asyncio.run(main())
 ```
 
-### Go
+```go
+// Go
+c := cadreen.NewClient(cadreen.CadreenConfig{
+    APIKey: os.Getenv("CADREEN_API_KEY"),
+})
+
+result, err := c.IntentInvoke(context.Background(), cadreen.IntentRequest{
+    Messages: []cadreen.IntentMessage{
+        {Role: "user", Content: "Handle refund for invoice inv_123"},
+    },
+})
+```
+
+### Chat Completions — OpenAI-compatible with governance
+
+```ts
+// TypeScript
+const response = await cadreen.chat.completions({
+  messages: [{ role: "user", content: "Summarize my recent orders" }],
+  tools: [{
+    type: "function",
+    function: {
+      name: "get_orders",
+      description: "Fetch recent orders",
+      parameters: { type: "object", properties: { limit: { type: "number" } } },
+    },
+  }],
+});
+console.log(response.choices[0].message);
+```
+
+```python
+# Python
+from cadreen.resources.chat import ChatCompletionRequest, ChatMessage, ChatToolDefinition, ChatFunctionDefinition
+
+response = await cadreen.chat.completions(ChatCompletionRequest(
+    messages=[ChatMessage(role="user", content="Summarize my recent orders")],
+    tools=[ChatToolDefinition(function=ChatFunctionDefinition(
+        name="get_orders",
+        description="Fetch recent orders",
+        parameters={"type": "object", "properties": {"limit": {"type": "number"}}},
+    ))],
+))
+print(response.choices[0].message)
+```
 
 ```go
-package main
+// Go
+resp, err := c.ChatCompletions(ctx, cadreen.ChatCompletionRequest{
+    Messages: []cadreen.ChatMessage{
+        {Role: "user", Content: "Summarize my recent orders"},
+    },
+    Tools: []cadreen.ChatToolDefinition{{
+        Type: "function",
+        Function: cadreen.ChatFunctionDefinition{
+            Name:       "get_orders",
+            Description: "Fetch recent orders",
+            Parameters: map[string]any{"type": "object", "properties": map[string]any{"limit": map[string]any{"type": "number"}}},
+        },
+    }},
+})
+```
 
-import (
-	"context"
-	"fmt"
-	"os"
+### Tool Discovery
 
-	cadreen "github.com/timothy-billingrails/cadreen-sdks/go/cadreen"
-)
+```ts
+// TypeScript
+const tools = await cadreen.chat.listTools();
+```
 
-func main() {
-	c := cadreen.NewClient(cadreen.CadreenConfig{
-		APIKey: os.Getenv("CADREEN_API_KEY"),
-	})
+```python
+# Python
+tools = await cadreen.chat.list_tools()
+```
 
-	result, err := c.IntentInvoke(context.Background(), cadreen.IntentRequest{
-		Messages: []cadreen.IntentMessage{
-			{Role: "user", Content: "Handle refund for invoice inv_123"},
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	switch result.Type {
-	case cadreen.IntentResultDirect:
-		fmt.Println(result.Message.Content)
-	case cadreen.IntentResultExecution:
-		fmt.Println("Execution started:", result.Execution.ID)
-	case cadreen.IntentResultBlocked:
-		fmt.Printf("Blocked by %s: %s\n", result.PolicyID, result.ReasonCode)
-	case cadreen.IntentResultClarify:
-		for _, q := range result.Questions {
-			fmt.Println(q.Question)
-		}
-	case cadreen.IntentResultConnectRequired:
-		fmt.Println("Connect:", result.Connection.Endpoint)
-	}
-}
+```go
+// Go
+tools, err := c.ListTools(ctx)
 ```
 
 ## Marketplace

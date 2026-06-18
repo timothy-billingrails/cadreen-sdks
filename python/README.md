@@ -43,6 +43,86 @@ async def main():
 asyncio.run(main())
 ```
 
+## Chat Completions
+
+OpenAI-compatible chat completions with built-in governance. Every tool call goes through governance before execution — auto-approved calls execute silently, blocked calls become conversation.
+
+```python
+from cadreen.resources.chat import (
+    ChatCompletionRequest, ChatMessage,
+    ChatToolDefinition, ChatFunctionDefinition,
+)
+
+# Basic completion
+response = await cadreen.chat.completions(ChatCompletionRequest(
+    messages=[ChatMessage(role="user", content="Hello!")],
+))
+print(response.choices[0].message.content)
+
+# With tool calling
+response = await cadreen.chat.completions(ChatCompletionRequest(
+    messages=[ChatMessage(role="user", content="Refund order 456")],
+    tools=[ChatToolDefinition(function=ChatFunctionDefinition(
+        name="process_refund",
+        description="Process a refund for an order",
+        parameters={
+            "type": "object",
+            "properties": {"order_id": {"type": "string"}},
+            "required": ["order_id"],
+        },
+    ))],
+))
+
+# If governance needs approval, the response contains a text message
+# asking the user to confirm — no tool_calls field
+msg = response.choices[0].message
+if msg.tool_calls:
+    for tc in msg.tool_calls:
+        print(f"{tc.function.name}({tc.function.arguments})")
+
+# Resume a conversation
+follow_up = await cadreen.chat.completions(ChatCompletionRequest(
+    messages=[ChatMessage(role="user", content="What about order 789?")],
+    conversation_id=response.conversation_id,
+))
+```
+
+### Streaming
+
+```python
+async for chunk in await cadreen.chat.completions_stream(ChatCompletionRequest(
+    messages=[ChatMessage(role="user", content="Hello!")],
+)):
+    if chunk.choices and chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+```
+
+### Tool Discovery
+
+```python
+tools = await cadreen.chat.list_tools()
+for tool in tools.data:
+    print(f"{tool.function.name}: {tool.function.description}")
+```
+
+### Tool Chaining
+
+When the model proposes tool calls, send results back for follow-up:
+
+```python
+response = await cadreen.chat.completions(ChatCompletionRequest(
+    messages=[
+        ChatMessage(role="user", content="What's the weather in NYC?"),
+        ChatMessage(role="assistant", tool_calls=[ChatToolCall(
+            id="tc_1",
+            function=ChatFunctionCall(name="get_weather", arguments='{"city":"NYC"}'),
+        )]),
+        ChatMessage(role="tool", tool_call_id="tc_1", content='{"temp": 72, "condition": "sunny"}'),
+    ],
+))
+# Model may propose more tools or return a final text response
+```
+
 ## Configuration
 
 ```python
@@ -151,6 +231,14 @@ stats = await cadreen.traces.stats()
 - httpx-sse >= 0.4
 
 ## Changelog
+
+### v0.4.0
+- Added `cadreen.chat.completions()` — OpenAI-compatible chat completions with governance
+- Added `cadreen.chat.completions_stream()` — streaming chat completions via SSE
+- Added `cadreen.chat.list_tools()` — discover available tools as OpenAI function definitions
+- Added tool calling support: `tools` param, `tool_calls` in responses, tool chaining
+- Added `conversation_id` for persistent conversations across requests
+- Added `ChatCompletionRequest`, `ChatCompletionResponse`, `ChatToolDefinition` and related types
 
 ### v0.3.0
 - Added `catalog()` — browse the unified integration marketplace

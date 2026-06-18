@@ -43,6 +43,88 @@ switch (result.type) {
 }
 ```
 
+## Chat Completions
+
+OpenAI-compatible chat completions with built-in governance. Every tool call goes through governance before execution — auto-approved calls execute silently, blocked calls become conversation.
+
+```ts
+// Basic completion
+const response = await cadreen.chat.completions({
+  messages: [{ role: "user", content: "Hello!" }],
+});
+console.log(response.choices[0].message.content);
+
+// With tool calling
+const response = await cadreen.chat.completions({
+  messages: [{ role: "user", content: "Refund order 456" }],
+  tools: [{
+    type: "function",
+    function: {
+      name: "process_refund",
+      description: "Process a refund for an order",
+      parameters: {
+        type: "object",
+        properties: { order_id: { type: "string" } },
+        required: ["order_id"],
+      },
+    },
+  }],
+});
+
+// If governance needs approval, the response contains a text message
+// asking the user to confirm — no tool_calls field
+if (response.choices[0].message.tool_calls) {
+  // Tool calls were auto-approved, handle them
+  for (const tc of response.choices[0].message.tool_calls) {
+    console.log(`${tc.function.name}(${tc.function.arguments})`);
+  }
+}
+
+// Resume a conversation
+const followUp = await cadreen.chat.completions({
+  messages: [{ role: "user", content: "What about order 789?" }],
+  conversation_id: response.conversation_id,
+});
+```
+
+### Streaming
+
+```ts
+const stream = await cadreen.chat.completionsStream({
+  messages: [{ role: "user", content: "Hello!" }],
+});
+
+for await (const event of stream) {
+  if (event.type === "chunk") {
+    process.stdout.write(event.chunk.choices[0]?.delta?.content || "");
+  }
+}
+```
+
+### Tool Discovery
+
+```ts
+const tools = await cadreen.chat.listTools();
+for (const tool of tools.data) {
+  console.log(`${tool.function.name}: ${tool.function.description}`);
+}
+```
+
+### Tool Chaining
+
+When the model proposes tool calls, send results back for follow-up:
+
+```ts
+const response = await cadreen.chat.completions({
+  messages: [
+    { role: "user", content: "What's the weather in NYC?" },
+    { role: "assistant", content: null, tool_calls: [{ id: "tc_1", type: "function", function: { name: "get_weather", arguments: '{"city":"NYC"}' } }] },
+    { role: "tool", tool_call_id: "tc_1", content: '{"temp": 72, "condition": "sunny"}' },
+  ],
+});
+// Model may propose more tools or return a final text response
+```
+
 ## Configuration
 
 ```ts
@@ -185,6 +267,7 @@ try {
 | Resource | Methods |
 |----------|---------|
 | `cadreen.intent` | `invoke(request)` |
+| `cadreen.chat` | `completions(request)`, `completionsStream(request)`, `listTools()` |
 | `cadreen.memory` | `remember(request)`, `search(request)`, `get(id)` |
 | `cadreen.policies` | `create(request)`, `evaluate(request)`, `confirm(id)`, `list()`, `get(id)`, `requireApproval(desc)` |
 | `cadreen.connections` | `catalog()`, `install(id)`, `registerOpenAPI(request)`, `registerMCP(request)`, `list()`, `delete(id)` |
@@ -196,6 +279,14 @@ try {
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.4.0
+- Added `cadreen.chat.completions()` — OpenAI-compatible chat completions with governance
+- Added `cadreen.chat.completionsStream()` — streaming chat completions via SSE
+- Added `cadreen.chat.listTools()` — discover available tools as OpenAI function definitions
+- Added tool calling support: `tools` param, `tool_calls` in responses, tool chaining
+- Added `conversation_id` for persistent conversations across requests
+- Added `ChatCompletionRequest`, `ChatCompletionResponse`, `ChatToolDefinition` and related types
 
 ### v0.3.0
 - Added `catalog()` — browse the unified integration marketplace
