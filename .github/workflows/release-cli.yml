@@ -82,3 +82,24 @@ jobs:
           files: go/dist/*
           draft: false
           prerelease: false
+
+      - name: Update Homebrew formula with SHA256
+        run: |
+          cd ..
+          ARM64_DARWIN=$(cat go/dist/cadreen_darwin_arm64.sha256 | awk '{print $1}')
+          AMD64_DARWIN=$(cat go/dist/cadreen_darwin_amd64.sha256 | awk '{print $1}')
+          ARM64_LINUX=$(cat go/dist/cadreen_linux_arm64.sha256 | awk '{print $1}')
+          AMD64_LINUX=$(cat go/dist/cadreen_linux_amd64.sha256 | awk '{print $1}')
+
+          sed -i "s/PLACEHOLDER_ARM64_DARWIN_SHA256/${ARM64_DARWIN}/" homebrew-cadreen/cadreen.rb
+          sed -i "s/PLACEHOLDER_AMD64_DARWIN_SHA256/${AMD64_DARWIN}/" homebrew-cadreen/cadreen.rb
+          sed -i "s/PLACEHOLDER_ARM64_LINUX_SHA256/${ARM64_LINUX}/" homebrew-cadreen/cadreen.rb
+          sed -i "s/PLACEHOLDER_AMD64_LINUX_SHA256/${AMD64_LINUX}/" homebrew-cadreen/cadreen.rb
+
+          sed -i "s/version \".*\"/version \"${{ steps.version.outputs.VERSION }}\"/" homebrew-cadreen/cadreen.rb
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add homebrew-cadreen/cadreen.rb
+          git diff --cached --quiet || git commit -m "chore: update Homebrew formula SHA256 for v${{ steps.version.outputs.VERSION }}"
+          git push
