@@ -1,0 +1,25 @@
+{
+  "name": "@cadreen/cli",
+  "version": "0.1.0",
+  "description": "Cadreen CLI — intelligence infrastructure for developers",
+  "keywords": ["cadreen", "cli", "ai", "governance", "memory"],
+  "homepage": "https://accomplishanything.today",
+  "license": "UNLICENSED",
+  "author": "Timothy Billingrails",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timothy-billingrails/cadreen-sdks.git"
+  },
+  "files": ["bin/", "install.js", "package.json"],
+  "bin": {
+    "cadreen": "bin/cadreen"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["x64", "arm64"]
+}

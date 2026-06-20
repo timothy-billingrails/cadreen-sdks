@@ -108,8 +108,9 @@ type ChatDelta struct {
 
 // ChatStreamEvent represents an event from the chat completion stream.
 type ChatStreamEvent struct {
-	Chunk *ChatCompletionChunk
-	Error error
+	Chunk   *ChatCompletionChunk
+	RawJSON []byte // Raw JSON before typed parsing; includes Cadreen-specific fields (pending_actions, conversation_id, intelligence)
+	Error   error
 }
 
 // ── Tool Discovery Types ──
@@ -210,14 +211,14 @@ func readChatSSEStream(ctx context.Context, resp *http.Response, ch chan<- ChatS
 		var chunk ChatCompletionChunk
 		if err := json.Unmarshal([]byte(data), &chunk); err != nil {
 			select {
-			case ch <- ChatStreamEvent{Error: fmt.Errorf("parse SSE chunk: %w", err)}:
+			case ch <- ChatStreamEvent{RawJSON: []byte(data), Error: fmt.Errorf("parse SSE chunk: %w", err)}:
 			case <-ctx.Done():
 			}
 			return
 		}
 
 		select {
-		case ch <- ChatStreamEvent{Chunk: &chunk}:
+		case ch <- ChatStreamEvent{Chunk: &chunk, RawJSON: []byte(data)}:
 		case <-ctx.Done():
 			return
 		}

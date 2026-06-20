@@ -2,7 +2,6 @@ package cadreen
 
 import (
 	"bufio"
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
