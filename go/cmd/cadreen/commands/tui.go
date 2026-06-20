@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 
 	cadreen "github.com/timothy-billingrails/cadreen-sdks/go/cadreen"
@@ -22,24 +26,65 @@ const (
 	tuiStateConfirming
 )
 
+type tuiKeyMap struct {
+	Send  key.Binding
+	Quit  key.Binding
+	Help  key.Binding
+	Clear key.Binding
+}
+
+func (k tuiKeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Send, k.Quit}
+}
+
+func (k tuiKeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{k.Send, k.Clear},
+		{k.Help, k.Quit},
+	}
+}
+
+var tuiKeys = tuiKeyMap{
+	Send: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "send"),
+	),
+	Quit: key.NewBinding(
+		key.WithKeys("ctrl+c"),
+		key.WithHelp("ctrl+c", "quit"),
+	),
+	Help: key.NewBinding(
+		key.WithKeys("?"),
+		key.WithHelp("?", "help"),
+	),
+	Clear: key.NewBinding(
+		key.WithKeys("ctrl+l"),
+		key.WithHelp("ctrl+l", "clear"),
+	),
+}
+
 type tuiModel struct {
-	state       tuiState
-	viewport    viewport.Model
-	textInput   textinput.Model
-	messages    []tuiMessage
-	pendingActs []pendingAction
-	convID      string
-	memoryOff   bool
-	width       int
-	height      int
-	streamCh    <-chan cadreen.ChatStreamEvent
-	streamBuf   strings.Builder
-	ready       bool
-	err         error
+	state         tuiState
+	viewport      viewport.Model
+	textarea      textarea.Model
+	spinner       spinner.Model
+	help          help.Model
+	keys          tuiKeyMap
+	glamourRender *glamour.TermRenderer
+	messages      []tuiMessage
+	pendingActs   []pendingAction
+	confirmCursor int
+	convID        string
+	memoryOff     bool
+	width         int
+	height        int
+	streamCh      <-chan cadreen.ChatStreamEvent
+	streamBuf     strings.Builder
+	ready         bool
 }
 
 type tuiMessage struct {
-	role    string // "user", "cadreen", "system"
+	role    string
 	content string
 }
 
@@ -67,6 +112,22 @@ var (
 	tuiTitleStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("5")).
 			Bold(true)
+
+	tuiHeaderSep = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("8"))
+
+	tuiFooterStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("8"))
+
+	tuiHelpStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("8"))
+
+	tuiSelectedStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("6")).
+				Bold(true)
+
+	tuiUnselectedStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("8"))
 )
 
 type streamDoneMsg struct {
@@ -81,27 +142,38 @@ type streamChunkMsg struct {
 }
 
 func initialTUIModel(memoryOff bool) tuiModel {
-	ti := textinput.New()
-	ti.Placeholder = "Type a message..."
-	ti.Focus()
-	ti.CharLimit = 0
-	ti.Width = 80
+	ta := textarea.New()
+	ta.Placeholder = "Ask Cadreen anything..."
+	ta.MaxHeight = 10
+	ta.ShowLineNumbers = false
+	ta.CharLimit = 0
+	ta.Focus()
+
+	sp := spinner.New()
+	sp.Spinner = spinner.MiniDot
+	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+
+	h := help.New()
+	h.ShowAll = false
 
 	vp := viewport.New(80, 20)
 
 	return tuiModel{
 		state:     tuiStateIdle,
 		viewport:  vp,
-		textInput: ti,
+		textarea:  ta,
+		spinner:   sp,
+		help:      h,
+		keys:      tuiKeys,
 		memoryOff: memoryOff,
 		messages: []tuiMessage{
-			{role: "system", content: "Cadreen Chat — type 'exit' to quit, 'clear' to reset"},
+			{role: "system", content: "Cadreen Chat — type a message to start"},
 		},
 	}
 }
 
 func (m tuiModel) Init() tea.Cmd {
-	return textinput.Blink
+	return tea.Batch(textarea.Blink, m.spinner.Tick)
 }
 
 func (m tuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -111,26 +183,50 @@ func (m tuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-		m.viewport.Width = msg.Width
-		m.viewport.Height = msg.Height - 4
-		m.textInput.Width = msg.Width - 4
+		m.updateLayout()
 		m.ready = true
 		m.renderViewport()
 		return m, nil
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
-			return m, tea.Quit
-		case "enter":
+		if msg.Type == tea.KeyEnter && !msg.Alt {
 			if m.state == tuiStateConfirming {
-				return m.handleConfirmation()
+				return m.handleConfirmKeys(msg)
 			}
 			return m.handleInput()
 		}
 
+		switch {
+		case key.Matches(msg, m.keys.Quit):
+			return m, tea.Quit
+		case key.Matches(msg, m.keys.Help):
+			m.help.ShowAll = !m.help.ShowAll
+			m.updateLayout()
+			return m, nil
+		case key.Matches(msg, m.keys.Clear):
+			m.messages = []tuiMessage{
+				{role: "system", content: "Conversation cleared."},
+			}
+			m.convID = ""
+			m.renderViewport()
+			return m, nil
+		}
+
+		if m.state == tuiStateConfirming {
+			return m.handleConfirmKeys(msg)
+		}
+
+		var cmd tea.Cmd
+		m.textarea, cmd = m.textarea.Update(msg)
+		cmds = append(cmds, cmd)
+
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		cmds = append(cmds, cmd)
+
 	case streamChunkMsg:
-		if msg.content != "" {
+		if msg.content != "" && len(m.messages) > 0 {
 			m.streamBuf.WriteString(msg.content)
 			m.messages[len(m.messages)-1].content = m.streamBuf.String()
 			m.renderViewport()
@@ -155,7 +251,7 @@ func (m tuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if len(msg.pendingActions) > 0 {
 			m.state = tuiStateConfirming
 			m.pendingActs = msg.pendingActions
-			m.messages = append(m.messages, tuiMessage{role: "system", content: formatConfirmationPrompt(msg.pendingActions)})
+			m.confirmCursor = 0
 		} else {
 			m.state = tuiStateIdle
 		}
@@ -163,17 +259,12 @@ func (m tuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	var cmd tea.Cmd
-	m.textInput, cmd = m.textInput.Update(msg)
-	cmds = append(cmds, cmd)
-
 	return m, tea.Batch(cmds...)
 }
 
 func (m *tuiModel) handleInput() (tea.Model, tea.Cmd) {
-	input := strings.TrimSpace(m.textInput.Value())
-	m.textInput.SetValue("")
-	m.textInput.Reset()
+	input := strings.TrimSpace(m.textarea.Value())
+	m.textarea.SetValue("")
 
 	if input == "" {
 		return *m, nil
@@ -207,32 +298,40 @@ func (m *tuiModel) handleInput() (tea.Model, tea.Cmd) {
 	return *m, m.startStream(input)
 }
 
-func (m *tuiModel) handleConfirmation() (tea.Model, tea.Cmd) {
-	input := strings.TrimSpace(strings.ToLower(m.textInput.Value()))
-	m.textInput.SetValue("")
-	m.textInput.Reset()
-
-	if input == "yes" || input == "y" {
-		m.messages = append(m.messages, tuiMessage{role: "user", content: "yes"})
-		m.messages = append(m.messages, tuiMessage{role: "cadreen", content: ""})
-		m.state = tuiStateStreaming
-		m.pendingActs = nil
-		m.streamBuf.Reset()
+func (m *tuiModel) handleConfirmKeys(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch {
+	case msg.String() == "y" || msg.String() == "Y":
+		return m.sendConfirm("yes")
+	case msg.String() == "n" || msg.String() == "N":
+		return m.sendConfirm("no")
+	case msg.String() == "up" || msg.String() == "k":
+		if m.confirmCursor > 0 {
+			m.confirmCursor--
+		}
 		m.renderViewport()
-		return *m, m.startStream("yes")
-	} else if input == "no" || input == "n" {
-		m.messages = append(m.messages, tuiMessage{role: "user", content: "no"})
-		m.messages = append(m.messages, tuiMessage{role: "cadreen", content: ""})
-		m.state = tuiStateStreaming
-		m.pendingActs = nil
-		m.streamBuf.Reset()
+		return *m, nil
+	case msg.String() == "down" || msg.String() == "j":
+		if m.confirmCursor < 1 {
+			m.confirmCursor++
+		}
 		m.renderViewport()
-		return *m, m.startStream("no")
+		return *m, nil
+	case msg.Type == tea.KeyEnter:
+		if m.confirmCursor == 0 {
+			return m.sendConfirm("yes")
+		}
+		return m.sendConfirm("no")
 	}
-
-	m.messages = append(m.messages, tuiMessage{role: "system", content: "Please type 'yes' or 'no'."})
-	m.renderViewport()
 	return *m, nil
+}
+
+func (m *tuiModel) sendConfirm(answer string) (tea.Model, tea.Cmd) {
+	m.messages = append(m.messages, tuiMessage{role: "user", content: answer})
+	m.messages = append(m.messages, tuiMessage{role: "cadreen", content: ""})
+	m.state = tuiStateStreaming
+	m.pendingActs = nil
+	m.streamBuf.Reset()
+	return *m, m.startStream(answer)
 }
 
 func (m tuiModel) startStream(input string) tea.Cmd {
@@ -271,13 +370,6 @@ func (m tuiModel) collectStream(ch <-chan cadreen.ChatStreamEvent) streamDoneMsg
 		}
 		if event.Chunk == nil {
 			continue
-		}
-
-		if len(event.Chunk.Choices) > 0 {
-			delta := event.Chunk.Choices[0].Delta
-			if delta.Content != "" {
-				tea.Printf("%s", delta.Content)()
-			}
 		}
 
 		if len(event.RawJSON) > 0 {
@@ -322,61 +414,116 @@ func (m *tuiModel) renderViewport() {
 			b.WriteString(msg.content)
 		case "cadreen":
 			b.WriteString(tuiCadreenStyle.Render("Cadreen: "))
-			b.WriteString(msg.content)
+			if m.glamourRender != nil {
+				rendered, err := m.glamourRender.Render(msg.content)
+				if err == nil {
+					b.WriteString(strings.TrimRight(rendered, "\n"))
+				} else {
+					b.WriteString(msg.content)
+				}
+			} else {
+				b.WriteString(msg.content)
+			}
 		case "system":
 			b.WriteString(tuiSystemStyle.Render(msg.content))
 		}
 		b.WriteString("\n")
 	}
 
-	if m.state == tuiStateStreaming {
-		b.WriteString("\n")
-		b.WriteString(tuiStatusStyle.Render("streaming..."))
-		b.WriteString("\n")
+	if m.state == tuiStateConfirming {
+		b.WriteString(m.renderConfirmation())
 	}
 
 	m.viewport.SetContent(b.String())
 	m.viewport.GotoBottom()
 }
 
-func formatConfirmationPrompt(actions []pendingAction) string {
+func (m tuiModel) renderConfirmation() string {
 	var b strings.Builder
 	b.WriteString("\n")
 	b.WriteString(tuiPromptStyle.Render("Before I can do this, I need your permission."))
 	b.WriteString("\n\n")
 
-	if len(actions) == 1 {
-		b.WriteString(fmt.Sprintf("I want to: %s\n", humanToolName(actions[0].Tool)))
+	if len(m.pendingActs) == 1 {
+		b.WriteString(fmt.Sprintf("I want to: %s\n", humanToolName(m.pendingActs[0].Tool)))
 	} else {
-		b.WriteString(fmt.Sprintf("I need your permission for %d things:\n\n", len(actions)))
-		for i, a := range actions {
+		b.WriteString(fmt.Sprintf("I need your permission for %d things:\n\n", len(m.pendingActs)))
+		for i, a := range m.pendingActs {
 			b.WriteString(fmt.Sprintf("  %d. %s\n", i+1, humanToolName(a.Tool)))
 		}
 	}
 
 	b.WriteString("\n")
-	b.WriteString(tuiPromptStyle.Render("Proceed? (yes/no)"))
+	choices := []string{"Yes, proceed", "No, skip this"}
+	for i, c := range choices {
+		if m.confirmCursor == i {
+			b.WriteString(tuiSelectedStyle.Render("(•) "))
+		} else {
+			b.WriteString(tuiUnselectedStyle.Render("( ) "))
+		}
+		b.WriteString(c + "\n")
+	}
+	b.WriteString("\n")
+	b.WriteString(tuiHelpStyle.Render("↑/↓ to select • enter to confirm • y/n shortcut"))
 	return b.String()
 }
 
-func (m tuiModel) View() string {
-	if !ready(m) {
-		return "Initializing..."
-	}
-
-	title := tuiTitleStyle.Render("Cadreen")
-	status := m.statusBar()
-
-	return fmt.Sprintf("%s\n%s\n%s\n%s",
-		title,
-		m.viewport.View(),
-		status,
-		m.textInput.View(),
+func (m *tuiModel) updateGlamour() {
+	renderer, err := glamour.NewTermRenderer(
+		glamour.WithAutoStyle(),
+		glamour.WithWordWrap(m.viewport.Width-4),
 	)
+	if err == nil {
+		m.glamourRender = renderer
+	}
 }
 
-func ready(m tuiModel) bool {
-	return m.ready
+func (m *tuiModel) updateLayout() {
+	headerHeight := 1
+	footerHeight := 1
+	helpHeight := 1
+	textareaHeight := m.textarea.Height()
+	if textareaHeight < 1 {
+		textareaHeight = 1
+	}
+
+	m.viewport.Width = m.width
+	m.viewport.Height = m.height - headerHeight - footerHeight - helpHeight - textareaHeight - 2
+	if m.viewport.Height < 1 {
+		m.viewport.Height = 1
+	}
+
+	m.textarea.SetWidth(m.width - 4)
+
+	m.updateGlamour()
+}
+
+func (m tuiModel) headerView() string {
+	title := tuiTitleStyle.Render("Cadreen")
+	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, title, tuiHeaderSep.Render(line))
+}
+
+func (m tuiModel) footerView() string {
+	info := ""
+	if len(m.convID) >= 8 {
+		info = fmt.Sprintf("conv: %s", m.convID[:8])
+	} else if m.convID != "" {
+		info = fmt.Sprintf("conv: %s", m.convID)
+	}
+	if m.viewport.ScrollPercent() < 1.0 {
+		pct := fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100)
+		if info != "" {
+			info = pct + "  " + info
+		} else {
+			info = pct
+		}
+	}
+	if info == "" {
+		info = " "
+	}
+	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, tuiHeaderSep.Render(line), tuiFooterStyle.Render(info))
 }
 
 func (m tuiModel) statusBar() string {
@@ -385,20 +532,36 @@ func (m tuiModel) statusBar() string {
 	case tuiStateIdle:
 		left = "ready"
 	case tuiStateStreaming:
-		left = "streaming..."
+		left = m.spinner.View() + " thinking..."
 	case tuiStateConfirming:
 		left = "waiting for confirmation"
 	}
 
 	right := ""
-	if m.convID != "" {
-		right = fmt.Sprintf("conversation: %s", m.convID[:8])
+	if m.memoryOff {
+		right = "memory: off"
+	} else {
+		right = "memory: on"
 	}
 
-	gap := m.width - len(left) - len(right) - 2
+	gap := m.width - lipgloss.Width(left) - lipgloss.Width(right) - 2
 	if gap < 0 {
 		gap = 0
 	}
 
 	return tuiStatusStyle.Render(left + strings.Repeat(" ", gap) + right)
+}
+
+func (m tuiModel) View() string {
+	if !m.ready {
+		return "Initializing..."
+	}
+
+	return fmt.Sprintf("%s\n%s\n%s\n%s\n%s",
+		m.headerView(),
+		m.viewport.View(),
+		m.footerView(),
+		m.textarea.View(),
+		m.statusBar(),
+	)
 }

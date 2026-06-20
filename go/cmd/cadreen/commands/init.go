@@ -8,6 +8,7 @@ import (
 
 	"github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen/output"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +20,12 @@ var initCmd = &cobra.Command{
 Checks for an API key, validates it, and saves your config.
 Run this once to get started.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		tuiFlag, _ := cmd.Flags().GetBool("tui")
+
+		if tuiFlag {
+			return runInitTUI()
+		}
+
 		if cfg.IsAuthenticated() {
 			fmt.Println("Already authenticated.")
 			fmt.Printf("  API Key: %s\n", output.MaskKey(cfg.APIKeyResolved()))
@@ -62,5 +69,13 @@ Run this once to get started.`,
 }
 
 func init() {
+	initCmd.Flags().Bool("tui", false, "launch interactive setup wizard")
 	rootCmd.AddCommand(initCmd)
+}
+
+func runInitTUI() error {
+	m := newWizardModel()
+	p := tea.NewProgram(m, tea.WithAltScreen())
+	_, err := p.Run()
+	return err
 }
