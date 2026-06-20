@@ -481,14 +481,15 @@ func (m *tuiModel) updateGlamour() {
 func (m *tuiModel) updateLayout() {
 	headerHeight := 1
 	footerHeight := 1
-	helpHeight := 1
+	statusBarHeight := 1
+	helpHeight := lipgloss.Height(m.help.View(m.keys))
 	textareaHeight := m.textarea.Height()
 	if textareaHeight < 1 {
 		textareaHeight = 1
 	}
 
 	m.viewport.Width = m.width
-	m.viewport.Height = m.height - headerHeight - footerHeight - helpHeight - textareaHeight - 2
+	m.viewport.Height = m.height - headerHeight - footerHeight - statusBarHeight - helpHeight - textareaHeight - 2
 	if m.viewport.Height < 1 {
 		m.viewport.Height = 1
 	}
@@ -557,11 +558,14 @@ func (m tuiModel) View() string {
 		return "Initializing..."
 	}
 
-	return fmt.Sprintf("%s\n%s\n%s\n%s\n%s",
+	helpView := m.help.View(m.keys)
+
+	return fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s",
 		m.headerView(),
 		m.viewport.View(),
 		m.footerView(),
 		m.textarea.View(),
+		helpView,
 		m.statusBar(),
 	)
 }
