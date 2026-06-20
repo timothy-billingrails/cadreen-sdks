@@ -203,6 +203,24 @@ if install.Status == "pending_auth" {
 }
 ```
 
+## Documents
+
+```go
+// List documents
+docs, _ := c.ListDocuments(ctx)
+for _, d := range docs.Documents {
+	fmt.Printf("%s (%s)\n", d.Name, d.ContentType)
+}
+
+// Upload a document
+result, _ := c.UploadDocument(ctx, "/path/to/report.pdf")
+fmt.Printf("Uploaded: %s (ID: %s)\n", result.Name, result.ID)
+
+// Get document details
+doc, _ := c.GetDocument(ctx, result.ID)
+fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
+```
+
 ## Resources
 
 | Resource | Methods |
@@ -218,6 +236,7 @@ if install.Status == "pending_auth" {
 | `Client.Install()` | Install integration |
 | `Client.ListDocuments()` | List uploaded documents |
 | `Client.GetDocument()` | Get document by ID |
+| `Client.UploadDocument()` | Upload a document from file path |
 | `Client.ListEscalations()` | List escalations |
 | `Client.GetEscalation()` | Get escalation by ID |
 | `Client.ResolveEscalation()` | Resolve an escalation |
@@ -241,6 +260,7 @@ if install.Status == "pending_auth" {
 ## Changelog
 
 ### v0.5.1
+- Added `UploadDocument()` — upload a document from file path via multipart POST
 - Added `ListDocuments()`, `GetDocument()` — document management
 - Added `ListEscalations()`, `GetEscalation()`, `ResolveEscalation()` — escalation management
 - Added `HealingStats()`, `ListHealingPrecedents()`, `Diagnose()` — self-healing

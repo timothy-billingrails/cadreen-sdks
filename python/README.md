@@ -224,6 +224,27 @@ recent = await cadreen.traces.list(limit=10)
 stats = await cadreen.traces.stats()
 ```
 
+## Documents
+
+```python
+# List documents
+docs = await cadreen.documents.list()
+for doc in docs.documents:
+    print(f"{doc.name} ({doc.content_type})")
+
+# Upload a document from file path
+result = await cadreen.documents.upload("/path/to/report.pdf")
+print(f"Uploaded: {result.name} (ID: {result.id})")
+
+# Upload from bytes
+result = await cadreen.documents.upload_bytes(b"file contents", "data.txt")
+print(f"Uploaded: {result.name} (ID: {result.id})")
+
+# Get document details
+doc = await cadreen.documents.get(result.id)
+print(f"Status: {doc.status}, Size: {doc.size} bytes")
+```
+
 ## Requirements
 
 - Python 3.10+
@@ -233,6 +254,7 @@ stats = await cadreen.traces.stats()
 ## Changelog
 
 ### v0.5.1
+- Added `cadreen.documents.upload(file_path)` and `cadreen.documents.upload_bytes(content, filename)` — upload documents
 - Added `cadreen.documents` — document management (list, get)
 - Added `cadreen.escalations` — escalation management (list, get, resolve)
 - Added `cadreen.healing` — self-healing (stats, precedents, diagnose)

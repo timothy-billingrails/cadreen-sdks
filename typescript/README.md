@@ -173,6 +173,25 @@ if (install.status === "pending_auth") {
 console.log(catalog.installed); // ["stripe", "github"]
 ```
 
+## Documents
+
+```ts
+// List documents
+const docs = await cadreen.documents.list();
+for (const doc of docs.documents) {
+  console.log(`${doc.name} (${doc.content_type})`);
+}
+
+// Upload a document (File, Blob, or ReadableStream)
+const file = new File(["content"], "report.pdf", { type: "application/pdf" });
+const result = await cadreen.documents.upload(file);
+console.log(`Uploaded: ${result.name} (ID: ${result.id})`);
+
+// Get document details
+const doc = await cadreen.documents.get(result.id);
+console.log(`Status: ${doc.status}, Size: ${doc.size} bytes`);
+```
+
 ## Memory
 
 Store and retrieve knowledge:
@@ -273,7 +292,7 @@ try {
 | `cadreen.connections` | `catalog()`, `install(id)`, `registerOpenAPI(request)`, `registerMCP(request)`, `list()`, `delete(id)` |
 | `cadreen.traces` | `get(id)`, `list(options?)`, `stats()` |
 | `cadreen.executions` | `stream(id)`, `getStatus(id)` |
-| `cadreen.documents` | `list()`, `get(id)`, `download(id)` |
+| `cadreen.documents` | `list()`, `get(id)`, `download(id)`, `upload(file)` |
 | `cadreen.escalations` | `list()`, `get(id)`, `resolve(id, resolution)` |
 | `cadreen.healing` | `stats()`, `precedents()`, `diagnose(request)` |
 | `cadreen.webhooks` | `create(request)`, `list()`, `delete(id)`, `verifySignature()` |
@@ -289,6 +308,7 @@ try {
 ## Changelog
 
 ### v0.5.1
+- Added `cadreen.documents.upload(file)` — upload documents via multipart POST
 - Added `cadreen.documents` — document management (list, get, download)
 - Added `cadreen.escalations` — escalation management (list, get, resolve)
 - Added `cadreen.healing` — self-healing (stats, precedents, diagnose)

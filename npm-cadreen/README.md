@@ -37,6 +37,7 @@ cadreen doctor      # Check readiness
 | `cadreen traces` | What happened |
 | `cadreen documents list` | List documents |
 | `cadreen documents get [id]` | Get document details |
+| `cadreen documents upload [filepath]` | Upload a document |
 | `cadreen escalations list` | List escalations |
 | `cadreen escalations get [id]` | Get escalation details |
 | `cadreen escalations resolve [id] "..."` | Resolve an escalation |
@@ -80,6 +81,7 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 ## Changelog
 
 ### v0.2.1
+- Added `documents upload` command — upload files via multipart POST
 - Added `documents` commands (list, get)
 - Added `escalations` commands (list, get, resolve)
 - Added `healing` commands (stats, precedents, diagnose)

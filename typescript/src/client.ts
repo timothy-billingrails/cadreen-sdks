@@ -279,6 +279,50 @@ export class HttpClient {
     return response;
   }
 
+  async postMultipart<T>(path: string, formData: FormData): Promise<T> {
+    if (this.sandbox) {
+      const fixtureKey = `POST ${path}`;
+      if (fixtureKey in this.fixtures) {
+        return this.fixtures[fixtureKey] as T;
+      }
+      if (path in this.fixtures) {
+        return this.fixtures[path] as T;
+      }
+      throw new CadreenError(404, "not_found", "not_found", `No fixture for ${fixtureKey}.`);
+    }
+
+    const url = `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${this.apiKey}`,
+      Accept: `application/json; profile="${this.profile}"`,
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let errorBody: ApiErrorResponse | null = null;
+      try {
+        errorBody = await response.json();
+      } catch {
+        // not JSON
+      }
+      throw new CadreenError(
+        response.status,
+        errorBody?.error?.code || "unknown",
+        errorBody?.error?.type || "error",
+        errorBody?.error?.message || response.statusText,
+        errorBody?.error?.details,
+        errorBody?.intelligence
+      );
+    }
+
+    return (await response.json()) as T;
+  }
+
   async put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>("PUT", path, body, options);
   }

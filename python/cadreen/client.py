@@ -168,6 +168,43 @@ class HttpClient:
     async def post(self, path: str, body: Optional[Any] = None, options: Optional[RequestOptions] = None) -> Any:
         return await self.request("POST", path, body, options)
 
+    async def post_multipart(self, path: str, files: dict[str, Any]) -> Any:
+        if self._sandbox:
+            fixture_key = f"POST {path}"
+            if fixture_key in self._fixtures:
+                return self._fixtures[fixture_key]
+            if path in self._fixtures:
+                return self._fixtures[path]
+            raise CadreenError(404, "not_found", "not_found", f"No fixture for {fixture_key}.")
+
+        url = f"{self._base_url}{path}"
+        headers: dict[str, str] = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Accept": f'application/json; profile="{self._profile}"',
+        }
+
+        async with httpx.AsyncClient(timeout=self._timeout) as client:
+            response = await client.post(url=url, headers=headers, files=files)
+
+        if not response.is_success:
+            error_body: Optional[dict[str, Any]] = None
+            try:
+                error_body = response.json()
+            except Exception:
+                pass
+            raise CadreenError(
+                status=response.status_code,
+                code=error_body.get("error", {}).get("code", "unknown") if error_body else "unknown",
+                error_type=error_body.get("error", {}).get("type", "error") if error_body else "error",
+                message=error_body.get("error", {}).get("message", response.text) if error_body else response.text,
+                details=error_body.get("error", {}).get("details") if error_body else None,
+                intelligence=error_body.get("intelligence") if error_body else None,
+            )
+
+        if response.status_code == 204:
+            return None
+        return response.json()
+
     async def put(self, path: str, body: Optional[Any] = None, options: Optional[RequestOptions] = None) -> Any:
         return await self.request("PUT", path, body, options)
 
