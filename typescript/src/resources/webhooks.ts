@@ -1,7 +1,29 @@
 import { timingSafeEqual } from "crypto";
 import { createHmac } from "crypto";
+import type {
+  Webhook,
+  ListWebhooksResponse,
+} from "../types";
+import { HttpClient } from "../client";
 
 export class WebhooksResource {
+  constructor(private client?: HttpClient) {}
+
+  async create(request: { url: string; events?: string[]; secret?: string }): Promise<Webhook> {
+    if (!this.client) throw new Error("WebhooksResource not initialized with HttpClient");
+    return this.client.post<Webhook>("/api/v1/cadreen/webhooks", request);
+  }
+
+  async list(): Promise<ListWebhooksResponse> {
+    if (!this.client) throw new Error("WebhooksResource not initialized with HttpClient");
+    return this.client.get<ListWebhooksResponse>("/api/v1/cadreen/webhooks");
+  }
+
+  async delete(id: string): Promise<void> {
+    if (!this.client) throw new Error("WebhooksResource not initialized with HttpClient");
+    return this.client.delete<void>(`/api/v1/cadreen/webhooks/${encodeURIComponent(id)}`);
+  }
+
   /**
    * Verify the HMAC-SHA256 signature of a webhook payload.
    *

@@ -1010,3 +1010,213 @@ class InstallResponse:
     provider: str
     auth_url: Optional[str] = None
     estimated_time: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Document types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Document:
+    id: str
+    name: str
+    content_type: Optional[str] = None
+    size: Optional[int] = None
+    status: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+@dataclass
+class ListDocumentsResponse:
+    documents: list[Document]
+    count: int
+    pagination: Optional[Pagination] = None
+
+
+@dataclass
+class UploadDocumentResponse:
+    id: str
+    name: str
+    content_type: Optional[str] = None
+    size: Optional[int] = None
+    status: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Webhook types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Webhook:
+    id: str
+    url: str
+    is_active: bool
+    events: Optional[list[str]] = None
+    secret: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+@dataclass
+class ListWebhooksResponse:
+    webhooks: list[Webhook]
+    count: int
+    pagination: Optional[Pagination] = None
+
+
+# ---------------------------------------------------------------------------
+# Learning types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class LearningPattern:
+    id: str
+    pattern: str
+    confidence: float
+    occurrences: Optional[int] = None
+    domain: Optional[str] = None
+    tags: Optional[list[str]] = None
+    created_at: Optional[str] = None
+
+
+@dataclass
+class LearningEpisode:
+    id: str
+    description: str
+    outcome: Optional[str] = None
+    trace_id: Optional[str] = None
+    domain: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+@dataclass
+class LearningSuggestion:
+    id: str
+    type: str
+    description: str
+    impact: Optional[str] = None
+    domain: Optional[str] = None
+
+
+@dataclass
+class ListLearningPatternsResponse:
+    patterns: list[LearningPattern]
+    count: int
+    pagination: Optional[Pagination] = None
+
+
+@dataclass
+class ListLearningEpisodesResponse:
+    episodes: list[LearningEpisode]
+    count: int
+    pagination: Optional[Pagination] = None
+
+
+@dataclass
+class ListLearningSuggestionsResponse:
+    suggestions: list[LearningSuggestion]
+    count: int
+    pagination: Optional[Pagination] = None
+
+
+# ---------------------------------------------------------------------------
+# Healing types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class HealingDiagnosis:
+    error_category: Optional[str] = None
+    semantic_reason: Optional[str] = None
+    root_cause: Optional[str] = None
+    can_retry: Optional[bool] = None
+    needs_sub_execution: Optional[bool] = None
+    needs_human: Optional[bool] = None
+    should_skip: Optional[bool] = None
+    needs_re_decide: Optional[bool] = None
+    needs_try_alternative: Optional[bool] = None
+    retry_delay_ms: Optional[int] = None
+    confidence: Optional[float] = None
+
+
+@dataclass
+class StrategyCount:
+    strategy: str
+    count: int
+
+
+@dataclass
+class ToolHealingStats:
+    tool_name: str
+    total: int
+    successful: int
+    failed: int
+    success_rate: float
+    top_strategy: Optional[str] = None
+
+
+@dataclass
+class TimeRange:
+    first_precedent: Optional[str] = None
+    last_precedent: Optional[str] = None
+
+
+@dataclass
+class HealingStatsResponse:
+    total_precedents: Optional[int] = None
+    successful_recoveries: Optional[int] = None
+    failed_recoveries: Optional[int] = None
+    success_rate: Optional[float] = None
+    avg_duration_ms: Optional[int] = None
+    common_strategies: Optional[list[StrategyCount]] = None
+    top_tools: Optional[list[ToolHealingStats]] = None
+    by_category: Optional[dict[str, Any]] = None
+    time_range: Optional[TimeRange] = None
+
+
+@dataclass
+class HealingPrecedent:
+    id: str
+    error_type: str
+    success: bool
+    attempts: int
+    confidence: float
+    tool_name: Optional[str] = None
+    error_category: Optional[str] = None
+    semantic_reason: Optional[str] = None
+    root_cause: Optional[str] = None
+    recovery_strategy: Optional[str] = None
+    what_worked: Optional[str] = None
+    what_failed: Optional[str] = None
+    duration_ms: Optional[int] = None
+    created_at: Optional[str] = None
+    domain: Optional[str] = None
+    tags: Optional[list[str]] = None
+
+
+@dataclass
+class ListHealingPrecedentsResponse:
+    precedents: list[HealingPrecedent]
+    count: int
+    pagination: Optional[Pagination] = None
+
+
+@dataclass
+class CreateCredentialRequest:
+    provider: str
+    key_data: dict
+    name: Optional[str] = None
+
+
+@dataclass
+class ResolveEscalationRequest:
+    resolution: str
+
+
+@dataclass
+class DiagnoseRequest:
+    error: str
+    tool_name: Optional[str] = None
+    trace_id: Optional[str] = None

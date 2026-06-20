@@ -54,3 +54,19 @@ func (c *Client) Confirm(ctx context.Context, policyID string, opts ...RequestOp
 	}
 	return &result, nil
 }
+
+func (c *Client) ListPolicies(ctx context.Context, opts ...RequestOption) (*ListPoliciesResponse, error) {
+	var result ListPoliciesResponse
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/policies", nil, &result, opts...); err != nil {
+		return nil, fmt.Errorf("list policies: %w", err)
+	}
+	return &result, nil
+}
+
+func (c *Client) GetPolicy(ctx context.Context, id string, opts ...RequestOption) (*PolicyBundle, error) {
+	var result PolicyBundle
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/policies/"+id, nil, &result, opts...); err != nil {
+		return nil, fmt.Errorf("get policy: %w", err)
+	}
+	return &result, nil
+}

@@ -35,6 +35,22 @@ cadreen doctor      # Check readiness
 | `cadreen policies evaluate "..."` | Test an action |
 | `cadreen tools` | Available tools |
 | `cadreen traces` | What happened |
+| `cadreen documents list` | List documents |
+| `cadreen documents get [id]` | Get document details |
+| `cadreen escalations list` | List escalations |
+| `cadreen escalations get [id]` | Get escalation details |
+| `cadreen escalations resolve [id] "..."` | Resolve an escalation |
+| `cadreen healing stats` | Healing statistics |
+| `cadreen healing precedents` | Healing precedents |
+| `cadreen healing diagnose "..."` | Diagnose a failure |
+| `cadreen webhooks list` | List webhooks |
+| `cadreen webhooks create [url]` | Create webhook |
+| `cadreen webhooks delete [id]` | Delete webhook |
+| `cadreen learning patterns` | Detected patterns |
+| `cadreen learning episodes` | Learning episodes |
+| `cadreen learning suggestions` | Improvement suggestions |
+| `cadreen credentials list` | List credentials |
+| `cadreen credentials delete [id]` | Delete credential |
 | `cadreen config` | Local settings |
 | `cadreen update` | Update CLI |
 
@@ -62,6 +78,14 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
 ## Changelog
+
+### v0.2.1
+- Added `documents` commands (list, get)
+- Added `escalations` commands (list, get, resolve)
+- Added `healing` commands (stats, precedents, diagnose)
+- Added `webhooks` commands (list, create, delete)
+- Added `learning` commands (patterns, episodes, suggestions)
+- Added `credentials` commands (list, delete)
 
 ### v0.2.0
 - Updated to SDK v0.5.0 (Cadreen surface paths)

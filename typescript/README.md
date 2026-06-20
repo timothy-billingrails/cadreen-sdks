@@ -273,12 +273,30 @@ try {
 | `cadreen.connections` | `catalog()`, `install(id)`, `registerOpenAPI(request)`, `registerMCP(request)`, `list()`, `delete(id)` |
 | `cadreen.traces` | `get(id)`, `list(options?)`, `stats()` |
 | `cadreen.executions` | `stream(id)`, `getStatus(id)` |
+| `cadreen.documents` | `list()`, `get(id)`, `download(id)` |
+| `cadreen.escalations` | `list()`, `get(id)`, `resolve(id, resolution)` |
+| `cadreen.healing` | `stats()`, `precedents()`, `diagnose(request)` |
+| `cadreen.webhooks` | `create(request)`, `list()`, `delete(id)`, `verifySignature()` |
+| `cadreen.learning` | `patterns()`, `episodes()`, `suggestions()` |
+| `cadreen.credentials` | `list()`, `create(request)`, `delete(id)` |
+| `cadreen.listCapabilities()` | List available capabilities |
+| `cadreen.assess(task, domain?)` | Assess task readiness |
 
 ## Shorthand
 
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.5.1
+- Added `cadreen.documents` — document management (list, get, download)
+- Added `cadreen.escalations` — escalation management (list, get, resolve)
+- Added `cadreen.healing` — self-healing (stats, precedents, diagnose)
+- Added `cadreen.webhooks` — webhook CRUD (create, list, delete) + signature verification
+- Added `cadreen.learning` — learning insights (patterns, episodes, suggestions)
+- Added `cadreen.credentials` — credential management (list, create, delete)
+- Added `cadreen.listCapabilities()` — list available capabilities
+- Added `cadreen.assess(task, domain?)` — assess task readiness
 
 ### v0.5.0 (BREAKING)
 - **BREAKING:** API endpoints moved to Cadreen surface (`/api/v1/cadreen/`):

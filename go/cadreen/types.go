@@ -836,3 +836,98 @@ type ConnectResult struct {
 	Capability string         `json:"capability,omitempty"`
 	Detail     map[string]any `json:"detail,omitempty"`
 }
+
+// ---------------------------------------------------------------------------
+// Document types
+// ---------------------------------------------------------------------------
+
+type Document struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	ContentType string `json:"content_type,omitempty"`
+	Size        int64  `json:"size,omitempty"`
+	Status      string `json:"status,omitempty"`
+	CreatedAt   string `json:"created_at,omitempty"`
+}
+
+type ListDocumentsResponse struct {
+	Documents  []Document `json:"documents"`
+	Count      int        `json:"count"`
+	Pagination Pagination `json:"pagination,omitempty"`
+}
+
+type UploadDocumentResponse struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	ContentType string `json:"content_type,omitempty"`
+	Size        int64  `json:"size,omitempty"`
+	Status      string `json:"status,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// Webhook types
+// ---------------------------------------------------------------------------
+
+type Webhook struct {
+	ID        string   `json:"id"`
+	URL       string   `json:"url"`
+	Events    []string `json:"events,omitempty"`
+	Secret    string   `json:"secret,omitempty"`
+	IsActive  bool     `json:"is_active"`
+	CreatedAt string   `json:"created_at,omitempty"`
+}
+
+type ListWebhooksResponse struct {
+	Webhooks   []Webhook  `json:"webhooks"`
+	Count      int        `json:"count"`
+	Pagination Pagination `json:"pagination,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// Learning types
+// ---------------------------------------------------------------------------
+
+type LearningPattern struct {
+	ID          string   `json:"id"`
+	Pattern     string   `json:"pattern"`
+	Confidence  float64  `json:"confidence"`
+	Occurrences int      `json:"occurrences,omitempty"`
+	Domain      string   `json:"domain,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+	CreatedAt   string   `json:"created_at,omitempty"`
+}
+
+type LearningEpisode struct {
+	ID          string `json:"id"`
+	Description string `json:"description"`
+	Outcome     string `json:"outcome,omitempty"`
+	TraceID     string `json:"trace_id,omitempty"`
+	Domain      string `json:"domain,omitempty"`
+	CreatedAt   string `json:"created_at,omitempty"`
+}
+
+type LearningSuggestion struct {
+	ID          string `json:"id"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Impact      string `json:"impact,omitempty"`
+	Domain      string `json:"domain,omitempty"`
+}
+
+type ListLearningPatternsResponse struct {
+	Patterns   []LearningPattern `json:"patterns"`
+	Count      int               `json:"count"`
+	Pagination Pagination        `json:"pagination,omitempty"`
+}
+
+type ListLearningEpisodesResponse struct {
+	Episodes   []LearningEpisode `json:"episodes"`
+	Count      int               `json:"count"`
+	Pagination Pagination        `json:"pagination,omitempty"`
+}
+
+type ListLearningSuggestionsResponse struct {
+	Suggestions []LearningSuggestion `json:"suggestions"`
+	Count       int                  `json:"count"`
+	Pagination  Pagination           `json:"pagination,omitempty"`
+}

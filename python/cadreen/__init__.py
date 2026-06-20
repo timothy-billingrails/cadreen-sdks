@@ -104,6 +104,27 @@ from .types import (
     CatalogCategory,
     CatalogIntegration,
     InstallResponse,
+    Document,
+    ListDocumentsResponse,
+    UploadDocumentResponse,
+    Webhook,
+    ListWebhooksResponse,
+    LearningPattern,
+    LearningEpisode,
+    LearningSuggestion,
+    ListLearningPatternsResponse,
+    ListLearningEpisodesResponse,
+    ListLearningSuggestionsResponse,
+    HealingDiagnosis,
+    HealingStatsResponse,
+    HealingPrecedent,
+    ListHealingPrecedentsResponse,
+    StrategyCount,
+    ToolHealingStats,
+    TimeRange,
+    CreateCredentialRequest,
+    ResolveEscalationRequest,
+    DiagnoseRequest,
 )
 
 from .client import HttpClient
@@ -115,6 +136,12 @@ from .resources.traces import TracesResource
 from .resources.executions import ExecutionsResource
 from .resources.guardrails import GuardrailsResource
 from .resources.chat import ChatResource
+from .resources.documents import DocumentsResource
+from .resources.escalations import EscalationsResource
+from .resources.healing import HealingResource
+from .resources.webhooks import WebhooksResource
+from .resources.learning import LearningResource
+from .resources.credentials import CredentialsResource
 from .resources.chat import (
     ChatMessage,
     ChatToolCall,
@@ -147,6 +174,12 @@ class Cadreen:
         self.executions = ExecutionsResource(self._client)
         self.guardrails = GuardrailsResource(self.policies)
         self.chat = ChatResource(self._client)
+        self.documents = DocumentsResource(self._client)
+        self.escalations = EscalationsResource(self._client)
+        self.healing = HealingResource(self._client)
+        self.webhooks = WebhooksResource(self._client)
+        self.learning = LearningResource(self._client)
+        self.credentials = CredentialsResource(self._client)
 
     async def invoke(self, request: IntentRequest) -> IntentResult:
         return await self.intent.invoke(request)
@@ -246,4 +279,85 @@ class Cadreen:
             applied=resp["applied"], failed=resp["failed"],
             workspace_id=resp.get("workspace_id"),
             proposals=props or None,
+        )
+
+    async def list_capabilities(self) -> ListCapabilitiesResponse:
+        raw = await self._client.get("/api/v1/cadreen/capabilities")
+        available = [
+            CapabilityMatch(
+                name=c["name"],
+                human_name=c.get("human_name"),
+                description=c.get("description"),
+                score=c.get("score"),
+                matched_on=c.get("matched_on"),
+                health=c.get("health"),
+                source=c.get("source"),
+                status=c.get("status"),
+                functions=c.get("functions"),
+                category=c.get("category"),
+            )
+            for c in raw.get("available", [])
+        ]
+        gaps = [
+            Gap(
+                capability=g["capability"],
+                severity=g.get("severity", "low"),
+                blocking=g.get("blocking", False),
+                reason=g.get("reason"),
+                description=g.get("description"),
+                source=g.get("source"),
+            )
+            for g in raw.get("gaps", [])
+        ]
+        return ListCapabilitiesResponse(
+            available=available,
+            count=raw.get("count", 0),
+            gaps=gaps or None,
+        )
+
+    async def assess(self, task: str, *, domain: str | None = None) -> Assessment:
+        body: dict = {"task": task}
+        if domain:
+            body["domain"] = domain
+        resp = await self._client.post("/api/v1/cadreen/assess", body)
+        a = resp.get("assessment", resp)
+        capabilities = [
+            CapabilityMatch(
+                name=c["name"],
+                human_name=c.get("human_name"),
+                description=c.get("description"),
+                score=c.get("score"),
+                matched_on=c.get("matched_on"),
+                health=c.get("health"),
+                source=c.get("source"),
+                status=c.get("status"),
+                functions=c.get("functions"),
+                category=c.get("category"),
+            )
+            for c in a.get("capabilities", [])
+        ]
+        gaps = [
+            Gap(
+                capability=g["capability"],
+                severity=g.get("severity", "low"),
+                blocking=g.get("blocking", False),
+                reason=g.get("reason"),
+                description=g.get("description"),
+                source=g.get("source"),
+            )
+            for g in a.get("gaps", [])
+        ]
+        return Assessment(
+            task=a["task"],
+            can_do=a.get("can_do", 0.0),
+            assessment_quality=a.get("assessment_quality", "insufficient_data"),
+            ready_capabilities=a.get("ready_capabilities", 0),
+            total_capabilities=a.get("total_capabilities", 0),
+            gap_count=a.get("gap_count", 0),
+            ready_for_deployment=a.get("ready_for_deployment", False),
+            capabilities=capabilities or None,
+            gaps=gaps or None,
+            gap_filling_tasks=a.get("gap_filling_tasks"),
+            blocking_gaps=a.get("blocking_gaps"),
+            needs_clarification=a.get("needs_clarification"),
         )

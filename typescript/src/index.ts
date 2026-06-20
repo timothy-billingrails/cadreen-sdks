@@ -10,6 +10,11 @@ import { SkillsResource } from "./resources/skills";
 import { FailuresResource } from "./resources/failures";
 import { WebhooksResource } from "./resources/webhooks";
 import { ChatResource } from "./resources/chat";
+import { DocumentsResource } from "./resources/documents";
+import { EscalationsResource } from "./resources/escalations";
+import { HealingResource } from "./resources/healing";
+import { LearningResource } from "./resources/learning";
+import { CredentialsResource } from "./resources/credentials";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -22,6 +27,8 @@ import type {
   ConnectResult,
   SetupRequest,
   SetupResult,
+  ListCapabilitiesResponse,
+  Assessment,
 } from "./types";
 
 export { CadreenError, CadreenBlockedError, CadreenClarifyError } from "./client";
@@ -43,6 +50,11 @@ export class Cadreen {
   public readonly failures: FailuresResource;
   public readonly webhooks: WebhooksResource;
   public readonly chat: ChatResource;
+  public readonly documents: DocumentsResource;
+  public readonly escalations: EscalationsResource;
+  public readonly healing: HealingResource;
+  public readonly learning: LearningResource;
+  public readonly credentials: CredentialsResource;
 
   private readonly client: HttpClient;
 
@@ -57,8 +69,13 @@ export class Cadreen {
     this.guardrails = new GuardrailsResource(this.policies);
     this.skills = new SkillsResource(this.intent, this.memory, this.connections);
     this.failures = new FailuresResource(this.traces);
-    this.webhooks = new WebhooksResource();
+    this.webhooks = new WebhooksResource(this.client);
     this.chat = new ChatResource(this.client);
+    this.documents = new DocumentsResource(this.client);
+    this.escalations = new EscalationsResource(this.client);
+    this.healing = new HealingResource(this.client);
+    this.learning = new LearningResource(this.client);
+    this.credentials = new CredentialsResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -105,6 +122,17 @@ export class Cadreen {
 
   async setup(request: SetupRequest): Promise<SetupResult> {
     return this.client.post<SetupResult>("/api/v1/cadreen/setup", request);
+  }
+
+  async listCapabilities(): Promise<ListCapabilitiesResponse> {
+    return this.client.get<ListCapabilitiesResponse>("/api/v1/cadreen/capabilities");
+  }
+
+  async assess(task: string, domain?: string): Promise<Assessment> {
+    const body: Record<string, string> = { task };
+    if (domain) body.domain = domain;
+    const wrapper = await this.client.post<{ assessment: Assessment }>("/api/v1/cadreen/assess", body);
+    return wrapper.assessment;
   }
 }
 
@@ -208,11 +236,37 @@ export type {
   ReplayResult,
   HandoffPacket,
   PromoteResult,
+  Document,
+  ListDocumentsResponse,
+  UploadDocumentResponse,
+  Webhook,
+  ListWebhooksResponse,
+  LearningPattern,
+  LearningEpisode,
+  LearningSuggestion,
+  ListLearningPatternsResponse,
+  ListLearningEpisodesResponse,
+  ListLearningSuggestionsResponse,
+  HealingDiagnosis,
+  HealingStatsResponse,
+  HealingPrecedent,
+  ListHealingPrecedentsResponse,
+  StrategyCount,
+  ToolHealingStats,
+  TimeRange,
+  CreateCredentialRequest,
+  ResolveEscalationRequest,
+  DiagnoseRequest,
 } from "./types";
 
 export { GuardrailsResource } from "./resources/guardrails";
 export { WebhooksResource } from "./resources/webhooks";
 export { ChatResource } from "./resources/chat";
+export { DocumentsResource } from "./resources/documents";
+export { EscalationsResource } from "./resources/escalations";
+export { HealingResource } from "./resources/healing";
+export { LearningResource } from "./resources/learning";
+export { CredentialsResource } from "./resources/credentials";
 export type {
   ChatMessage,
   ChatToolCall,

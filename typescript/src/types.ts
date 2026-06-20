@@ -740,3 +740,192 @@ export interface InstallResponse {
   provider: string;
   estimated_time?: string;
 }
+
+// ---------------------------------------------------------------------------
+// Document types
+// ---------------------------------------------------------------------------
+
+export interface Document {
+  id: string;
+  name: string;
+  content_type?: string;
+  size?: number;
+  status?: string;
+  created_at?: string;
+}
+
+export interface ListDocumentsResponse {
+  documents: Document[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface UploadDocumentResponse {
+  id: string;
+  name: string;
+  content_type?: string;
+  size?: number;
+  status?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Webhook types
+// ---------------------------------------------------------------------------
+
+export interface Webhook {
+  id: string;
+  url: string;
+  events?: string[];
+  secret?: string;
+  is_active: boolean;
+  created_at?: string;
+}
+
+export interface ListWebhooksResponse {
+  webhooks: Webhook[];
+  count: number;
+  pagination?: Pagination;
+}
+
+// ---------------------------------------------------------------------------
+// Learning types
+// ---------------------------------------------------------------------------
+
+export interface LearningPattern {
+  id: string;
+  pattern: string;
+  confidence: number;
+  occurrences?: number;
+  domain?: string;
+  tags?: string[];
+  created_at?: string;
+}
+
+export interface LearningEpisode {
+  id: string;
+  description: string;
+  outcome?: string;
+  trace_id?: string;
+  domain?: string;
+  created_at?: string;
+}
+
+export interface LearningSuggestion {
+  id: string;
+  type: string;
+  description: string;
+  impact?: string;
+  domain?: string;
+}
+
+export interface ListLearningPatternsResponse {
+  patterns: LearningPattern[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListLearningEpisodesResponse {
+  episodes: LearningEpisode[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListLearningSuggestionsResponse {
+  suggestions: LearningSuggestion[];
+  count: number;
+  pagination?: Pagination;
+}
+
+// ---------------------------------------------------------------------------
+// Healing types
+// ---------------------------------------------------------------------------
+
+export interface HealingDiagnosis {
+  error_category?: string;
+  semantic_reason?: string;
+  root_cause?: string;
+  can_retry?: boolean;
+  needs_sub_execution?: boolean;
+  needs_human?: boolean;
+  should_skip?: boolean;
+  needs_re_decide?: boolean;
+  needs_try_alternative?: boolean;
+  retry_delay_ms?: number;
+  confidence?: number;
+}
+
+export interface StrategyCount {
+  strategy: string;
+  count: number;
+}
+
+export interface ToolHealingStats {
+  tool_name: string;
+  total: number;
+  successful: number;
+  failed: number;
+  success_rate: number;
+  top_strategy?: string;
+}
+
+export interface TimeRange {
+  first_precedent?: string;
+  last_precedent?: string;
+}
+
+export interface HealingStatsResponse {
+  total_precedents?: number;
+  successful_recoveries?: number;
+  failed_recoveries?: number;
+  success_rate?: number;
+  avg_duration_ms?: number;
+  common_strategies?: StrategyCount[];
+  top_tools?: ToolHealingStats[];
+  by_category?: Record<string, unknown>;
+  time_range?: TimeRange;
+}
+
+export interface HealingPrecedent {
+  id: string;
+  tool_name?: string;
+  error_type: string;
+  error_category?: string;
+  semantic_reason?: string;
+  root_cause?: string;
+  recovery_strategy?: string;
+  success: boolean;
+  what_worked?: string;
+  what_failed?: string;
+  attempts: number;
+  duration_ms?: number;
+  confidence: number;
+  created_at?: string;
+  domain?: string;
+  tags?: string[];
+}
+
+export interface ListHealingPrecedentsResponse {
+  precedents: HealingPrecedent[];
+  count: number;
+  pagination?: Pagination;
+}
+
+// ---------------------------------------------------------------------------
+// Credential types (request)
+// ---------------------------------------------------------------------------
+
+export interface CreateCredentialRequest {
+  provider: string;
+  name?: string;
+  key_data: Record<string, unknown>;
+}
+
+export interface ResolveEscalationRequest {
+  resolution: string;
+}
+
+export interface DiagnoseRequest {
+  error: string;
+  tool_name?: string;
+  trace_id?: string;
+}

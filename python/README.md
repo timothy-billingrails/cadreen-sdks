@@ -232,6 +232,16 @@ stats = await cadreen.traces.stats()
 
 ## Changelog
 
+### v0.5.1
+- Added `cadreen.documents` — document management (list, get)
+- Added `cadreen.escalations` — escalation management (list, get, resolve)
+- Added `cadreen.healing` — self-healing (stats, precedents, diagnose)
+- Added `cadreen.webhooks` — webhook CRUD (create, list, delete)
+- Added `cadreen.learning` — learning insights (patterns, episodes, suggestions)
+- Added `cadreen.credentials` — credential management (list, create, delete)
+- Added `cadreen.list_capabilities()` — list available capabilities
+- Added `cadreen.assess(task, domain=)` — assess task readiness
+
 ### v0.5.0 (BREAKING)
 - **BREAKING:** API endpoints moved to Cadreen surface (`/api/v1/cadreen/`):
   - `/api/v1/chat/completions` → `/api/v1/cadreen/chat/completions`

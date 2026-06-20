@@ -216,8 +216,38 @@ if install.Status == "pending_auth" {
 | `Client.Setup()` | One-time setup |
 | `Client.Catalog()` | Browse marketplace |
 | `Client.Install()` | Install integration |
+| `Client.ListDocuments()` | List uploaded documents |
+| `Client.GetDocument()` | Get document by ID |
+| `Client.ListEscalations()` | List escalations |
+| `Client.GetEscalation()` | Get escalation by ID |
+| `Client.ResolveEscalation()` | Resolve an escalation |
+| `Client.HealingStats()` | Healing statistics |
+| `Client.ListHealingPrecedents()` | List healing precedents |
+| `Client.Diagnose()` | Diagnose a failure |
+| `Client.CreateWebhook()` | Create webhook subscription |
+| `Client.ListWebhooks()` | List webhook subscriptions |
+| `Client.DeleteWebhook()` | Delete webhook |
+| `Client.ListLearningPatterns()` | Detected patterns |
+| `Client.ListLearningEpisodes()` | Learning episodes |
+| `Client.ListLearningSuggestions()` | Improvement suggestions |
+| `Client.ListCredentials()` | List credentials |
+| `Client.CreateCredential()` | Create credential |
+| `Client.DeleteCredential()` | Delete credential |
+| `Client.ListPolicies()` | List policies |
+| `Client.GetPolicy()` | Get policy bundle |
+| `Client.ListCapabilities()` | List capabilities |
+| `Client.Assess()` | Assess task readiness |
 
 ## Changelog
+
+### v0.5.1
+- Added `ListDocuments()`, `GetDocument()` — document management
+- Added `ListEscalations()`, `GetEscalation()`, `ResolveEscalation()` — escalation management
+- Added `HealingStats()`, `ListHealingPrecedents()`, `Diagnose()` — self-healing
+- Added `CreateWebhook()`, `ListWebhooks()`, `DeleteWebhook()` — webhook subscriptions
+- Added `ListLearningPatterns()`, `ListLearningEpisodes()`, `ListLearningSuggestions()` — learning insights
+- Added `ListCredentials()`, `CreateCredential()`, `DeleteCredential()` — credential management
+- Added `ListPolicies()`, `GetPolicy()` — policy listing (was missing, TS/Python had it)
 
 ### v0.5.0 (BREAKING)
 - **BREAKING:** API endpoints moved to Cadreen surface (`/api/v1/cadreen/`):
