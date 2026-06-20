@@ -139,7 +139,7 @@ cadreen = Cadreen(
 
 | Profile | What you get | Use when |
 |---------|-------------|----------|
-| `"full"` (default) | Full intelligence envelope | You want full transparency |
+| `"full"` (default) | Full response metadata | You want full transparency |
 | `"audit"` | Only governance decision + confidence + blocking gaps | You need to react to gates |
 | `"lean"` | No envelope. Just `trace_id` | Hot-looping, minimal payload |
 
@@ -231,6 +231,13 @@ stats = await cadreen.traces.stats()
 - httpx-sse >= 0.4
 
 ## Changelog
+
+### v0.5.0 (BREAKING)
+- **BREAKING:** API endpoints moved to Cadreen surface (`/api/v1/cadreen/`):
+  - `/api/v1/chat/completions` → `/api/v1/cadreen/chat/completions`
+  - `/api/v1/tools` → `/api/v1/cadreen/tools`
+- All external API calls now route through the Cadreen surface
+- Removed "response metadata" terminology (was "intelligence envelope")
 
 ### v0.4.0
 - Added `cadreen.chat.completions()` — OpenAI-compatible chat completions with governance

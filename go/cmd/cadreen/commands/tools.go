@@ -18,7 +18,7 @@ Shows connected services and their capabilities.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		requireAuth()
 
-		resp, err := rawDo("GET", "/api/v1/tools", nil)
+		resp, err := rawDo("GET", "/api/v1/cadreen/tools", nil)
 		if err != nil {
 			return handleAPIError(err)
 		}

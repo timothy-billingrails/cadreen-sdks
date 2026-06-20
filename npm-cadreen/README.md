@@ -61,6 +61,15 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [Docs](https://accomplishanything.today/infra/docs)
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
+## Changelog
+
+### v0.2.0
+- Updated to SDK v0.5.0 (Cadreen surface paths)
+- `cadreen tools` now calls `/api/v1/cadreen/tools`
+
+### v0.1.0
+- Initial release
+
 ## License
 
 UNLICENSED

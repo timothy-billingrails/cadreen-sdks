@@ -112,7 +112,7 @@ export class ChatResource {
    * ```
    */
   async completions(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
-    return this.client.post<ChatCompletionResponse>("/api/v1/chat/completions", {
+    return this.client.post<ChatCompletionResponse>("/api/v1/cadreen/chat/completions", {
       ...request,
       stream: false,
     });
@@ -137,7 +137,7 @@ export class ChatResource {
   async completionsStream(
     request: ChatCompletionRequest
   ): Promise<AsyncIterable<ChatStreamEvent>> {
-    const response = await this.client.postStream("/api/v1/chat/completions", {
+    const response = await this.client.postStream("/api/v1/cadreen/chat/completions", {
       ...request,
       stream: true,
     });
@@ -154,7 +154,7 @@ export class ChatResource {
    * List available tools as OpenAI-compatible function definitions.
    */
   async listTools(): Promise<ListToolsResponse> {
-    return this.client.get<ListToolsResponse>("/api/v1/tools");
+    return this.client.get<ListToolsResponse>("/api/v1/cadreen/tools");
   }
 }
 

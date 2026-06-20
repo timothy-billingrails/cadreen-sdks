@@ -143,7 +143,7 @@ Control how much intelligence metadata you get back:
 
 | Profile | What you get | Use when |
 |---------|-------------|----------|
-| `"full"` (default) | Full intelligence envelope with capability, reasoning, memory, governance, humility, process | You want full transparency |
+| `"full"` (default) | Full response metadata with capability, reasoning, memory, governance, humility, process | You want full transparency |
 | `"audit"` | Only governance decision + confidence + blocking gaps | You need to react to gates, not inspect internals |
 | `"lean"` | No envelope. `trace_id` in body + `X-Cadreen-Trace-ID` header | Hot-looping, minimal payload |
 
@@ -279,6 +279,13 @@ try {
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.5.0 (BREAKING)
+- **BREAKING:** API endpoints moved to Cadreen surface (`/api/v1/cadreen/`):
+  - `/api/v1/chat/completions` → `/api/v1/cadreen/chat/completions`
+  - `/api/v1/tools` → `/api/v1/cadreen/tools`
+- All external API calls now route through the Cadreen surface
+- Removed "response metadata" terminology (was "intelligence envelope")
 
 ### v0.4.0
 - Added `cadreen.chat.completions()` — OpenAI-compatible chat completions with governance

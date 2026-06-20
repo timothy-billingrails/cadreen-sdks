@@ -268,7 +268,7 @@ class ChatResource:
         if request.conversation_id:
             body["conversation_id"] = request.conversation_id
 
-        raw = await self._client.post("/api/v1/chat/completions", body)
+        raw = await self._client.post("/api/v1/cadreen/chat/completions", body)
         return _parse_chat_response(raw)
 
     async def completions_stream(
@@ -288,7 +288,7 @@ class ChatResource:
         if request.conversation_id:
             body["conversation_id"] = request.conversation_id
 
-        url = f"{self._client._base_url}/api/v1/chat/completions"
+        url = f"{self._client._base_url}/api/v1/cadreen/chat/completions"
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self._client._api_key}",
@@ -312,7 +312,7 @@ class ChatResource:
                         continue
 
     async def list_tools(self) -> ListToolsResponse:
-        raw = await self._client.get("/api/v1/tools")
+        raw = await self._client.get("/api/v1/cadreen/tools")
         return ListToolsResponse(
             object=raw.get("object", "list"),
             data=[_parse_tool_entry(t) for t in raw.get("data", [])],
