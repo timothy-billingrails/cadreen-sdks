@@ -12,7 +12,7 @@ import (
 var toolsCmd = &cobra.Command{
 	Use:   "tools",
 	Short: "List available tools",
-	Long: `List the tools your AI can use.
+	Long: `List the tools Cadreen can use.
 
 Shows connected services and their capabilities.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -57,7 +57,7 @@ func printToolsText(t ListToolsResponseData) {
 		return
 	}
 
-	fmt.Printf("Your AI can do %d things:\n\n", len(t.Data))
+	fmt.Printf("Cadreen can do %d things:\n\n", len(t.Data))
 
 	for _, tool := range t.Data {
 		name := tool.Function.Name

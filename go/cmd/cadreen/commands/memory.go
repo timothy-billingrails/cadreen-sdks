@@ -14,7 +14,7 @@ import (
 var memoryCmd = &cobra.Command{
 	Use:   "memory",
 	Short: "Manage knowledge (list, add, search)",
-	Long: `Manage what your AI knows.
+	Long: `Manage what Cadreen knows.
 
 List memories, add new knowledge, or search existing knowledge.`,
 }
@@ -57,8 +57,8 @@ var memoryListCmd = &cobra.Command{
 
 var memoryAddCmd = &cobra.Command{
 	Use:   "add [text]",
-	Short: "Teach your AI something new",
-	Long: `Add knowledge to your AI's memory.
+	Short: "Teach Cadreen something new",
+	Long: `Add knowledge to Cadreen's memory.
 
 Examples:
   cadreen memory add "Our refund policy is 30 days"
@@ -116,7 +116,7 @@ func printMemoryText(resp *cadreen.SearchMemoryResponse) {
 		return
 	}
 
-	fmt.Printf("Your AI remembers things. Here are the recent ones:\n\n")
+	fmt.Printf("Cadreen remembers things. Here are the recent ones:\n\n")
 
 	for _, r := range resp.Results {
 		fmt.Printf("  %s\n", humanAtomType(r.Type))
@@ -151,13 +151,13 @@ func printMemoryVerbose(resp *cadreen.SearchMemoryResponse) {
 func humanAtomType(t string) string {
 	switch t {
 	case "fact", "reference":
-		return "A fact it learned"
+		return "A fact Cadreen learned"
 	case "preference":
-		return "A preference it picked up"
+		return "A preference Cadreen picked up"
 	case "episode":
 		return "Something that happened"
 	case "precedent":
-		return "Something it fixed before"
+		return "Something Cadreen fixed before"
 	case "procedure":
 		return "How to do something"
 	case "note":

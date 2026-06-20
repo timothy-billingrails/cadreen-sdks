@@ -16,7 +16,7 @@ var tracesCmd = &cobra.Command{
 	Short: "Browse what happened",
 	Long: `Browse recent activity.
 
-Shows what your AI did, whether it handled things on its own
+Shows what Cadreen did, whether it handled things on its own
 or asked for permission.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		requireAuth()

@@ -15,7 +15,7 @@ import (
 var policiesCmd = &cobra.Command{
 	Use:   "policies",
 	Short: "Manage governance policies (list, evaluate)",
-	Long: `Manage the rules your AI follows.
+	Long: `Manage the rules Cadreen follows.
 
 List active policies or test what would happen with a given action.`,
 }
@@ -58,7 +58,7 @@ var policiesListCmd = &cobra.Command{
 var policiesEvaluateCmd = &cobra.Command{
 	Use:   "evaluate [action]",
 	Short: "Test what would happen",
-	Long: `Test what would happen if your AI tried to do something.
+	Long: `Test what would happen if Cadreen tried to do something.
 
 Examples:
   cadreen policies evaluate "Refund $700 to customer 123"
@@ -103,7 +103,7 @@ func printPoliciesText(policies []cadreen.Policy) {
 		return
 	}
 
-	fmt.Printf("Your AI follows %d rules:\n\n", len(policies))
+	fmt.Printf("Cadreen follows %d rules:\n\n", len(policies))
 
 	for _, p := range policies {
 		fmt.Printf("  %s\n", p.Name)
@@ -130,9 +130,9 @@ func printPoliciesVerbose(policies []cadreen.Policy) {
 func printEvaluateText(resp *cadreen.EvaluatePolicyResponse) {
 	decision := resp.GovernanceResult.Type
 	if decision == "auto" {
-		fmt.Println("It would proceed on its own.")
+		fmt.Println("Cadreen would proceed on its own.")
 	} else if decision == "handoff" {
-		fmt.Println("It would ask you first.")
+		fmt.Println("Cadreen would ask you first.")
 	} else {
 		fmt.Printf("Result: %s\n", decision)
 	}

@@ -28,7 +28,7 @@ var rootCmd = &cobra.Command{
 	Short: "Intelligence infrastructure for developers",
 	Long: `Cadreen — intelligence infrastructure for developers.
 
-Your AI remembers things, follows rules, connects to services,
+Cadreen remembers things, follows rules, connects to services,
 and heals itself when things go wrong. All governed. All observable.
 
 Run 'cadreen init' to get started.`,
