@@ -2,7 +2,7 @@
   "name": "@cadreen/cli",
   "version": "0.1.0",
   "description": "Cadreen CLI — intelligence infrastructure for developers",
-  "keywords": ["cadreen", "cli", "ai", "governance", "memory"],
+  "keywords": ["cadreen", "cli", "governance", "memory"],
   "homepage": "https://accomplishanything.today",
   "license": "UNLICENSED",
   "author": "Timothy Billingrails",
