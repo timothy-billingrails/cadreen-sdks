@@ -91,16 +91,16 @@ jobs:
           ARM64_LINUX=$(cat go/dist/cadreen_linux_arm64.sha256 | awk '{print $1}')
           AMD64_LINUX=$(cat go/dist/cadreen_linux_amd64.sha256 | awk '{print $1}')
 
-          sed -i "s/PLACEHOLDER_ARM64_DARWIN_SHA256/${ARM64_DARWIN}/" homebrew-cadreen/cadreen.rb
-          sed -i "s/PLACEHOLDER_AMD64_DARWIN_SHA256/${AMD64_DARWIN}/" homebrew-cadreen/cadreen.rb
-          sed -i "s/PLACEHOLDER_ARM64_LINUX_SHA256/${ARM64_LINUX}/" homebrew-cadreen/cadreen.rb
-          sed -i "s/PLACEHOLDER_AMD64_LINUX_SHA256/${AMD64_LINUX}/" homebrew-cadreen/cadreen.rb
+          sed -i "s/PLACEHOLDER_ARM64_DARWIN_SHA256/${ARM64_DARWIN}/" Formula/cadreen.rb
+          sed -i "s/PLACEHOLDER_AMD64_DARWIN_SHA256/${AMD64_DARWIN}/" Formula/cadreen.rb
+          sed -i "s/PLACEHOLDER_ARM64_LINUX_SHA256/${ARM64_LINUX}/" Formula/cadreen.rb
+          sed -i "s/PLACEHOLDER_AMD64_LINUX_SHA256/${AMD64_LINUX}/" Formula/cadreen.rb
 
-          sed -i "s/version \".*\"/version \"${{ steps.version.outputs.VERSION }}\"/" homebrew-cadreen/cadreen.rb
+          sed -i "s/version \".*\"/version \"${{ steps.version.outputs.VERSION }}\"/" Formula/cadreen.rb
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout master
-          git add homebrew-cadreen/cadreen.rb
+          git add Formula/cadreen.rb
           git diff --cached --quiet || git commit -m "chore: update Homebrew formula SHA256 for v${{ steps.version.outputs.VERSION }}"
           git push origin master
