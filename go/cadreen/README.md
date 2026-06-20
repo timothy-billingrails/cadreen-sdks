@@ -219,6 +219,10 @@ if install.Status == "pending_auth" {
 
 ## Changelog
 
+### v0.4.1
+- Added `ChatStreamEvent.RawJSON` — raw JSON bytes before typed parsing; enables extracting `pending_actions`, `conversation_id`, and `intelligence` fields without SDK type changes
+- Fixed unused `bytes` import in `executions.go`
+
 ### v0.4.0
 - Added `ChatCompletions()` — OpenAI-compatible chat completions with governance
 - Added `ChatCompletionsStream()` — streaming chat completions via SSE
