@@ -112,7 +112,7 @@ func askStreaming(req cadreen.ChatCompletionRequest) error {
 
 	fmt.Println()
 	if convID != "" {
-		fmt.Fprintf(os.Stderr, "conversation: %s\n", convID)
+		output.PrintStatus(fmt.Sprintf("conversation: %s", convID))
 	}
 
 	return nil

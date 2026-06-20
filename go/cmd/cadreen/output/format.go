@@ -6,6 +6,16 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
+)
+
+var (
+	errorColor = color.New(color.FgRed, color.Bold)
+	hintColor  = color.New(color.FgYellow)
+	tryColor   = color.New(color.FgCyan)
+	successColor = color.New(color.FgGreen)
+	statusColor = color.New(color.FgWhite, color.Bold)
 )
 
 type Format string
@@ -77,19 +87,27 @@ func printVerbose(w io.Writer, v any) {
 }
 
 func PrintError(msg string) {
-	fmt.Fprintf(os.Stderr, "Error: %s\n", msg)
+	errorColor.Fprintf(os.Stderr, "Error: %s\n", msg)
 }
 
 func PrintHint(hint string) {
 	if hint != "" {
-		fmt.Fprintf(os.Stderr, "Hint:  %s\n", hint)
+		hintColor.Fprintf(os.Stderr, "Hint:  %s\n", hint)
 	}
 }
 
 func PrintTry(action string) {
 	if action != "" {
-		fmt.Fprintf(os.Stderr, "Try:   %s\n", action)
+		tryColor.Fprintf(os.Stderr, "Try:   %s\n", action)
 	}
+}
+
+func PrintSuccess(msg string) {
+	successColor.Fprintf(os.Stdout, "%s\n", msg)
+}
+
+func PrintStatus(msg string) {
+	statusColor.Fprintf(os.Stdout, "%s\n", msg)
 }
 
 func MaskKey(key string) string {

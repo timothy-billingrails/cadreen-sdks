@@ -185,7 +185,7 @@ func validateAndSave() error {
 	}
 
 	fmt.Println()
-	fmt.Println("Authenticated.")
+	output.PrintSuccess("Authenticated.")
 	fmt.Printf("  API Key: %s\n", output.MaskKey(cfg.APIKeyResolved()))
 	fmt.Printf("  Config:  %s\n", config.ConfigPath())
 	fmt.Println()

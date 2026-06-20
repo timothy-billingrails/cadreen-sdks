@@ -7,6 +7,7 @@ import (
 	"github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen/config"
 	"github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen/output"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
@@ -48,6 +49,23 @@ Run 'cadreen init' to get started.`,
 		}
 		return nil
 	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if !cfg.IsAuthenticated() {
+			fmt.Println("Welcome to Cadreen. Let's get you set up.")
+			fmt.Println()
+			fmt.Println("  cadreen init    — Set up your account")
+			fmt.Println("  cadreen login   — Authenticate with an API key")
+			fmt.Println()
+			fmt.Println("Run 'cadreen init' to get started.")
+			return nil
+		}
+
+		memoryOff, _ := cmd.Flags().GetBool("no-memory")
+		model := initialTUIModel(memoryOff)
+		p := tea.NewProgram(model, tea.WithAltScreen())
+		_, err := p.Run()
+		return err
+	},
 }
 
 func Execute() error {
@@ -59,6 +77,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "API key (overrides config and env)")
 	rootCmd.PersistentFlags().StringVar(&format, "format", "", "output format: text, json, verbose")
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "show detailed output")
+	rootCmd.Flags().Bool("no-memory", false, "disable cross-conversation memory (TUI mode)")
 
 	rootCmd.AddCommand(versionCmd)
 }
@@ -87,7 +106,8 @@ func outputFormat() output.Format {
 func requireAuth() {
 	if cfg == nil || !cfg.IsAuthenticated() {
 		output.PrintError("Not authenticated.")
-		output.PrintHint("Run 'cadreen init' or 'cadreen login' to authenticate.")
+		output.PrintHint("Run 'cadreen init' to set up your account.")
+		output.PrintTry("cadreen init")
 		os.Exit(1)
 	}
 }

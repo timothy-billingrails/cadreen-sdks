@@ -4,10 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen/config"
 	"github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen/output"
 
 	"github.com/spf13/cobra"
+)
+
+var (
+	doctorOK   = color.New(color.FgGreen).SprintFunc()
+	doctorFail = color.New(color.FgRed).SprintFunc()
+	doctorTodo = color.New(color.FgYellow).SprintFunc()
 )
 
 var doctorCmd = &cobra.Command{
@@ -39,11 +46,11 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 
 	authStatus, authOK := checkAuth()
 	if authOK {
-		fmt.Printf("  ✓ %-20s %s\n", "Authenticated", authStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorOK("✓"), "Authenticated", authStatus)
 	} else {
-		fmt.Printf("  ✗ %-20s %s\n", "Authenticated", authStatus)
-		fmt.Printf("  ○ %-20s %s\n", "Test request", "Send: cadreen ask \"hello\"")
-		fmt.Printf("  ○ %-20s %s\n", "Self-healing", "Not tested yet")
+		fmt.Printf("  %s %-20s %s\n", doctorFail("✗"), "Authenticated", authStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorTodo("○"), "Test request", "Send: cadreen ask \"hello\"")
+		fmt.Printf("  %s %-20s %s\n", doctorTodo("○"), "Self-healing", "Not tested yet")
 		fmt.Println()
 		fmt.Printf("You're 0/4 ready. Fix the issues above first.\n")
 		return nil
@@ -51,44 +58,44 @@ func runDoctor(cmd *cobra.Command, args []string) error {
 
 	health, err := fetchHealth()
 	if err != nil {
-		fmt.Printf("  ✗ %-20s %s\n", "API reachable", err.Error())
-		fmt.Printf("  ○ %-20s %s\n", "Test request", "Send: cadreen ask \"hello\"")
-		fmt.Printf("  ○ %-20s %s\n", "Self-healing", "Not tested yet")
+		fmt.Printf("  %s %-20s %s\n", doctorFail("✗"), "API reachable", err.Error())
+		fmt.Printf("  %s %-20s %s\n", doctorTodo("○"), "Test request", "Send: cadreen ask \"hello\"")
+		fmt.Printf("  %s %-20s %s\n", doctorTodo("○"), "Self-healing", "Not tested yet")
 		fmt.Println()
 		fmt.Printf("You're 1/4 ready. Fix the issues above first.\n")
 		return nil
 	}
 
-	fmt.Printf("  ✓ %-20s %s\n", "API reachable", "Everything is working")
+	fmt.Printf("  %s %-20s %s\n", doctorOK("✓"), "API reachable", "Everything is working")
 
 	passed := 1
 
 	memStatus, memOK := checkMemoryFromHealth(health)
 	if memOK {
-		fmt.Printf("  ✓ %-20s %s\n", "Memory", memStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorOK("✓"), "Memory", memStatus)
 		passed++
 	} else {
-		fmt.Printf("  ✗ %-20s %s\n", "Memory", memStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorFail("✗"), "Memory", memStatus)
 	}
 
 	govStatus, govOK := checkGovernanceFromHealth(health)
 	if govOK {
-		fmt.Printf("  ✓ %-20s %s\n", "Rules", govStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorOK("✓"), "Rules", govStatus)
 		passed++
 	} else {
-		fmt.Printf("  ✗ %-20s %s\n", "Rules", govStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorFail("✗"), "Rules", govStatus)
 	}
 
 	connStatus, connOK := checkConnectionsFromHealth(health)
 	if connOK {
-		fmt.Printf("  ✓ %-20s %s\n", "Connections", connStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorOK("✓"), "Connections", connStatus)
 		passed++
 	} else {
-		fmt.Printf("  ✗ %-20s %s\n", "Connections", connStatus)
+		fmt.Printf("  %s %-20s %s\n", doctorFail("✗"), "Connections", connStatus)
 	}
 
-	fmt.Printf("  ○ %-20s %s\n", "Test request", "Send: cadreen ask \"hello\"")
-	fmt.Printf("  ○ %-20s %s\n", "Self-healing", "Not tested yet")
+	fmt.Printf("  %s %-20s %s\n", doctorTodo("○"), "Test request", "Send: cadreen ask \"hello\"")
+	fmt.Printf("  %s %-20s %s\n", doctorTodo("○"), "Self-healing", "Not tested yet")
 	fmt.Println()
 
 	total := 4 // API + memory + governance + connections
