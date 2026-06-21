@@ -1,6 +1,6 @@
 {
   "name": "@cadreen/cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Cadreen CLI — intelligence infrastructure for developers",
   "keywords": ["cadreen", "cli", "governance", "memory"],
   "homepage": "https://accomplishanything.today",
