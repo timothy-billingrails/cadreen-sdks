@@ -679,7 +679,7 @@ export interface SetupCredentialResult {
   provider: string;
   name: string;
   id?: string;
-  status: "created" | "failed";
+  status: "created" | "would_create" | "failed";
   error?: string;
 }
 
@@ -688,14 +688,14 @@ export interface SetupMemoryResult {
   type: string;
   kind?: string;
   classified: boolean;
-  status: "created" | "failed";
+  status: "created" | "would_create" | "failed";
   error?: string;
 }
 
 export interface SetupPolicyResult {
   name: string;
   id?: string;
-  status: "created" | "failed";
+  status: "created" | "would_create" | "failed";
   error?: string;
 }
 
