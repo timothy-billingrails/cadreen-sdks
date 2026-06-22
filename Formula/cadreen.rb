@@ -1,7 +1,7 @@
 class Cadreen < Formula
   desc "Intelligence infrastructure for developers"
   homepage "https://accomplishanything.today"
-  version "0.2.1"
+  version "0.2.2"
   license "UNLICENSED"
 
   on_macos do
