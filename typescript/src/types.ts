@@ -646,6 +646,7 @@ export interface SetupRequest {
   memory?: Array<{ type?: string; content: Record<string, unknown>; domain?: string; tags?: string[]; authority?: number }>;
   policies?: Array<{ name: string; description?: string; rule: string; severity?: string }>;
   confirm?: boolean;
+  dry_run?: boolean;
 }
 
 export interface SetupProposal {
@@ -661,8 +662,10 @@ export interface SetupResult {
   memory: Array<SetupMemoryResult>;
   policies: Array<SetupPolicyResult>;
   proposals?: Array<SetupProposal>;
+  notice?: string;
   applied: number;
   failed: number;
+  dry_run?: boolean;
 }
 
 export interface SetupConnectionResult {
