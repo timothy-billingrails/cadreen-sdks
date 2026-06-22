@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen/output"

@@ -62,10 +62,6 @@ export class BlueprintsResource {
     return this.client.post<Blueprint>("/api/v1/cadreen/blueprints", request);
   }
 
-  async update(id: string, request: Partial<CreateBlueprintRequest>): Promise<Blueprint> {
-    return this.client.patch<Blueprint>(`/api/v1/cadreen/blueprints/${encodeURIComponent(id)}`, request);
-  }
-
   async delete(id: string): Promise<void> {
     return this.client.delete(`/api/v1/cadreen/blueprints/${encodeURIComponent(id)}`);
   }
