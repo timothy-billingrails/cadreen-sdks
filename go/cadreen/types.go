@@ -557,6 +557,7 @@ type SetupRequest struct {
 	Memory      []SetupMemory     `json:"memory,omitempty"`
 	Policies    []SetupPolicy     `json:"policies,omitempty"`
 	Confirm     bool              `json:"confirm,omitempty"`
+	DryRun      bool              `json:"dry_run,omitempty"`
 }
 
 type SetupProposal struct {
@@ -603,8 +604,10 @@ type SetupResult struct {
 	Memory      []SetupMemoryResult     `json:"memory"`
 	Policies    []SetupPolicyResult     `json:"policies"`
 	Proposals   []SetupProposal         `json:"proposals,omitempty"`
+	Notice      string                  `json:"notice,omitempty"`
 	Applied     int                     `json:"applied"`
 	Failed      int                     `json:"failed"`
+	DryRun      bool                    `json:"dry_run,omitempty"`
 }
 
 type HealingDiagnosis struct {

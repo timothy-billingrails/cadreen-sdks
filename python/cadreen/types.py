@@ -914,6 +914,7 @@ class SetupRequest:
     examples: Optional[list[str]] = None
     constraints: Optional[list[str]] = None
     confirm: Optional[bool] = None
+    dry_run: Optional[bool] = None
 
 
 @dataclass
@@ -961,6 +962,8 @@ class SetupResult:
     failed: int
     workspace_id: Optional[str] = None
     proposals: Optional[list[SetupProposal]] = None
+    notice: Optional[str] = None
+    dry_run: Optional[bool] = None
 
 
 # ---------------------------------------------------------------------------

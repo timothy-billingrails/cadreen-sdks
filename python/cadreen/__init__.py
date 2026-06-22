@@ -268,6 +268,8 @@ class Cadreen:
             payload["memory"] = mem_items
         if request.policies:
             payload["policies"] = [{"name": p.name, "rule": p.rule, "description": p.description, "severity": p.severity} for p in request.policies]
+        if request.dry_run:
+            payload["dry_run"] = True
         resp = await self._client.post("/api/v1/cadreen/setup", payload)
         conns = [SetupConnectionResult(capability=c["capability"], status=c["status"], detail=c.get("detail"), error=c.get("error")) for c in resp.get("connections", [])]
         creds = [SetupCredentialResult(provider=c["provider"], name=c.get("name", ""), status=c["status"], id=c.get("id"), error=c.get("error")) for c in resp.get("credentials", [])]
@@ -279,6 +281,8 @@ class Cadreen:
             applied=resp["applied"], failed=resp["failed"],
             workspace_id=resp.get("workspace_id"),
             proposals=props or None,
+            notice=resp.get("notice"),
+            dry_run=resp.get("dry_run"),
         )
 
     async def list_capabilities(self) -> ListCapabilitiesResponse:
