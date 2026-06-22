@@ -253,6 +253,12 @@ print(f"Status: {doc.status}, Size: {doc.size} bytes")
 
 ## Changelog
 
+### v0.5.2
+- Added `dry_run` mode to `setup()` — preview what would be created without persisting
+- Added `notice` and `dry_run` fields to `SetupResult`
+- Added `cadreen.list_blueprints()`, `cadreen.get_blueprint()`, `cadreen.create_blueprint()`, `cadreen.delete_blueprint()`, `cadreen.run_blueprint()`, `cadreen.list_blueprint_runs()`
+- Added `cadreen.list_schedules()`, `cadreen.get_schedule()`, `cadreen.create_schedule()`, `cadreen.pause_schedule()`, `cadreen.resume_schedule()`
+
 ### v0.5.1
 - Added `cadreen.documents.upload(file_path)` and `cadreen.documents.upload_bytes(content, filename)` — upload documents
 - Added `cadreen.documents` — document management (list, get)
