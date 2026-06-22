@@ -2,7 +2,6 @@
 
 Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
 
-> **Note:** As of v0.5.0, all API endpoints use the Cadreen surface (`/api/v1/cadreen/`). If you are on v0.4.x or earlier, upgrade to v0.5.0+ for the canonical paths.
 
 ## Packages
 
