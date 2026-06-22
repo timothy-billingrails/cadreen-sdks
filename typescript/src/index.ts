@@ -15,6 +15,8 @@ import { EscalationsResource } from "./resources/escalations";
 import { HealingResource } from "./resources/healing";
 import { LearningResource } from "./resources/learning";
 import { CredentialsResource } from "./resources/credentials";
+import { BlueprintsResource } from "./resources/blueprints";
+import { SchedulesResource } from "./resources/schedules";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -55,6 +57,8 @@ export class Cadreen {
   public readonly healing: HealingResource;
   public readonly learning: LearningResource;
   public readonly credentials: CredentialsResource;
+  public readonly blueprints: BlueprintsResource;
+  public readonly schedules: SchedulesResource;
 
   private readonly client: HttpClient;
 
@@ -76,6 +80,8 @@ export class Cadreen {
     this.healing = new HealingResource(this.client);
     this.learning = new LearningResource(this.client);
     this.credentials = new CredentialsResource(this.client);
+    this.blueprints = new BlueprintsResource(this.client);
+    this.schedules = new SchedulesResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {

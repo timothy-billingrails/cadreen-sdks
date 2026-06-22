@@ -1,6 +1,6 @@
 class Cadreen < Formula
   desc "Intelligence infrastructure for developers"
-  homepage "https://accomplishanything.today"
+  homepage "https://accomplishanything.today/infra"
   version "0.2.2"
   license "UNLICENSED"
 
