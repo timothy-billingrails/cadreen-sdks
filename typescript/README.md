@@ -307,6 +307,13 @@ try {
 
 ## Changelog
 
+### v0.5.2
+- Added `dry_run` mode to `setup()` — preview what would be created without persisting
+- Added `notice` and `dry_run` fields to `SetupResult`
+- Added `BlueprintsResource` — list, get, create, delete, run, listRuns
+- Added `SchedulesResource` — list, get, create, pause, resume
+- Added `would_create` to status union types for dry_run responses
+
 ### v0.5.1
 - Added `cadreen.documents.upload(file)` — upload documents via multipart POST
 - Added `cadreen.documents` — document management (list, get, download)

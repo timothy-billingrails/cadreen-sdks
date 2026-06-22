@@ -80,6 +80,13 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 
 ## Changelog
 
+### v0.2.2
+- Added `setup` command with `--dry-run` flag — preview without creating
+- Added `setup --purpose`, `--memory`, `--policy` flags
+- Added `blueprints` commands (list, create, run, show, runs, archive)
+- Added `schedules` commands (list, create, pause, resume, show)
+- Added `policies create` command
+
 ### v0.2.1
 - Added `documents upload` command — upload files via multipart POST
 - Added `documents` commands (list, get)

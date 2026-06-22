@@ -259,6 +259,12 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 
 ## Changelog
 
+### v0.5.2
+- Added `DryRun` field to `SetupRequest` — preview what would be created without persisting
+- Added `DryRun` and `Notice` fields to `SetupResult`
+- Added `ListBlueprints()`, `GetBlueprint()`, `CreateBlueprint()`, `DeleteBlueprint()`, `RunBlueprint()`, `ListBlueprintRuns()`
+- Added `ListSchedules()`, `GetSchedule()`, `CreateSchedule()`, `PauseSchedule()`, `ResumeSchedule()`
+
 ### v0.5.1
 - Added `UploadDocument()` — upload a document from file path via multipart POST
 - Added `ListDocuments()`, `GetDocument()` — document management
