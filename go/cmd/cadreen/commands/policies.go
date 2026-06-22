@@ -89,11 +89,79 @@ Examples:
 	},
 }
 
+var policiesCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a policy",
+	Long: `Create a governance policy from a natural-language rule.
+
+Examples:
+  cadreen policies create --name "Refund threshold" --rule "Refunds over $500 require manager approval"
+  cadreen policies create --name "Data privacy" --rule "Block cross-border PII transfers" --severity critical`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		requireAuth()
+
+		name, _ := cmd.Flags().GetString("name")
+		rule, _ := cmd.Flags().GetString("rule")
+		severity, _ := cmd.Flags().GetString("severity")
+
+		if name == "" {
+			return fmt.Errorf("--name is required")
+		}
+		if rule == "" {
+			return fmt.Errorf("--rule is required")
+		}
+
+		payload := map[string]any{
+			"name":  name,
+			"rules": []map[string]any{{"condition": rule, "effect": "require_human_approval"}},
+		}
+		if severity != "" {
+			payload["severity"] = severity
+		}
+
+		resp, err := rawDo("POST", "/api/v1/cadreen/policies", payload)
+		if err != nil {
+			return handleAPIError(err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != 200 && resp.StatusCode != 201 {
+			return handleHTTPError(resp)
+		}
+
+		var result struct {
+			ID      string `json:"id"`
+			Name    string `json:"name"`
+			Status  string `json:"status"`
+			Version int    `json:"version"`
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return err
+		}
+
+		format := outputFormat()
+		if format == output.FormatJSON {
+			output.Print(result, format)
+		} else {
+			fmt.Printf("Policy created: %s\n", result.ID)
+			fmt.Printf("  Name:    %s\n", result.Name)
+			fmt.Printf("  Status:  %s\n", result.Status)
+		}
+
+		return nil
+	},
+}
+
 func init() {
 	policiesEvaluateCmd.Flags().String("domain", "", "policy domain to evaluate against")
 
+	policiesCreateCmd.Flags().String("name", "", "policy name (required)")
+	policiesCreateCmd.Flags().String("rule", "", "natural-language rule (required)")
+	policiesCreateCmd.Flags().String("severity", "", "severity: low, medium, high, critical")
+
 	policiesCmd.AddCommand(policiesListCmd)
 	policiesCmd.AddCommand(policiesEvaluateCmd)
+	policiesCmd.AddCommand(policiesCreateCmd)
 	rootCmd.AddCommand(policiesCmd)
 }
 
