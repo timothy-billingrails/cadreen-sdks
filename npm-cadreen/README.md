@@ -80,6 +80,9 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 
 ## Changelog
 
+### v0.2.3
+- Updated npm description and keywords for discoverability (openai, ai, automation, orchestration, llm, agent, tool-calling, policy)
+
 ### v0.2.2
 - Added `setup` command with `--dry-run` flag — preview without creating
 - Added `setup --purpose`, `--memory`, `--policy` flags

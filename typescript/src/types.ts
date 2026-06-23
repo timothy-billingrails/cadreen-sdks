@@ -420,6 +420,7 @@ export interface IntentRequest {
   context?: IntentContext;
   mode?: IntentMode;
   stream?: boolean;
+  dry_run?: boolean;
 }
 
 export interface ResponseMessage {

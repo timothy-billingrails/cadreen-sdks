@@ -307,6 +307,10 @@ try {
 
 ## Changelog
 
+### v0.5.3
+- Added `dry_run` field to `IntentRequest` — preview intent classification, governance, and capability assessment without creating a mission or persisting conversation
+- Fixed Go SDK `Version` constant (was stuck at 0.5.0)
+
 ### v0.5.2
 - Added `dry_run` mode to `setup()` — preview what would be created without persisting
 - Added `notice` and `dry_run` fields to `SetupResult`

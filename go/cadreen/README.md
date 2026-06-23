@@ -259,6 +259,10 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 
 ## Changelog
 
+### v0.5.3
+- Added `DryRun` field to `IntentRequest` — preview intent classification, governance, and capability assessment without creating a mission or persisting conversation
+- Fixed `Version` constant (was stuck at 0.5.0)
+
 ### v0.5.2
 - Added `DryRun` field to `SetupRequest` — preview what would be created without persisting
 - Added `DryRun` and `Notice` fields to `SetupResult`

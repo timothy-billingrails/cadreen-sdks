@@ -552,6 +552,7 @@ class IntentRequest:
     context: Optional[IntentContext] = None
     mode: Optional[IntentMode] = None
     stream: Optional[bool] = None
+    dry_run: Optional[bool] = None
 
 
 @dataclass

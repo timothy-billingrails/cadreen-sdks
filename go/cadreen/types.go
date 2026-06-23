@@ -429,6 +429,7 @@ type IntentRequest struct {
 	Context        *IntentContext  `json:"context,omitempty"`
 	Mode           string          `json:"mode,omitempty"`
 	Stream         bool            `json:"stream,omitempty"`
+	DryRun         bool            `json:"dry_run,omitempty"`
 }
 
 type ResponseMessage struct {
