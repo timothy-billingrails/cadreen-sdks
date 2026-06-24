@@ -1224,3 +1224,72 @@ class DiagnoseRequest:
     error: str
     tool_name: Optional[str] = None
     trace_id: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Proposal types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class ProposalEvidence:
+    description: str
+    source: Optional[str] = None
+    count: Optional[int] = None
+    confidence: Optional[float] = None
+
+
+@dataclass
+class TaskProposal:
+    id: str
+    title: str
+    description: str
+    intent: str
+    proposal_type: str
+    trigger_type: str
+    trigger_source: str
+    confidence: float
+    priority: int
+    status: str
+    created_at: str
+    domain: Optional[str] = None
+    mission_intent: Optional[str] = None
+    trigger_details: Optional[str] = None
+    evidence: Optional[list[ProposalEvidence]] = None
+    expires_at: Optional[str] = None
+    accepted_at: Optional[str] = None
+    dismissed_at: Optional[str] = None
+    dismissal_reason: Optional[str] = None
+    execution_id: Optional[str] = None
+    dedup_key: Optional[str] = None
+    requires_review: Optional[bool] = None
+
+
+@dataclass
+class ListProposalsResponse:
+    proposals: list[TaskProposal]
+    count: int
+
+
+@dataclass
+class AcceptProposalResponse:
+    status: str
+    execution_id: str
+    action: str
+    intent: str
+    next_step: str
+    auto_approved: Optional[bool] = None
+    result: Optional[dict] = None
+
+
+@dataclass
+class DismissProposalResponse:
+    status: str
+
+
+@dataclass
+class ProposalStatsResponse:
+    proposed: int = 0
+    accepted: int = 0
+    dismissed: int = 0
+    expired: int = 0

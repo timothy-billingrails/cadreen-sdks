@@ -1,6 +1,6 @@
 {
   "name": "@cadreen/sdk",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "TypeScript SDK for Cadreen — Intelligence as a Service",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

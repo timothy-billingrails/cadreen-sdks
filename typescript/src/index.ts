@@ -17,6 +17,7 @@ import { LearningResource } from "./resources/learning";
 import { CredentialsResource } from "./resources/credentials";
 import { BlueprintsResource } from "./resources/blueprints";
 import { SchedulesResource } from "./resources/schedules";
+import { ProposalsResource } from "./resources/proposals";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -59,6 +60,7 @@ export class Cadreen {
   public readonly credentials: CredentialsResource;
   public readonly blueprints: BlueprintsResource;
   public readonly schedules: SchedulesResource;
+  public readonly proposals: ProposalsResource;
 
   private readonly client: HttpClient;
 
@@ -82,6 +84,7 @@ export class Cadreen {
     this.credentials = new CredentialsResource(this.client);
     this.blueprints = new BlueprintsResource(this.client);
     this.schedules = new SchedulesResource(this.client);
+    this.proposals = new ProposalsResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -263,8 +266,18 @@ export type {
   CreateCredentialRequest,
   ResolveEscalationRequest,
   DiagnoseRequest,
+  TaskProposal,
+  ProposalType,
+  ProposalStatus,
+  ProposalEvidence,
+  ListProposalsOptions,
+  ListProposalsResponse,
+  AcceptProposalResponse,
+  DismissProposalResponse,
+  ProposalStatsResponse,
 } from "./types";
 
+export { ProposalsResource } from "./resources/proposals";
 export { GuardrailsResource } from "./resources/guardrails";
 export { WebhooksResource } from "./resources/webhooks";
 export { ChatResource } from "./resources/chat";

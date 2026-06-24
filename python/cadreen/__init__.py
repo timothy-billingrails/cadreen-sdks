@@ -125,6 +125,12 @@ from .types import (
     CreateCredentialRequest,
     ResolveEscalationRequest,
     DiagnoseRequest,
+    ProposalEvidence,
+    TaskProposal,
+    ListProposalsResponse,
+    AcceptProposalResponse,
+    DismissProposalResponse,
+    ProposalStatsResponse,
 )
 
 from .client import HttpClient
@@ -139,6 +145,7 @@ from .resources.chat import ChatResource
 from .resources.documents import DocumentsResource
 from .resources.escalations import EscalationsResource
 from .resources.healing import HealingResource
+from .resources.proposals import ProposalsResource
 from .resources.webhooks import WebhooksResource
 from .resources.learning import LearningResource
 from .resources.credentials import CredentialsResource
@@ -177,6 +184,7 @@ class Cadreen:
         self.documents = DocumentsResource(self._client)
         self.escalations = EscalationsResource(self._client)
         self.healing = HealingResource(self._client)
+        self.proposals = ProposalsResource(self._client)
         self.webhooks = WebhooksResource(self._client)
         self.learning = LearningResource(self._client)
         self.credentials = CredentialsResource(self._client)

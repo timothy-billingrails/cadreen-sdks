@@ -933,3 +933,73 @@ export interface DiagnoseRequest {
   tool_name?: string;
   trace_id?: string;
 }
+
+// ---------------------------------------------------------------------------
+// Proposal types
+// ---------------------------------------------------------------------------
+
+export type ProposalType = "automation" | "governance" | "learning" | "blueprint" | "task";
+export type ProposalStatus = "proposed" | "accepted" | "dismissed" | "expired" | "superseded";
+
+export interface ProposalEvidence {
+  description: string;
+  source?: string;
+  count?: number;
+  confidence?: number;
+}
+
+export interface TaskProposal {
+  id: string;
+  title: string;
+  description: string;
+  intent: string;
+  domain?: string;
+  proposal_type: ProposalType;
+  mission_intent?: string;
+  trigger_type: string;
+  trigger_source: string;
+  trigger_details?: string;
+  evidence?: ProposalEvidence[];
+  confidence: number;
+  priority: number;
+  status: ProposalStatus;
+  created_at: string;
+  expires_at?: string;
+  accepted_at?: string;
+  dismissed_at?: string;
+  dismissal_reason?: string;
+  execution_id?: string;
+  dedup_key?: string;
+  requires_review?: boolean;
+}
+
+export interface ListProposalsOptions {
+  status?: ProposalStatus | "all";
+  limit?: number;
+}
+
+export interface ListProposalsResponse {
+  proposals: TaskProposal[];
+  count: number;
+}
+
+export interface AcceptProposalResponse {
+  status: string;
+  execution_id: string;
+  action: string;
+  intent: string;
+  next_step: string;
+  auto_approved?: boolean;
+  result?: Record<string, unknown>;
+}
+
+export interface DismissProposalResponse {
+  status: string;
+}
+
+export interface ProposalStatsResponse {
+  proposed: number;
+  accepted: number;
+  dismissed: number;
+  expired: number;
+}

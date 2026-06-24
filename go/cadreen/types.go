@@ -888,6 +888,42 @@ type ListWebhooksResponse struct {
 }
 
 // ---------------------------------------------------------------------------
+// Proposal types
+// ---------------------------------------------------------------------------
+
+type ProposalEvidence struct {
+	Description string  `json:"description"`
+	Source      string  `json:"source,omitempty"`
+	Count       int     `json:"count,omitempty"`
+	Confidence  float64 `json:"confidence,omitempty"`
+}
+
+type TaskProposal struct {
+	ID              string             `json:"id"`
+	Title           string             `json:"title"`
+	Description     string             `json:"description"`
+	Intent          string             `json:"intent"`
+	Domain          string             `json:"domain,omitempty"`
+	ProposalType    string             `json:"proposal_type"`
+	MissionIntent   string             `json:"mission_intent,omitempty"`
+	TriggerType     string             `json:"trigger_type"`
+	TriggerSource   string             `json:"trigger_source"`
+	TriggerDetails  string             `json:"trigger_details,omitempty"`
+	Evidence        []ProposalEvidence `json:"evidence,omitempty"`
+	Confidence      float64            `json:"confidence"`
+	Priority        int                `json:"priority"`
+	Status          string             `json:"status"`
+	CreatedAt       string             `json:"created_at"`
+	ExpiresAt       string             `json:"expires_at,omitempty"`
+	AcceptedAt      string             `json:"accepted_at,omitempty"`
+	DismissedAt     string             `json:"dismissed_at,omitempty"`
+	DismissalReason string             `json:"dismissal_reason,omitempty"`
+	ExecutionID     string             `json:"execution_id,omitempty"`
+	DedupKey        string             `json:"dedup_key,omitempty"`
+	RequiresReview  bool               `json:"requires_review,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
 // Learning types
 // ---------------------------------------------------------------------------
 
