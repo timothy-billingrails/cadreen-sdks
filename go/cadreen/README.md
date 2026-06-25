@@ -203,6 +203,34 @@ if install.Status == "pending_auth" {
 }
 ```
 
+## Proposals
+
+Cadreen watches your usage and suggests improvements — actions to automate, schedules to set, rules to relax. You decide what runs.
+
+```go
+// List proposals waiting for your decision
+proposals, err := c.ListProposals(ctx, cadreen.ListProposalsOptions{
+	Status: "proposed",
+	Limit:  50,
+})
+for _, p := range proposals.Proposals {
+	fmt.Printf("[%s] %s (%.0f%% confidence)\n", p.Status, p.Title, p.Confidence*100)
+}
+
+// Accept — executes via the intent engine
+result, err := c.AcceptProposal(ctx, "550e8400-...")
+fmt.Printf("Execution: %s, Action: %s\n", result.ExecutionID, result.Action)
+
+// Dismiss — teaches Cadreen what you don't want
+err = c.DismissProposal(ctx, "550e8400-...", cadreen.DismissProposalRequest{
+	Reason: "We handle this manually",
+})
+
+// See counts by status
+stats, err := c.ProposalStats(ctx)
+fmt.Printf("Waiting: %d, Accepted: %d\n", stats.Proposed, stats.Accepted)
+```
+
 ## Documents
 
 ```go
@@ -252,12 +280,21 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 | `Client.ListCredentials()` | List credentials |
 | `Client.CreateCredential()` | Create credential |
 | `Client.DeleteCredential()` | Delete credential |
+| `Client.ListProposals()` | List task proposals |
+| `Client.GetProposal()` | Get proposal by ID |
+| `Client.AcceptProposal()` | Accept a proposal |
+| `Client.DismissProposal()` | Dismiss a proposal |
+| `Client.ProposalStats()` | Proposal statistics |
 | `Client.ListPolicies()` | List policies |
 | `Client.GetPolicy()` | Get policy bundle |
 | `Client.ListCapabilities()` | List capabilities |
 | `Client.Assess()` | Assess task readiness |
 
 ## Changelog
+
+### v0.5.4
+- Added `ListProposals()`, `GetProposal()`, `AcceptProposal()`, `DismissProposal()`, `ProposalStats()` — task proposals
+- Added `TaskProposal`, `ProposalEvidence`, `ListProposalsResponse`, `AcceptProposalResponse`, `DismissProposalResponse`, `ProposalStatsResponse` types
 
 ### v0.5.3
 - Added `DryRun` field to `IntentRequest` — preview intent classification, governance, and capability assessment without creating a mission or persisting conversation

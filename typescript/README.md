@@ -265,6 +265,32 @@ const recent = await cadreen.traces.list({ limit: 10 });
 const stats = await cadreen.traces.stats();
 ```
 
+## Proposals
+
+Cadreen watches your usage and suggests improvements — actions to automate, schedules to set, rules to relax. You decide what runs.
+
+```ts
+// List proposals waiting for your decision
+const { proposals } = await cadreen.proposals.list();
+for (const p of proposals) {
+  console.log(`[${p.status}] ${p.title} (${Math.round(p.confidence * 100)}% confidence)`);
+}
+
+// Get a specific proposal
+const proposal = await cadreen.proposals.get("550e8400-...");
+
+// Accept — executes via the intent engine
+const result = await cadreen.proposals.accept("550e8400-...");
+console.log(`Execution: ${result.execution_id}, Action: ${result.action}`);
+
+// Dismiss — teaches Cadreen what you don't want
+await cadreen.proposals.dismiss("550e8400-...", "We handle this manually");
+
+// See counts by status
+const stats = await cadreen.proposals.stats();
+console.log(`Waiting: ${stats.proposed}, Accepted: ${stats.accepted}`);
+```
+
 ## Error Handling
 
 ```ts
@@ -297,6 +323,7 @@ try {
 | `cadreen.healing` | `stats()`, `precedents()`, `diagnose(request)` |
 | `cadreen.webhooks` | `create(request)`, `list()`, `delete(id)`, `verifySignature()` |
 | `cadreen.learning` | `patterns()`, `episodes()`, `suggestions()` |
+| `cadreen.proposals` | `list(options?)`, `get(id)`, `accept(id)`, `dismiss(id, reason?)`, `stats()` |
 | `cadreen.credentials` | `list()`, `create(request)`, `delete(id)` |
 | `cadreen.listCapabilities()` | List available capabilities |
 | `cadreen.assess(task, domain?)` | Assess task readiness |
@@ -306,6 +333,10 @@ try {
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.5.4
+- Added `cadreen.proposals` — task proposals (list, get, accept, dismiss, stats)
+- Added `TaskProposal`, `ProposalType`, `ProposalStatus`, `ProposalEvidence` types
 
 ### v0.5.3
 - Added `dry_run` field to `IntentRequest` — preview intent classification, governance, and capability assessment without creating a mission or persisting conversation

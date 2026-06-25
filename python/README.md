@@ -245,6 +245,31 @@ doc = await cadreen.documents.get(result.id)
 print(f"Status: {doc.status}, Size: {doc.size} bytes")
 ```
 
+## Proposals
+
+Cadreen watches your usage and suggests improvements — actions to automate, schedules to set, rules to relax. You decide what runs.
+
+```python
+# List proposals waiting for your decision
+proposals = await cadreen.proposals.list()
+for p in proposals.proposals:
+    print(f"[{p.status}] {p.title} ({p.confidence:.0%} confidence)")
+
+# Get a specific proposal
+proposal = await cadreen.proposals.get("550e8400-...")
+
+# Accept — executes via the intent engine
+result = await cadreen.proposals.accept("550e8400-...")
+print(f"Execution: {result.execution_id}, Action: {result.action}")
+
+# Dismiss — teaches Cadreen what you don't want
+await cadreen.proposals.dismiss("550e8400-...", reason="We handle this manually")
+
+# See counts by status
+stats = await cadreen.proposals.stats()
+print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
+```
+
 ## Requirements
 
 - Python 3.10+
@@ -252,6 +277,10 @@ print(f"Status: {doc.status}, Size: {doc.size} bytes")
 - httpx-sse >= 0.4
 
 ## Changelog
+
+### v0.5.4
+- Added `cadreen.proposals` — task proposals (list, get, accept, dismiss, stats)
+- Added `TaskProposal`, `ProposalEvidence`, `ListProposalsResponse`, `AcceptProposalResponse`, `DismissProposalResponse`, `ProposalStatsResponse` types
 
 ### v0.5.3
 - Added `dry_run` field to `IntentRequest` — preview intent classification, governance, and capability assessment without creating a mission or persisting conversation

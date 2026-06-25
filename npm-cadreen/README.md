@@ -52,6 +52,11 @@ cadreen doctor      # Check readiness
 | `cadreen learning suggestions` | Improvement suggestions |
 | `cadreen credentials list` | List credentials |
 | `cadreen credentials delete [id]` | Delete credential |
+| `cadreen proposals list` | Task proposals waiting for you |
+| `cadreen proposals get [id]` | Get proposal details |
+| `cadreen proposals accept [id]` | Accept a proposal |
+| `cadreen proposals dismiss [id]` | Dismiss a proposal |
+| `cadreen proposals stats` | Proposal statistics |
 | `cadreen config` | Local settings |
 | `cadreen update` | Update CLI |
 
@@ -79,6 +84,10 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
 ## Changelog
+
+### v0.2.4
+- Added `proposals` commands: list, get, accept, dismiss, stats
+- Flags: `--status`, `--limit`, `--reason`
 
 ### v0.2.3
 - Updated npm description and keywords for discoverability (openai, ai, automation, orchestration, llm, agent, tool-calling, policy)
