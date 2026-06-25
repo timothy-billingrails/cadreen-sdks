@@ -100,6 +100,11 @@ from .types import (
     SetupMemoryResult,
     SetupPolicyResult,
     SetupProposal,
+    SetupSessionCreateRequest,
+    SetupSessionAddRequest,
+    SetupSessionApplyRequest,
+    SetupSession,
+    SetupSessionApplyResult,
     CatalogResponse,
     CatalogCategory,
     CatalogIntegration,
@@ -146,6 +151,7 @@ from .resources.documents import DocumentsResource
 from .resources.escalations import EscalationsResource
 from .resources.healing import HealingResource
 from .resources.proposals import ProposalsResource
+from .resources.setup_sessions import SetupSessionsResource
 from .resources.webhooks import WebhooksResource
 from .resources.learning import LearningResource
 from .resources.credentials import CredentialsResource
@@ -185,6 +191,7 @@ class Cadreen:
         self.escalations = EscalationsResource(self._client)
         self.healing = HealingResource(self._client)
         self.proposals = ProposalsResource(self._client)
+        self.setup_sessions = SetupSessionsResource(self._client)
         self.webhooks = WebhooksResource(self._client)
         self.learning = LearningResource(self._client)
         self.credentials = CredentialsResource(self._client)

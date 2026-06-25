@@ -967,6 +967,54 @@ class SetupResult:
     dry_run: Optional[bool] = None
 
 
+@dataclass
+class SetupSessionCreateRequest:
+    purpose: Optional[str] = None
+    constraints: Optional[list[str]] = None
+    workspace_id: Optional[str] = None
+
+
+@dataclass
+class SetupSessionAddRequest:
+    connections: Optional[list[dict[str, Any]]] = None
+    credentials: Optional[list[dict[str, Any]]] = None
+    memory: Optional[list[dict[str, Any]]] = None
+    policies: Optional[list[dict[str, Any]]] = None
+
+
+@dataclass
+class SetupSessionApplyRequest:
+    confirm: bool = True
+
+
+@dataclass
+class SetupSession:
+    id: str
+    workspace_id: str
+    status: str
+    created_at: str
+    updated_at: str
+    connections: list[dict[str, Any]] = field(default_factory=list)
+    credentials: list[dict[str, Any]] = field(default_factory=list)
+    memory: list[dict[str, Any]] = field(default_factory=list)
+    policies: list[dict[str, Any]] = field(default_factory=list)
+    applied_count: int = 0
+    failed_count: int = 0
+    purpose: Optional[str] = None
+    constraints: Optional[list[str]] = None
+    proposals: Optional[list[dict[str, Any]]] = None
+    applied_at: Optional[str] = None
+
+
+@dataclass
+class SetupSessionApplyResult:
+    session_id: str
+    status: str
+    applied: int
+    failed: int
+    result: Optional[dict[str, Any]] = None
+
+
 # ---------------------------------------------------------------------------
 # Abstraction aliases: Atom → MemoryItem
 # ---------------------------------------------------------------------------

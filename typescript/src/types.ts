@@ -700,6 +700,49 @@ export interface SetupPolicyResult {
   error?: string;
 }
 
+export interface SetupSessionCreateRequest {
+  workspace_id?: string;
+  purpose?: string;
+  constraints?: string[];
+}
+
+export interface SetupSessionAddRequest {
+  connections?: Array<{ capability: string }>;
+  credentials?: Array<{ provider: string; name?: string; key_data: Record<string, unknown> }>;
+  memory?: Array<{ type?: string; content: Record<string, unknown>; domain?: string; tags?: string[]; authority?: number }>;
+  policies?: Array<{ name: string; description?: string; rule: string; severity?: string }>;
+}
+
+export interface SetupSessionApplyRequest {
+  confirm: boolean;
+}
+
+export interface SetupSession {
+  id: string;
+  workspace_id: string;
+  status: "draft" | "applying" | "applied" | "failed";
+  purpose?: string;
+  constraints?: string[];
+  connections: Array<{ capability: string }>;
+  credentials: Array<{ provider: string; name?: string; key_data?: Record<string, unknown> }>;
+  memory: Array<{ type?: string; content: Record<string, unknown> }>;
+  policies: Array<{ name: string; rule?: string }>;
+  proposals?: Array<SetupProposal>;
+  applied_count: number;
+  failed_count: number;
+  created_at: string;
+  updated_at: string;
+  applied_at?: string;
+}
+
+export interface SetupSessionApplyResult {
+  session_id: string;
+  status: string;
+  applied: number;
+  failed: number;
+  result?: SetupResult;
+}
+
 // ---------------------------------------------------------------------------
 // Abstraction aliases: Atom → MemoryItem
 // ---------------------------------------------------------------------------
