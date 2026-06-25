@@ -1,6 +1,6 @@
 {
   "name": "@cadreen/cli",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Cadreen CLI — AI orchestration, governance, and memory for developers. OpenAI-compatible with built-in policy enforcement, self-healing, and structured traces.",
   "keywords": ["cadreen", "cli", "governance", "memory", "openai", "ai", "automation", "orchestration", "llm", "agent", "tool-calling", "policy"],
   "homepage": "https://accomplishanything.today",
