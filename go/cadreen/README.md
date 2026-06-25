@@ -285,12 +285,21 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 | `Client.AcceptProposal()` | Accept a proposal |
 | `Client.DismissProposal()` | Dismiss a proposal |
 | `Client.ProposalStats()` | Proposal statistics |
+| `Client.CreateSetupSession()` | Create a setup session |
+| `Client.ListSetupSessions()` | List setup sessions |
+| `Client.GetSetupSession()` | Get setup session by ID |
+| `Client.AddToSetupSession()` | Add resources to a session |
+| `Client.ApplySetupSession()` | Apply a session atomically |
 | `Client.ListPolicies()` | List policies |
 | `Client.GetPolicy()` | Get policy bundle |
 | `Client.ListCapabilities()` | List capabilities |
 | `Client.Assess()` | Assess task readiness |
 
 ## Changelog
+
+### v0.5.5
+- Added `CreateSetupSession()`, `ListSetupSessions()`, `GetSetupSession()`, `AddToSetupSession()`, `ApplySetupSession()` — stateful setup sessions
+- Added `SetupSession`, `SetupSessionCreateRequest`, `SetupSessionAddRequest`, `SetupSessionApplyRequest`, `SetupSessionApplyResult` types
 
 ### v0.5.4
 - Added `ListProposals()`, `GetProposal()`, `AcceptProposal()`, `DismissProposal()`, `ProposalStats()` — task proposals

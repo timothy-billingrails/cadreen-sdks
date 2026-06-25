@@ -324,6 +324,7 @@ try {
 | `cadreen.webhooks` | `create(request)`, `list()`, `delete(id)`, `verifySignature()` |
 | `cadreen.learning` | `patterns()`, `episodes()`, `suggestions()` |
 | `cadreen.proposals` | `list(options?)`, `get(id)`, `accept(id)`, `dismiss(id, reason?)`, `stats()` |
+| `cadreen.setupSessions` | `create(request)`, `list()`, `get(id)`, `addResources(id, request)`, `apply(id, request)` |
 | `cadreen.credentials` | `list()`, `create(request)`, `delete(id)` |
 | `cadreen.listCapabilities()` | List available capabilities |
 | `cadreen.assess(task, domain?)` | Assess task readiness |
@@ -333,6 +334,10 @@ try {
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.5.5
+- Added `cadreen.setupSessions` — stateful setup sessions (create, list, get, addResources, apply)
+- Added `SetupSession`, `SetupSessionCreateRequest`, `SetupSessionAddRequest`, `SetupSessionApplyRequest`, `SetupSessionApplyResult` types
 
 ### v0.5.4
 - Added `cadreen.proposals` — task proposals (list, get, accept, dismiss, stats)

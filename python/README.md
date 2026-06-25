@@ -278,6 +278,10 @@ print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
 
 ## Changelog
 
+### v0.5.5
+- Added `cadreen.setup_sessions` — stateful setup sessions (create, list, get, add_resources, apply)
+- Added `SetupSession`, `SetupSessionCreateRequest`, `SetupSessionAddRequest`, `SetupSessionApplyRequest`, `SetupSessionApplyResult` types
+
 ### v0.5.4
 - Added `cadreen.proposals` — task proposals (list, get, accept, dismiss, stats)
 - Added `TaskProposal`, `ProposalEvidence`, `ListProposalsResponse`, `AcceptProposalResponse`, `DismissProposalResponse`, `ProposalStatsResponse` types
