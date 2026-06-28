@@ -88,12 +88,12 @@ class HealingResource:
 
     async def diagnose(
         self,
-        error: str,
+        error_message: str,
         *,
         tool_name: str | None = None,
         trace_id: str | None = None,
     ) -> HealingDiagnosis:
-        body: dict[str, Any] = {"error": error}
+        body: dict[str, Any] = {"error_message": error_message}
         if tool_name is not None:
             body["tool_name"] = tool_name
         if trace_id is not None:

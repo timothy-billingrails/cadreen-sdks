@@ -102,7 +102,7 @@ Examples:
 
 		toolName, _ := cmd.Flags().GetString("tool")
 
-		body := map[string]string{"error": args[0]}
+		body := map[string]string{"error_message": args[0]}
 		if toolName != "" {
 			body["tool_name"] = toolName
 		}

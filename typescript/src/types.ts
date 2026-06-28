@@ -968,11 +968,11 @@ export interface CreateCredentialRequest {
 }
 
 export interface ResolveEscalationRequest {
-  resolution: string;
+  decision: string;
 }
 
 export interface DiagnoseRequest {
-  error: string;
+  error_message: string;
   tool_name?: string;
   trace_id?: string;
 }

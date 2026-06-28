@@ -6,7 +6,7 @@ import (
 )
 
 type ResolveEscalationRequest struct {
-	Resolution string `json:"resolution"`
+	Decision string `json:"decision"`
 }
 
 func (c *Client) ListEscalations(ctx context.Context, opts ...RequestOption) (*ListEscalationsResponse, error) {
@@ -25,8 +25,8 @@ func (c *Client) GetEscalation(ctx context.Context, id string, opts ...RequestOp
 	return &result, nil
 }
 
-func (c *Client) ResolveEscalation(ctx context.Context, id string, resolution string, opts ...RequestOption) (*Escalation, error) {
-	req := ResolveEscalationRequest{Resolution: resolution}
+func (c *Client) ResolveEscalation(ctx context.Context, id string, decision string, opts ...RequestOption) (*Escalation, error) {
+	req := ResolveEscalationRequest{Decision: decision}
 	var result Escalation
 	if err := c.do(ctx, "POST", "/api/v1/cadreen/escalations/"+id+"/resolve", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("resolve escalation: %w", err)

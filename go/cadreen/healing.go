@@ -6,9 +6,9 @@ import (
 )
 
 type DiagnoseRequest struct {
-	Error      string `json:"error"`
-	ToolName   string `json:"tool_name,omitempty"`
-	TraceID    string `json:"trace_id,omitempty"`
+	ErrorMessage string  `json:"error_message"`
+	ToolName     string  `json:"tool_name,omitempty"`
+	TraceID      string  `json:"trace_id,omitempty"`
 }
 
 type ListHealingPrecedentsResponse struct {
