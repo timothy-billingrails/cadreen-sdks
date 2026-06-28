@@ -16,10 +16,10 @@ export class EscalationsResource {
     return this.client.get<Escalation>(`/api/v1/cadreen/escalations/${encodeURIComponent(id)}`);
   }
 
-  async resolve(id: string, resolution: string): Promise<Escalation> {
+  async resolve(id: string, decision: string): Promise<Escalation> {
     return this.client.post<Escalation>(
       `/api/v1/cadreen/escalations/${encodeURIComponent(id)}/resolve`,
-      { resolution } as ResolveEscalationRequest
+      { decision } as ResolveEscalationRequest
     );
   }
 }

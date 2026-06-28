@@ -64,10 +64,10 @@ class EscalationsResource:
             resolution=raw.get("resolution"),
         )
 
-    async def resolve(self, id: str, resolution: str) -> Escalation:
+    async def resolve(self, id: str, decision: str) -> Escalation:
         raw = await self._client.post(
             f"/api/v1/cadreen/escalations/{id}/resolve",
-            {"resolution": resolution},
+            {"decision": decision},
         )
         return Escalation(
             id=raw["id"],

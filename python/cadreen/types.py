@@ -1264,12 +1264,12 @@ class CreateCredentialRequest:
 
 @dataclass
 class ResolveEscalationRequest:
-    resolution: str
+    decision: str
 
 
 @dataclass
 class DiagnoseRequest:
-    error: str
+    error_message: str
     tool_name: Optional[str] = None
     trace_id: Optional[str] = None
 
