@@ -87,7 +87,7 @@ export class CadreenClarifyError extends CadreenError {
 }
 
 const DEFAULT_BASE_URL = "https://accomplishanything.today";
-const DEFAULT_MAX_RETRIES = 2;
+const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_TIMEOUT = 30000;
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
 const IDEMPOTENT_METHODS = new Set<HttpMethod>(["GET", "PUT"]);
