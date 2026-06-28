@@ -196,10 +196,10 @@ class TestTimeoutHandling:
         assert client._timeout == 10
 
     @pytest.mark.asyncio
-    async def test_default_max_retries_is_2(self):
+    async def test_default_max_retries_is_3(self):
         config = CadreenConfig(api_key="key", sandbox=True)
         client = HttpClient(config)
-        assert client._max_retries == 2
+        assert client._max_retries == 3
 
     @pytest.mark.asyncio
     async def test_custom_max_retries_stored(self):

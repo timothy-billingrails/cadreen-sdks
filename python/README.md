@@ -129,7 +129,7 @@ response = await cadreen.chat.completions(ChatCompletionRequest(
 cadreen = Cadreen(
     api_key="sk_cadreen_...",
     base_url="https://accomplishanything.today",  # default
-    max_retries=2,      # default 2
+    max_retries=3,      # default 3
     timeout=30,          # default 30s
     profile="lean",     # optional: "lean" | "audit" | "full" (default "full")
 )
