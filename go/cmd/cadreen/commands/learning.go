@@ -12,7 +12,12 @@ import (
 var learningCmd = &cobra.Command{
 	Use:   "learning",
 	Short: "Learning insights (patterns, episodes, suggestions)",
-	Long:  `View detected patterns, learning episodes, and improvement suggestions.`,
+	Long: `View detected patterns, learning episodes, and improvement suggestions.
+
+Examples:
+  cadreen learning patterns
+  cadreen learning episodes
+  cadreen learning suggestions`,
 }
 
 var learningPatternsCmd = &cobra.Command{
