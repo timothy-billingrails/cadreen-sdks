@@ -49,6 +49,7 @@ Supports stdin for piping:
 		noStream, _ := cmd.Flags().GetBool("no-stream")
 		memoryOff, _ := cmd.Flags().GetBool("no-memory")
 		convID, _ := cmd.Flags().GetString("conversation-id")
+		userID, _ := cmd.Flags().GetString("user-id")
 
 		req := cadreen.ChatCompletionRequest{
 			Messages: []cadreen.ChatMessage{
@@ -60,6 +61,9 @@ Supports stdin for piping:
 		}
 		if convID != "" {
 			req.ConversationID = convID
+		}
+		if userID != "" {
+			req.UserID = userID
 		}
 
 		if noStream {
@@ -73,6 +77,7 @@ func init() {
 	askCmd.Flags().Bool("no-stream", false, "disable streaming")
 	askCmd.Flags().Bool("no-memory", false, "disable cross-conversation memory")
 	askCmd.Flags().String("conversation-id", "", "continue an existing conversation")
+	askCmd.Flags().String("user-id", "", "end-user ID for permission scoping")
 	rootCmd.AddCommand(askCmd)
 }
 

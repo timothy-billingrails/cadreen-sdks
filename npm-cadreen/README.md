@@ -63,6 +63,10 @@ cadreen doctor      # Check readiness
 | `cadreen setup session get [id]` | Get session details |
 | `cadreen setup session add [id]` | Add resources to a session |
 | `cadreen setup session apply [id]` | Apply a session atomically |
+| `cadreen workspace users list` | List workspace users |
+| `cadreen workspace users invite [email]` | Invite a user to the workspace |
+| `cadreen workspace users role [id] [role]` | Update a user's role |
+| `cadreen workspace users remove [id]` | Remove a user from the workspace |
 | `cadreen config` | Local settings |
 | `cadreen update` | Update CLI |
 
@@ -90,6 +94,10 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
 ## Changelog
+
+### v0.3.1
+- Added `--user-id` flag to `ask` and `chat` commands — pass end-user identity for per-user context
+- Added `workspace users` command group: `list`, `invite`, `role`, `remove` — manage workspace team members
 
 ### v0.3.0 (BREAKING)
 - **BREAKING:** `cadreen setup-session` renamed to `cadreen setup session` — nested under `setup` as a subcommand

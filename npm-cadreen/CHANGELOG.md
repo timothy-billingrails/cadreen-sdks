@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Add `--user-id` flag to `ask` and `chat` commands — pass end-user identity for per-user context
+- Add `workspace users` command group: `list`, `invite`, `role`, `remove` — manage workspace team members
+
 ## 0.3.0
 
 **Breaking changes:**

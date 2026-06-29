@@ -430,6 +430,7 @@ type IntentRequest struct {
 	Mode           string          `json:"mode,omitempty"`
 	Stream         bool            `json:"stream,omitempty"`
 	DryRun         bool            `json:"dry_run,omitempty"`
+	UserID         string          `json:"user_id,omitempty"`
 }
 
 type ResponseMessage struct {
@@ -970,4 +971,40 @@ type ListLearningSuggestionsResponse struct {
 	Suggestions []LearningSuggestion `json:"suggestions"`
 	Count       int                  `json:"count"`
 	Pagination  Pagination           `json:"pagination,omitempty"`
+}
+
+// ── Workspace Users ──
+
+type WorkspaceRole string
+
+const (
+	WorkspaceRoleAdmin    WorkspaceRole = "admin"
+	WorkspaceRoleOperator WorkspaceRole = "operator"
+	WorkspaceRoleMember   WorkspaceRole = "member"
+	WorkspaceRoleViewer   WorkspaceRole = "viewer"
+)
+
+type WorkspaceUser struct {
+	ID          string        `json:"id"`
+	WorkspaceID string        `json:"workspace_id"`
+	UserID      string        `json:"user_id"`
+	Role        WorkspaceRole `json:"role"`
+	InvitedBy   string        `json:"invited_by,omitempty"`
+	InvitedAt   string        `json:"invited_at"`
+	CreatedAt   string        `json:"created_at"`
+	UpdatedAt   string        `json:"updated_at"`
+}
+
+type InviteUserRequest struct {
+	Email string        `json:"email"`
+	Role  WorkspaceRole `json:"role,omitempty"`
+}
+
+type UpdateRoleRequest struct {
+	Role WorkspaceRole `json:"role"`
+}
+
+type ListWorkspaceUsersResponse struct {
+	Users []WorkspaceUser `json:"users"`
+	Count int             `json:"count"`
 }

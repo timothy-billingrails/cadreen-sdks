@@ -19,6 +19,7 @@ import { BlueprintsResource } from "./resources/blueprints";
 import { SchedulesResource } from "./resources/schedules";
 import { ProposalsResource } from "./resources/proposals";
 import { SetupSessionsResource } from "./resources/setup-sessions";
+import { WorkspaceUsersResource } from "./resources/workspace-users";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -63,6 +64,7 @@ export class Cadreen {
   public readonly schedules: SchedulesResource;
   public readonly proposals: ProposalsResource;
   public readonly setupSessions: SetupSessionsResource;
+  public readonly workspaceUsers: WorkspaceUsersResource;
 
   private readonly client: HttpClient;
 
@@ -88,6 +90,7 @@ export class Cadreen {
     this.schedules = new SchedulesResource(this.client);
     this.proposals = new ProposalsResource(this.client);
     this.setupSessions = new SetupSessionsResource(this.client);
+    this.workspaceUsers = new WorkspaceUsersResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -283,10 +286,16 @@ export type {
   AcceptProposalResponse,
   DismissProposalResponse,
   ProposalStatsResponse,
+  WorkspaceRole,
+  WorkspaceUser,
+  InviteUserRequest,
+  UpdateRoleRequest,
+  ListWorkspaceUsersResponse,
 } from "./types";
 
 export { ProposalsResource } from "./resources/proposals";
 export { SetupSessionsResource } from "./resources/setup-sessions";
+export { WorkspaceUsersResource } from "./resources/workspace-users";
 export { GuardrailsResource } from "./resources/guardrails";
 export { WebhooksResource } from "./resources/webhooks";
 export { ChatResource } from "./resources/chat";

@@ -278,6 +278,12 @@ print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
 
 ## Changelog
 
+### v0.6.1
+- Added `user_id` optional field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
+- Added `WorkspaceUsersResource`: list, invite, update_role, remove — manage workspace team members
+- Added `WorkspaceUser`, `WorkspaceRole`, `InviteUserRequest`, `UpdateRoleRequest` types
+- Added `HttpClient.patch()` method for PATCH requests
+
 ### v0.6.0 (BREAKING)
 - **BREAKING:** `ResolveEscalationRequest.resolution` renamed to `decision` — aligns SDK with API contract
 - **BREAKING:** `DiagnoseRequest.error` renamed to `error_message` — aligns SDK with API contract

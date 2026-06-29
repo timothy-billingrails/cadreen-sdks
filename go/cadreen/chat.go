@@ -56,6 +56,7 @@ type ChatCompletionRequest struct {
 	Tools          []ChatToolDefinition `json:"tools,omitempty"`
 	Context        map[string]any       `json:"context,omitempty"`
 	ConversationID string               `json:"conversation_id,omitempty"`
+	UserID         string               `json:"user_id,omitempty"`
 }
 
 // ChatCompletionResponse is the response from POST /api/v1/cadreen/chat/completions.
