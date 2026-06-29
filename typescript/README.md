@@ -335,6 +335,11 @@ try {
 
 ## Changelog
 
+### v0.6.0 (BREAKING)
+- **BREAKING:** `ResolveEscalationRequest.resolution` renamed to `decision` — aligns SDK with API contract
+- **BREAKING:** `DiagnoseRequest.error` renamed to `error_message` — aligns SDK with API contract
+- Retry default increased from 2 to 3
+
 ### v0.5.5
 - Added `cadreen.setupSessions` — stateful setup sessions (create, list, get, addResources, apply)
 - Added `SetupSession`, `SetupSessionCreateRequest`, `SetupSessionAddRequest`, `SetupSessionApplyRequest`, `SetupSessionApplyResult` types
