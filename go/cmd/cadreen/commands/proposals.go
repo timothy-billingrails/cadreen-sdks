@@ -16,7 +16,16 @@ import (
 var proposalsCmd = &cobra.Command{
 	Use:   "proposals",
 	Short: "Task proposals",
-	Long:  `List, view, accept, dismiss, and get stats on task proposals.`,
+	Long: `List, view, accept, dismiss, and get stats on task proposals.
+
+Proposals are system-detected opportunities — Cadreen proposes, you decide.
+
+Examples:
+  cadreen proposals list
+  cadreen proposals list --status proposed
+  cadreen proposals accept prop_01abc
+  cadreen proposals dismiss prop_01abc --reason "Not relevant"
+  cadreen proposals stats`,
 }
 
 var proposalsListCmd = &cobra.Command{
