@@ -7,9 +7,9 @@ Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs)
 
 | Language | Package | Version | Install |
 |----------|---------|---------|---------|
-| TypeScript | `@cadreen/sdk` | 0.5.5 | `npm install @cadreen/sdk` |
+| TypeScript | `@cadreen/sdk` | 0.6.1 | `npm install @cadreen/sdk` |
 | Python | `cadreen-sdk` | 0.5.5 | `pip install cadreen-sdk` |
-| Go | `cadreen` | 0.5.5 | `go get github.com/timothy-billingrails/cadreen-sdks/go/cadreen@latest` |
+| Go | `cadreen` | 0.6.1 | `go get github.com/timothy-billingrails/cadreen-sdks/go/cadreen@latest` |
 
 ## Quick Start
 
