@@ -13,17 +13,17 @@ import (
 )
 
 var setupSessionCmd = &cobra.Command{
-	Use:   "setup-session",
+	Use:   "session",
 	Short: "Manage setup sessions",
 	Long: `Create and manage stateful setup sessions. Accumulate resources incrementally,
 then apply them atomically.
 
 Examples:
-  cadreen setup-session create --purpose "Customer support"
-  cadreen setup-session list
-  cadreen setup-session get sess_01abc
-  cadreen setup-session add sess_01abc --memory "Refund policy: 30 days"
-  cadreen setup-session apply sess_01abc --confirm`,
+  cadreen setup session create --purpose "Customer support"
+  cadreen setup session list
+  cadreen setup session get sess_01abc
+  cadreen setup session add sess_01abc --memory "Refund policy: 30 days"
+  cadreen setup session apply sess_01abc --confirm`,
 }
 
 var setupSessionCreateCmd = &cobra.Command{
@@ -219,8 +219,6 @@ func init() {
 	setupSessionCmd.AddCommand(setupSessionGetCmd)
 	setupSessionCmd.AddCommand(setupSessionAddCmd)
 	setupSessionCmd.AddCommand(setupSessionApplyCmd)
-
-	rootCmd.AddCommand(setupSessionCmd)
 }
 
 func printSetupSession(s *cadreen.SetupSession) {
