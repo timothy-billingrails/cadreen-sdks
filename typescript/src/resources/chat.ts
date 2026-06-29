@@ -39,6 +39,7 @@ export interface ChatCompletionRequest {
   tools?: ChatToolDefinition[];
   context?: Record<string, unknown>;
   conversation_id?: string;
+  user_id?: string;
 }
 
 export interface ChatCompletionResponse {

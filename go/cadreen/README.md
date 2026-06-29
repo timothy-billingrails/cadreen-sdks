@@ -297,6 +297,11 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 
 ## Changelog
 
+### v0.6.1
+- Added `UserID` field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
+- Added `ListWorkspaceUsers()`, `InviteUser()`, `UpdateUserRole()`, `RemoveUser()` — manage workspace team members
+- Added `WorkspaceUser`, `WorkspaceRole`, `InviteUserRequest`, `UpdateRoleRequest` types
+
 ### v0.6.0 (BREAKING)
 - **BREAKING:** `ResolveEscalationRequest.Resolution` renamed to `Decision` — aligns SDK with API contract
 - **BREAKING:** `DiagnoseRequest.Error` renamed to `ErrorMessage` — aligns SDK with API contract

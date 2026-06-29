@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.1
+
+- Add `user_id` optional field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
+- Add `WorkspaceUsersResource`: list, invite, update_role, remove — manage workspace team members
+- Add `WorkspaceUser`, `WorkspaceRole`, `InviteUserRequest`, `UpdateRoleRequest`, `ListWorkspaceUsersResponse` types
+- Add `HttpClient.patch()` method for PATCH requests
+
 ## 0.6.0
 
 **Breaking changes:**

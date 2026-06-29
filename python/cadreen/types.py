@@ -553,6 +553,7 @@ class IntentRequest:
     mode: Optional[IntentMode] = None
     stream: Optional[bool] = None
     dry_run: Optional[bool] = None
+    user_id: Optional[str] = None
 
 
 @dataclass
@@ -1341,3 +1342,35 @@ class ProposalStatsResponse:
     accepted: int = 0
     dismissed: int = 0
     expired: int = 0
+
+
+WorkspaceRole = Literal["admin", "operator", "member", "viewer"]
+
+
+@dataclass
+class WorkspaceUser:
+    id: str
+    workspace_id: str
+    user_id: str
+    role: str
+    invited_at: str
+    created_at: str
+    updated_at: str
+    invited_by: Optional[str] = None
+
+
+@dataclass
+class InviteUserRequest:
+    email: str
+    role: Optional[str] = None
+
+
+@dataclass
+class UpdateRoleRequest:
+    role: str
+
+
+@dataclass
+class ListWorkspaceUsersResponse:
+    users: list[WorkspaceUser]
+    count: int

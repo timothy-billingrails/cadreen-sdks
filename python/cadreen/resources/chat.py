@@ -53,6 +53,7 @@ class ChatCompletionRequest:
     tools: Optional[list[ChatToolDefinition]] = None
     context: Optional[dict[str, Any]] = None
     conversation_id: Optional[str] = None
+    user_id: Optional[str] = None
 
 
 @dataclass

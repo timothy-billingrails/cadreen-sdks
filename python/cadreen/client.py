@@ -208,6 +208,9 @@ class HttpClient:
     async def put(self, path: str, body: Optional[Any] = None, options: Optional[RequestOptions] = None) -> Any:
         return await self.request("PUT", path, body, options)
 
+    async def patch(self, path: str, body: Optional[Any] = None, options: Optional[RequestOptions] = None) -> Any:
+        return await self.request("PATCH", path, body, options)
+
     async def delete(self, path: str) -> Any:
         return await self.request("DELETE", path)
 

@@ -35,6 +35,7 @@ Type 'exit' or 'quit' to leave. Type 'clear' to reset.`,
 
 		memoryOff, _ := cmd.Flags().GetBool("no-memory")
 		convID, _ := cmd.Flags().GetString("conversation-id")
+		userID, _ := cmd.Flags().GetString("user-id")
 
 		reader := bufio.NewReader(os.Stdin)
 		state := chatStateIdle
@@ -77,6 +78,9 @@ Type 'exit' or 'quit' to leave. Type 'clear' to reset.`,
 				}
 				if convID != "" {
 					req.ConversationID = convID
+				}
+				if userID != "" {
+					req.UserID = userID
 				}
 
 				state = chatStateStreaming
@@ -160,6 +164,7 @@ Type 'exit' or 'quit' to leave. Type 'clear' to reset.`,
 func init() {
 	chatCmd.Flags().Bool("no-memory", false, "disable cross-conversation memory")
 	chatCmd.Flags().String("conversation-id", "", "resume a specific conversation")
+	chatCmd.Flags().String("user-id", "", "end-user ID for permission scoping")
 	rootCmd.AddCommand(chatCmd)
 }
 

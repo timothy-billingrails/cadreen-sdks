@@ -421,6 +421,7 @@ export interface IntentRequest {
   mode?: IntentMode;
   stream?: boolean;
   dry_run?: boolean;
+  user_id?: string;
 }
 
 export interface ResponseMessage {
@@ -1045,4 +1046,31 @@ export interface ProposalStatsResponse {
   accepted: number;
   dismissed: number;
   expired: number;
+}
+
+export type WorkspaceRole = "admin" | "operator" | "member" | "viewer";
+
+export interface WorkspaceUser {
+  id: string;
+  workspace_id: string;
+  user_id: string;
+  role: WorkspaceRole;
+  invited_by?: string;
+  invited_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InviteUserRequest {
+  email: string;
+  role?: WorkspaceRole;
+}
+
+export interface UpdateRoleRequest {
+  role: WorkspaceRole;
+}
+
+export interface ListWorkspaceUsersResponse {
+  users: WorkspaceUser[];
+  count: number;
 }
