@@ -57,6 +57,12 @@ cadreen doctor      # Check readiness
 | `cadreen proposals accept [id]` | Accept a proposal |
 | `cadreen proposals dismiss [id]` | Dismiss a proposal |
 | `cadreen proposals stats` | Proposal statistics |
+| `cadreen setup run` | One-shot workspace setup |
+| `cadreen setup session create` | Create a setup session |
+| `cadreen setup session list` | List setup sessions |
+| `cadreen setup session get [id]` | Get session details |
+| `cadreen setup session add [id]` | Add resources to a session |
+| `cadreen setup session apply [id]` | Apply a session atomically |
 | `cadreen config` | Local settings |
 | `cadreen update` | Update CLI |
 
@@ -84,6 +90,15 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
 ## Changelog
+
+### v0.3.0 (BREAKING)
+- **BREAKING:** `cadreen setup-session` renamed to `cadreen setup session` — nested under `setup` as a subcommand
+- **BREAKING:** `cadreen setup` flags (`--purpose`, `--dry-run`, etc.) moved to `cadreen setup run`
+- `cadreen proposals`: added description and usage examples
+- `cadreen learning`: added usage examples
+
+### v0.2.5
+- Added `setup-session` commands: create, list, get, add, apply — stateful setup sessions for incremental workspace configuration
 
 ### v0.2.4
 - Added `proposals` commands: list, get, accept, dismiss, stats

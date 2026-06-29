@@ -297,6 +297,11 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 
 ## Changelog
 
+### v0.6.0 (BREAKING)
+- **BREAKING:** `ResolveEscalationRequest.Resolution` renamed to `Decision` — aligns SDK with API contract
+- **BREAKING:** `DiagnoseRequest.Error` renamed to `ErrorMessage` — aligns SDK with API contract
+- Retry default was already at 3 — no change needed
+
 ### v0.5.5
 - Added `CreateSetupSession()`, `ListSetupSessions()`, `GetSetupSession()`, `AddToSetupSession()`, `ApplySetupSession()` — stateful setup sessions
 - Added `SetupSession`, `SetupSessionCreateRequest`, `SetupSessionAddRequest`, `SetupSessionApplyRequest`, `SetupSessionApplyResult` types
