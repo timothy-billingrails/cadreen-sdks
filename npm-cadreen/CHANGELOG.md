@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2
+
+- Add reasoning display to `chat` and `ask` commands — thinking model reasoning (DeepSeek, MiMo, Anthropic) shown in gray during streaming
+
 ## 0.3.1
 
 - Add `--user-id` flag to `ask` and `chat` commands — pass end-user identity for per-user context

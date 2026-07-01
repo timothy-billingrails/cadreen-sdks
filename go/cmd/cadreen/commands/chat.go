@@ -187,6 +187,12 @@ func chatStreamResponse(req cadreen.ChatCompletionRequest) ([]pendingAction, str
 			handleAPIError(event.Error)
 			return nil, "", event.Error
 		}
+
+		// Display reasoning (thinking models: DeepSeek, MiMo, Anthropic)
+		if event.Reasoning != "" {
+			fmt.Printf("\033[90m%s\033[0m", event.Reasoning) // gray text
+		}
+
 		if event.Chunk == nil {
 			continue
 		}

@@ -94,6 +94,12 @@ func askStreaming(req cadreen.ChatCompletionRequest) error {
 			fmt.Fprintln(os.Stderr)
 			return handleAPIError(event.Error)
 		}
+
+		// Display reasoning (thinking models: DeepSeek, MiMo, Anthropic)
+		if event.Reasoning != "" {
+			fmt.Printf("\033[90m%s\033[0m", event.Reasoning) // gray text
+		}
+
 		if event.Chunk == nil {
 			continue
 		}

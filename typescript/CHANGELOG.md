@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.2
+
+**Features:**
+
+- Add `intelligence` field to `ChatCompletionResponse` — full intelligence metadata (capability, reasoning, memory, governance, humility, process traces)
+- Add `conversation_id` field to `ChatCompletionResponse` — conversation continuity across requests
+- Add `reasoning` field to `ChatDelta` — streaming reasoning from thinking models (DeepSeek, MiMo, Anthropic)
+- Add `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` to `ChatUsage`
+- Document `reasoning_delta` streaming event in README
+
+**Fixes:**
+
+- IntelligenceMeta shape aligned with server — `capability` (not `capability_assessment`), `humility` (not `epistemic_humility`)
+
 ## 0.6.1
 
 - Add `user_id` optional field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering

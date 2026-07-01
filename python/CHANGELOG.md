@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.2
+
+**Features:**
+
+- Add `intelligence` field to `ChatCompletionResponse` — full intelligence metadata
+- Add `conversation_id` field to `ChatCompletionResponse` — conversation continuity
+- Add `reasoning` field to `ChatDelta` — streaming reasoning from thinking models
+- Add `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` to `ChatUsage`
+- Add `BlueprintsResource`: list, get, create, update, delete, run, get_runs
+- Add `SchedulesResource`: list, get, create, update, delete, pause, resume, get_runs
+- Add 16 new types: `Blueprint`, `BlueprintRun`, `Schedule`, `ScheduleRun`, etc.
+- Document `reasoning_delta` streaming event in README
+
+**Fixes:**
+
+- IntelligenceMeta shape aligned with server — `capability` (not `capability_assessment`), `humility` (not `epistemic_humility`)
+
 ## 0.6.1
 
 - Add `user_id` optional field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
