@@ -10,11 +10,10 @@
 - Add `ReasoningTokens`, `CacheWriteTokens`, `PromptTokensDetails` to `ChatUsage`
 - Add `Reasoning` field to `ChatStreamEvent` — non-empty on reasoning_delta events
 - Document `reasoning_delta` streaming event in README
-- Fix README: `resp.ID` → `resp.ConversationID` in conversation resume example
 
 **Fixes:**
 
-- IntelligenceMeta shape aligned with server — `capability` (not `capability_assessment`), `humility` (not `epistemic_humility`)
+- IntelligenceMeta shape aligned with server
 
 ## 0.6.1
 

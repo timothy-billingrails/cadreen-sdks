@@ -15,7 +15,7 @@
 
 **Fixes:**
 
-- IntelligenceMeta shape aligned with server — `capability` (not `capability_assessment`), `humility` (not `epistemic_humility`)
+- IntelligenceMeta shape aligned with server
 
 ## 0.6.1
 

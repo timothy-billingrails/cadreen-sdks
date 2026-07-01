@@ -2,7 +2,7 @@
 
 ## 0.3.2
 
-- Add reasoning display to `chat` and `ask` commands — thinking model reasoning (DeepSeek, MiMo, Anthropic) shown in gray during streaming
+- Add reasoning display to `chat` and `ask` commands — thinking model reasoning shown in gray during streaming
 
 ## 0.3.1
 

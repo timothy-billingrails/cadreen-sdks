@@ -6,13 +6,13 @@
 
 - Add `intelligence` field to `ChatCompletionResponse` — full intelligence metadata (capability, reasoning, memory, governance, humility, process traces)
 - Add `conversation_id` field to `ChatCompletionResponse` — conversation continuity across requests
-- Add `reasoning` field to `ChatDelta` — streaming reasoning from thinking models (DeepSeek, MiMo, Anthropic)
+- Add `reasoning` field to `ChatDelta` — streaming reasoning from thinking models
 - Add `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` to `ChatUsage`
 - Document `reasoning_delta` streaming event in README
 
 **Fixes:**
 
-- IntelligenceMeta shape aligned with server — `capability` (not `capability_assessment`), `humility` (not `epistemic_humility`)
+- IntelligenceMeta shape aligned with server
 
 ## 0.6.1
 
