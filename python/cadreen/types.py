@@ -1374,3 +1374,135 @@ class UpdateRoleRequest:
 class ListWorkspaceUsersResponse:
     users: list[WorkspaceUser]
     count: int
+
+
+@dataclass
+class Blueprint:
+    id: str
+    name: str
+    status: str
+    version: int
+    created_at: str
+    updated_at: str
+    description: Optional[str] = None
+    intent: Optional[str] = None
+    source_type: Optional[str] = None
+    source_id: Optional[str] = None
+
+
+@dataclass
+class BlueprintRun:
+    id: str
+    blueprint_id: str
+    blueprint_version: int
+    status: str
+    created_at: str
+    params: Optional[dict[str, Any]] = None
+    result_summary: Optional[str] = None
+    trace_id: Optional[str] = None
+
+
+@dataclass
+class BlueprintSource:
+    type: str
+    trace_id: Optional[str] = None
+    execution_id: Optional[str] = None
+
+
+@dataclass
+class CreateBlueprintRequest:
+    name: str
+    description: Optional[str] = None
+    source: Optional[BlueprintSource] = None
+    parameter_schema: Optional[dict[str, Any]] = None
+    default_params: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class UpdateBlueprintRequest:
+    name: Optional[str] = None
+    description: Optional[str] = None
+    parameter_schema: Optional[dict[str, Any]] = None
+    default_params: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class ListBlueprintsResponse:
+    blueprints: list[Blueprint]
+    count: int
+
+
+@dataclass
+class ListBlueprintRunsResponse:
+    runs: list[BlueprintRun]
+    count: int
+
+
+@dataclass
+class Schedule:
+    id: str
+    name: str
+    blueprint_id: str
+    blueprint_version: int
+    status: str
+    trigger: dict[str, Any]
+    timezone: str
+    created_at: str
+    updated_at: str
+    params: Optional[dict[str, Any]] = None
+    next_run_at: Optional[str] = None
+    last_run_at: Optional[str] = None
+    pause_reason: Optional[str] = None
+
+
+@dataclass
+class CreateScheduleRequest:
+    blueprint_id: str
+    name: str
+    trigger: dict[str, Any]
+    timezone: Optional[str] = None
+    params: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class UpdateScheduleRequest:
+    name: Optional[str] = None
+    trigger: Optional[dict[str, Any]] = None
+    timezone: Optional[str] = None
+    params: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class ListSchedulesResponse:
+    schedules: list[Schedule]
+    count: int
+
+
+@dataclass
+class ScheduleRun:
+    id: str
+    schedule_id: str
+    status: str
+    started_at: Optional[str] = None
+    finished_at: Optional[str] = None
+    result_summary: Optional[str] = None
+    error: Optional[str] = None
+
+
+@dataclass
+class ListScheduleRunsResponse:
+    runs: list[ScheduleRun]
+    count: int
+
+
+@dataclass
+class PauseScheduleResponse:
+    id: str
+    status: str
+
+
+@dataclass
+class ResumeScheduleResponse:
+    id: str
+    status: str
+    next_run_at: Optional[str] = None

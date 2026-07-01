@@ -141,6 +141,21 @@ from .types import (
     InviteUserRequest,
     UpdateRoleRequest,
     ListWorkspaceUsersResponse,
+    Blueprint,
+    BlueprintRun,
+    BlueprintSource,
+    CreateBlueprintRequest,
+    UpdateBlueprintRequest,
+    ListBlueprintsResponse,
+    ListBlueprintRunsResponse,
+    Schedule,
+    ScheduleRun,
+    CreateScheduleRequest,
+    UpdateScheduleRequest,
+    ListSchedulesResponse,
+    ListScheduleRunsResponse,
+    PauseScheduleResponse,
+    ResumeScheduleResponse,
 )
 
 from .client import HttpClient
@@ -161,6 +176,8 @@ from .resources.workspace_users import WorkspaceUsersResource
 from .resources.webhooks import WebhooksResource
 from .resources.learning import LearningResource
 from .resources.credentials import CredentialsResource
+from .resources.blueprints import BlueprintsResource
+from .resources.schedules import SchedulesResource
 from .resources.chat import (
     ChatMessage,
     ChatToolCall,
@@ -202,6 +219,8 @@ class Cadreen:
         self.webhooks = WebhooksResource(self._client)
         self.learning = LearningResource(self._client)
         self.credentials = CredentialsResource(self._client)
+        self.blueprints = BlueprintsResource(self._client)
+        self.schedules = SchedulesResource(self._client)
 
     async def invoke(self, request: IntentRequest) -> IntentResult:
         return await self.intent.invoke(request)
@@ -388,58 +407,4 @@ class Cadreen:
             needs_clarification=a.get("needs_clarification"),
         )
 
-    # ── Blueprints ──
 
-    async def list_blueprints(self, status: str = "active", limit: int = 50) -> dict:
-        resp = await self._client.get(f"/api/v1/cadreen/blueprints?status={status}&limit={limit}")
-        return resp
-
-    async def get_blueprint(self, blueprint_id: str) -> dict:
-        return await self._client.get(f"/api/v1/cadreen/blueprints/{blueprint_id}")
-
-    async def create_blueprint(self, name: str, description: str = None, parameter_schema: dict = None, default_params: dict = None) -> dict:
-        payload: dict = {"name": name}
-        if description:
-            payload["description"] = description
-        if parameter_schema:
-            payload["parameter_schema"] = parameter_schema
-        if default_params:
-            payload["default_params"] = default_params
-        return await self._client.post("/api/v1/cadreen/blueprints", payload)
-
-    async def delete_blueprint(self, blueprint_id: str) -> None:
-        await self._client.delete(f"/api/v1/cadreen/blueprints/{blueprint_id}")
-
-    async def run_blueprint(self, blueprint_id: str, params: dict = None) -> dict:
-        payload: dict = {}
-        if params:
-            payload["params"] = params
-        return await self._client.post(f"/api/v1/cadreen/blueprints/{blueprint_id}/runs", payload)
-
-    async def list_blueprint_runs(self, blueprint_id: str, limit: int = 10) -> dict:
-        return await self._client.get(f"/api/v1/cadreen/blueprints/{blueprint_id}/runs?limit={limit}")
-
-    # ── Schedules ──
-
-    async def list_schedules(self) -> dict:
-        return await self._client.get("/api/v1/cadreen/schedules")
-
-    async def get_schedule(self, schedule_id: str) -> dict:
-        return await self._client.get(f"/api/v1/cadreen/schedules/{schedule_id}")
-
-    async def create_schedule(self, blueprint_id: str, name: str, trigger: dict, timezone: str = None, params: dict = None) -> dict:
-        payload: dict = {"blueprint_id": blueprint_id, "name": name, "trigger": trigger}
-        if timezone:
-            payload["timezone"] = timezone
-        if params:
-            payload["params"] = params
-        return await self._client.post("/api/v1/cadreen/schedules", payload)
-
-    async def pause_schedule(self, schedule_id: str, reason: str = None) -> None:
-        payload: dict = {}
-        if reason:
-            payload["reason"] = reason
-        await self._client.post(f"/api/v1/cadreen/schedules/{schedule_id}/pause", payload)
-
-    async def resume_schedule(self, schedule_id: str) -> dict:
-        return await self._client.post(f"/api/v1/cadreen/schedules/{schedule_id}/resume")

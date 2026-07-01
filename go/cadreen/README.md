@@ -101,7 +101,7 @@ followUp, err := c.ChatCompletions(ctx, cadreen.ChatCompletionRequest{
 	Messages: []cadreen.ChatMessage{
 		{Role: "user", Content: "What about order 789?"},
 	},
-	ConversationID: resp.ID, // use conversation_id from prior response
+	ConversationID: resp.ConversationID, // use conversation_id from prior response
 })
 ```
 
@@ -116,6 +116,10 @@ ch, err := c.ChatCompletionsStream(ctx, cadreen.ChatCompletionRequest{
 for event := range ch {
 	if event.Error != nil {
 		log.Fatal(event.Error)
+	}
+	if event.Type == "reasoning_delta" {
+		// Model is thinking — render in a collapsible accordion
+		fmt.Printf("[thinking] %s", event.Reasoning)
 	}
 	if len(event.Chunk.Choices) > 0 {
 		fmt.Print(event.Chunk.Choices[0].Delta.Content)

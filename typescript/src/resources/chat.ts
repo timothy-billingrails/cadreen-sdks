@@ -1,10 +1,12 @@
 import type { HttpClient } from "../client";
+import type { IntelligenceMeta } from "../types";
 
 // ── Chat Completions Types (OpenAI-compatible) ──
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant" | "tool";
   content?: string;
+  reasoning?: string; // Model reasoning (thinking models: DeepSeek, MiMo, Anthropic)
   name?: string;
   tool_call_id?: string; // for "tool" role
   tool_calls?: ChatToolCall[]; // for "assistant" role
@@ -40,6 +42,7 @@ export interface ChatCompletionRequest {
   context?: Record<string, unknown>;
   conversation_id?: string;
   user_id?: string;
+  max_tokens?: number;
 }
 
 export interface ChatCompletionResponse {
@@ -49,6 +52,8 @@ export interface ChatCompletionResponse {
   model: string;
   choices: ChatChoice[];
   usage?: ChatUsage;
+  intelligence?: IntelligenceMeta;
+  conversation_id?: string;
 }
 
 export interface ChatChoice {
@@ -81,6 +86,7 @@ export interface ChatChunkChoice {
 export interface ChatDelta {
   role?: string;
   content?: string;
+  reasoning?: string;
   tool_calls?: ChatToolCall[];
 }
 
@@ -161,6 +167,7 @@ export class ChatResource {
 
 export type ChatStreamEvent =
   | { type: "chunk"; chunk: ChatCompletionChunk }
+  | { type: "reasoning"; reasoning: string }
   | { type: "done" }
   | { type: "error"; error: Error };
 
@@ -175,6 +182,7 @@ async function* parseChatSSEStream(
 
   const decoder = new TextDecoder();
   let buffer = "";
+  let currentEvent = "message";
 
   try {
     while (true) {
@@ -187,6 +195,10 @@ async function* parseChatSSEStream(
 
       for (const line of lines) {
         const trimmed = line.trim();
+        if (trimmed.startsWith("event: ")) {
+          currentEvent = trimmed.slice(7).trim();
+          continue;
+        }
         if (!trimmed.startsWith("data: ")) continue;
 
         const data = trimmed.slice(6);
@@ -196,8 +208,15 @@ async function* parseChatSSEStream(
         }
 
         try {
+          if (currentEvent === "reasoning_delta") {
+            const parsed = JSON.parse(data) as { reasoning?: string };
+            yield { type: "reasoning", reasoning: parsed.reasoning || "" };
+            currentEvent = "message";
+            continue;
+          }
           const chunk = JSON.parse(data) as ChatCompletionChunk;
           yield { type: "chunk", chunk };
+          currentEvent = "message";
         } catch (e) {
           yield { type: "error", error: new Error(`Parse error: ${e}`) };
         }

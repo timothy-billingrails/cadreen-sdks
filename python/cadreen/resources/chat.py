@@ -27,6 +27,7 @@ class ChatToolCall:
 class ChatMessage:
     role: str
     content: Optional[str] = None
+    reasoning: Optional[str] = None  # Model reasoning (thinking models: DeepSeek, MiMo, Anthropic)
     name: Optional[str] = None
     tool_call_id: Optional[str] = None  # for "tool" role
     tool_calls: Optional[list[ChatToolCall]] = None  # for "assistant" role
@@ -54,6 +55,7 @@ class ChatCompletionRequest:
     context: Optional[dict[str, Any]] = None
     conversation_id: Optional[str] = None
     user_id: Optional[str] = None
+    max_tokens: Optional[int] = None
 
 
 @dataclass
@@ -61,6 +63,9 @@ class ChatUsage:
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
+    reasoning_tokens: int = 0
+    cache_write_tokens: int = 0
+    prompt_tokens_details: Optional[dict[str, Any]] = None
 
 
 @dataclass
@@ -78,12 +83,15 @@ class ChatCompletionResponse:
     model: str = ""
     choices: list[ChatChoice] = field(default_factory=list)
     usage: Optional[ChatUsage] = None
+    intelligence: Optional[Any] = None
+    conversation_id: Optional[str] = None
 
 
 @dataclass
 class ChatDelta:
     role: Optional[str] = None
     content: Optional[str] = None
+    reasoning: Optional[str] = None
     tool_calls: Optional[list[ChatToolCall]] = None
 
 
@@ -102,6 +110,7 @@ class ChatCompletionChunk:
     model: str = ""
     choices: list[ChatChunkChoice] = field(default_factory=list)
     usage: Optional[ChatUsage] = None
+    reasoning: Optional[str] = None  # Present when object == "reasoning_delta"
 
 
 @dataclass
@@ -139,6 +148,7 @@ def _parse_chat_message(raw: dict[str, Any]) -> ChatMessage:
     return ChatMessage(
         role=raw.get("role", "assistant"),
         content=raw.get("content"),
+        reasoning=raw.get("reasoning"),
         name=raw.get("name"),
         tool_call_id=raw.get("tool_call_id"),
         tool_calls=_parse_tool_calls(raw.get("tool_calls")),
@@ -160,6 +170,9 @@ def _parse_usage(raw: dict[str, Any] | None) -> ChatUsage | None:
         prompt_tokens=raw.get("prompt_tokens", 0),
         completion_tokens=raw.get("completion_tokens", 0),
         total_tokens=raw.get("total_tokens", 0),
+        reasoning_tokens=raw.get("reasoning_tokens", 0),
+        cache_write_tokens=raw.get("cache_write_tokens", 0),
+        prompt_tokens_details=raw.get("prompt_tokens_details"),
     )
 
 
@@ -171,6 +184,8 @@ def _parse_chat_response(raw: dict[str, Any]) -> ChatCompletionResponse:
         model=raw.get("model", ""),
         choices=[_parse_chat_choice(c) for c in raw.get("choices", [])],
         usage=_parse_usage(raw.get("usage")),
+        intelligence=raw.get("intelligence"),
+        conversation_id=raw.get("conversation_id"),
     )
 
 
@@ -179,6 +194,7 @@ def _parse_chunk_choice(raw: dict[str, Any]) -> ChatChunkChoice:
     delta = ChatDelta(
         role=delta_raw.get("role"),
         content=delta_raw.get("content"),
+        reasoning=delta_raw.get("reasoning"),
         tool_calls=_parse_tool_calls(delta_raw.get("tool_calls")),
     )
     return ChatChunkChoice(
@@ -268,6 +284,8 @@ class ChatResource:
             body["context"] = request.context
         if request.conversation_id:
             body["conversation_id"] = request.conversation_id
+        if request.max_tokens is not None:
+            body["max_tokens"] = request.max_tokens
 
         raw = await self._client.post("/api/v1/cadreen/chat/completions", body)
         return _parse_chat_response(raw)
@@ -288,6 +306,8 @@ class ChatResource:
             body["context"] = request.context
         if request.conversation_id:
             body["conversation_id"] = request.conversation_id
+        if request.max_tokens is not None:
+            body["max_tokens"] = request.max_tokens
 
         url = f"{self._client._base_url}/api/v1/cadreen/chat/completions"
         headers = {
@@ -304,6 +324,17 @@ class ChatResource:
                 async for event in event_source.aiter_sse():
                     if event.data == "[DONE]":
                         return
+                    if event.event == "reasoning_delta":
+                        try:
+                            data = json.loads(event.data)
+                            yield ChatCompletionChunk(
+                                id="",
+                                object="reasoning_delta",
+                                reasoning=data.get("reasoning", ""),
+                            )
+                        except Exception:
+                            continue
+                        continue
                     try:
                         data = json.loads(event.data)
                         yield _parse_chat_chunk(data)

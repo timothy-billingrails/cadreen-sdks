@@ -93,7 +93,10 @@ follow_up = await cadreen.chat.completions(ChatCompletionRequest(
 async for chunk in await cadreen.chat.completions_stream(ChatCompletionRequest(
     messages=[ChatMessage(role="user", content="Hello!")],
 )):
-    if chunk.choices and chunk.choices[0].delta.content:
+    if chunk.type == "reasoning_delta":
+        # Model is thinking — render in a collapsible accordion
+        print(f"[thinking] {chunk.reasoning}", end="", flush=True)
+    elif chunk.choices and chunk.choices[0].delta.content:
         print(chunk.choices[0].delta.content, end="", flush=True)
 ```
 

@@ -95,7 +95,10 @@ const stream = await cadreen.chat.completionsStream({
 });
 
 for await (const event of stream) {
-  if (event.type === "chunk") {
+  if (event.type === "reasoning") {
+    // Model is thinking — render in a collapsible accordion
+    process.stdout.write(`[thinking] ${event.reasoning}`);
+  } else if (event.type === "chunk") {
     process.stdout.write(event.chunk.choices[0]?.delta?.content || "");
   }
 }

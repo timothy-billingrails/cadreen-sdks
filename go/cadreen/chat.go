@@ -17,6 +17,7 @@ import (
 type ChatMessage struct {
 	Role       string           `json:"role"`
 	Content    string           `json:"content,omitempty"`
+	Reasoning  string           `json:"reasoning,omitempty"` // Model reasoning (thinking models: DeepSeek, MiMo, Anthropic)
 	Name       string           `json:"name,omitempty"`
 	ToolCallID string           `json:"tool_call_id,omitempty"` // for "tool" role
 	ToolCalls  []ChatToolCall   `json:"tool_calls,omitempty"`   // for "assistant" role
@@ -57,16 +58,19 @@ type ChatCompletionRequest struct {
 	Context        map[string]any       `json:"context,omitempty"`
 	ConversationID string               `json:"conversation_id,omitempty"`
 	UserID         string               `json:"user_id,omitempty"`
+	MaxTokens      int                  `json:"max_tokens,omitempty"`
 }
 
 // ChatCompletionResponse is the response from POST /api/v1/cadreen/chat/completions.
 type ChatCompletionResponse struct {
-	ID      string             `json:"id"`
-	Object  string             `json:"object"`
-	Created int64              `json:"created"`
-	Model   string             `json:"model"`
-	Choices []ChatChoice       `json:"choices"`
-	Usage   *ChatUsage         `json:"usage,omitempty"`
+	ID             string             `json:"id"`
+	Object         string             `json:"object"`
+	Created        int64              `json:"created"`
+	Model          string             `json:"model"`
+	Choices        []ChatChoice       `json:"choices"`
+	Usage          *ChatUsage         `json:"usage,omitempty"`
+	Intelligence   *IntelligenceMeta  `json:"intelligence,omitempty"`
+	ConversationID string             `json:"conversation_id,omitempty"`
 }
 
 // ChatChoice represents a single choice in the response.
@@ -81,6 +85,11 @@ type ChatUsage struct {
 	PromptTokens     int `json:"prompt_tokens"`
 	CompletionTokens int `json:"completion_tokens"`
 	TotalTokens      int `json:"total_tokens"`
+	PromptTokensDetails struct {
+		CachedTokens int `json:"cached_tokens"`
+	} `json:"prompt_tokens_details,omitempty"`
+	ReasoningTokens  int `json:"reasoning_tokens,omitempty"`
+	CacheWriteTokens int `json:"cache_write_tokens,omitempty"`
 }
 
 // ChatCompletionChunk is a streaming chunk from POST /api/v1/cadreen/chat/completions.
@@ -104,14 +113,16 @@ type ChatChunkChoice struct {
 type ChatDelta struct {
 	Role      string         `json:"role,omitempty"`
 	Content   string         `json:"content,omitempty"`
+	Reasoning string         `json:"reasoning,omitempty"`
 	ToolCalls []ChatToolCall `json:"tool_calls,omitempty"`
 }
 
 // ChatStreamEvent represents an event from the chat completion stream.
 type ChatStreamEvent struct {
-	Chunk   *ChatCompletionChunk
-	RawJSON []byte // Raw JSON before typed parsing; includes Cadreen-specific fields (pending_actions, conversation_id, intelligence)
-	Error   error
+	Chunk    *ChatCompletionChunk
+	Reasoning string // Non-empty when this is a reasoning_delta event
+	RawJSON  []byte // Raw JSON before typed parsing; includes Cadreen-specific fields (pending_actions, conversation_id, intelligence)
+	Error    error
 }
 
 // ── Tool Discovery Types ──
@@ -186,6 +197,7 @@ func readChatSSEStream(ctx context.Context, resp *http.Response, ch chan<- ChatS
 	defer resp.Body.Close()
 
 	reader := bufio.NewReader(resp.Body)
+	currentEvent := "message"
 
 	for {
 		line, err := reader.ReadString('\n')
@@ -201,12 +213,32 @@ func readChatSSEStream(ctx context.Context, resp *http.Response, ch chan<- ChatS
 
 		line = strings.TrimRight(line, "\r\n")
 
+		if strings.HasPrefix(line, "event: ") {
+			currentEvent = strings.TrimPrefix(line, "event: ")
+			continue
+		}
+
 		if !strings.HasPrefix(line, "data: ") {
 			continue
 		}
 		data := strings.TrimPrefix(line, "data: ")
 		if data == "[DONE]" {
 			return
+		}
+
+		if currentEvent == "reasoning_delta" {
+			var rd struct {
+				Reasoning string `json:"reasoning"`
+			}
+			if err := json.Unmarshal([]byte(data), &rd); err == nil {
+				select {
+				case ch <- ChatStreamEvent{Reasoning: rd.Reasoning, RawJSON: []byte(data)}:
+				case <-ctx.Done():
+					return
+				}
+			}
+			currentEvent = "message"
+			continue
 		}
 
 		var chunk ChatCompletionChunk
@@ -218,6 +250,7 @@ func readChatSSEStream(ctx context.Context, resp *http.Response, ch chan<- ChatS
 			return
 		}
 
+		currentEvent = "message"
 		select {
 		case ch <- ChatStreamEvent{Chunk: &chunk, RawJSON: []byte(data)}:
 		case <-ctx.Done():
