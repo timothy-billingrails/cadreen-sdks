@@ -2,6 +2,9 @@ package cadreen
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 )
 
@@ -32,4 +35,24 @@ func (c *Client) DeleteWebhook(ctx context.Context, id string, opts ...RequestOp
 		return fmt.Errorf("delete webhook: %w", err)
 	}
 	return nil
+}
+
+// VerifyWebhookSignature verifies the HMAC-SHA256 signature of a webhook payload.
+//
+// Parameters:
+//   - rawBody: the raw request body bytes (do NOT unmarshal JSON first)
+//   - signature: the value of the X-Cadreen-Signature header
+//   - secret: the secret you set when creating the webhook subscription
+//
+// Returns true if the signature is valid.
+func VerifyWebhookSignature(rawBody []byte, signature string, secret string) bool {
+	if len(rawBody) == 0 || signature == "" || secret == "" {
+		return false
+	}
+
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(rawBody)
+	expected := hex.EncodeToString(mac.Sum(nil))
+
+	return hmac.Equal([]byte(signature), []byte(expected))
 }
