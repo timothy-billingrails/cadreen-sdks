@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.3
+
+**Fixes:**
+
+- Fix CLI version string — was `0.2.5`, now matches npm package version
+- Fix `traces` output formatting — add newline between confidence and duration lines
+
 ## 0.3.2
 
 - Add reasoning display to `chat` and `ask` commands — thinking model reasoning shown in gray during streaming

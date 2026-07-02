@@ -338,6 +338,9 @@ try {
 
 ## Changelog
 
+### v0.6.3
+- Fix: add missing `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` fields to `ChatUsage`
+
 ### v0.6.2
 - Added `intelligence` field to `ChatCompletionResponse` — full intelligence metadata (capability, reasoning, memory, governance, humility, process traces)
 - Added `conversation_id` field to `ChatCompletionResponse` — conversation continuity across requests

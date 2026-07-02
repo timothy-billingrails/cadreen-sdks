@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.3
+
+**Fixes:**
+
+- Fix retry body reuse bug — `bytes.Reader` was consumed on first attempt, retries sent empty body. Now creates fresh `bytes.NewReader` for each retry.
+- Add `VerifyWebhookSignature()` function for HMAC-SHA256 webhook signature verification
+
 ## 0.6.2
 
 **Features:**

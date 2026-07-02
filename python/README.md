@@ -281,6 +281,10 @@ print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
 
 ## Changelog
 
+### v0.6.3
+- Fix: `invoke_stream()` crash — was using nonexistent `_client._session`, now uses `httpx-sse`
+- Fix: `chat.completions()` and `completions_stream()` silently dropping `user_id` from request body
+
 ### v0.6.2
 - Added `intelligence` field to `ChatCompletionResponse` — full intelligence metadata
 - Added `conversation_id` field to `ChatCompletionResponse` — conversation continuity

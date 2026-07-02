@@ -95,6 +95,10 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 
 ## Changelog
 
+### v0.3.3
+- Fix: CLI version string was `0.2.5`, now matches npm package version
+- Fix: `traces` output — add newline between confidence and duration lines
+
 ### v0.3.2
 - Added reasoning display to `chat` and `ask` commands — thinking model reasoning shown in gray during streaming
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3
+
+**Fixes:**
+
+- Add missing `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` fields to `ChatUsage` — were claimed in v0.6.2 changelog but not present in code
+
 ## 0.6.2
 
 **Features:**
