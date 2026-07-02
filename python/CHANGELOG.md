@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.3
+
+**Fixes:**
+
+- Fix `invoke_stream()` crash — was using nonexistent `_client._session`, now uses `httpx-sse` `aconnect_sse`
+- Fix `chat.completions()` and `completions_stream()` silently dropping `user_id` from request body
+
 ## 0.6.2
 
 **Features:**

@@ -301,6 +301,10 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 
 ## Changelog
 
+### v0.6.3
+- Fix: retry body reuse bug — retries were sending empty body because `bytes.Reader` was consumed on first attempt
+- Add: `VerifyWebhookSignature()` function for HMAC-SHA256 webhook signature verification
+
 ### v0.6.2
 - Added `Intelligence` field to `ChatCompletionResponse` — full intelligence metadata
 - Added `ConversationID` field to `ChatCompletionResponse` — conversation continuity
