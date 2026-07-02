@@ -79,10 +79,10 @@ func printTracesText(t cadreen.ListIntelligenceResponse) {
 			fmt.Printf("    \"%s\"\n", tr.Meta.Summary)
 		}
 		if tr.Meta.Governance.Confidence > 0 {
-			fmt.Printf("    Confidence: %.0f%%", tr.Meta.Governance.Confidence*100)
+			fmt.Printf("    Confidence: %.0f%%\n", tr.Meta.Governance.Confidence*100)
 		}
 		if tr.Meta.Process.DurationMs > 0 {
-			fmt.Printf("    Duration: %.1fs", float64(tr.Meta.Process.DurationMs)/1000)
+			fmt.Printf("    Duration: %.1fs\n", float64(tr.Meta.Process.DurationMs)/1000)
 		}
 		fmt.Println()
 		fmt.Println()

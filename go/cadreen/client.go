@@ -147,9 +147,11 @@ func (c *Client) do(ctx context.Context, method, path string, body, result any, 
 
 	reqURL := c.config.BaseURL + path
 
+	var bodyBytes []byte
 	var bodyReader io.Reader
 	if body != nil {
-		bodyBytes, err := json.Marshal(body)
+		var err error
+		bodyBytes, err = json.Marshal(body)
 		if err != nil {
 			return fmt.Errorf("marshal request body: %w", err)
 		}
@@ -198,7 +200,7 @@ func (c *Client) do(ctx context.Context, method, path string, body, result any, 
 		if err != nil {
 			if isIdempotent && attempt < maxAttempts-1 {
 				lastErr = &APIError{Code: "network_error", Type: "network", Message: err.Error()}
-				freshReq, newReqErr := http.NewRequestWithContext(ctx, method, reqURL, bodyReader)
+				freshReq, newReqErr := http.NewRequestWithContext(ctx, method, reqURL, bytes.NewReader(bodyBytes))
 				if newReqErr != nil {
 					return lastErr
 				}
@@ -236,7 +238,7 @@ func (c *Client) do(ctx context.Context, method, path string, body, result any, 
 
 		if retryableStatusCodes[resp.StatusCode] && isIdempotent && attempt < maxAttempts-1 {
 			lastErr = apiErr
-			freshReq, newReqErr := http.NewRequestWithContext(ctx, method, reqURL, bodyReader)
+			freshReq, newReqErr := http.NewRequestWithContext(ctx, method, reqURL, bytes.NewReader(bodyBytes))
 			if newReqErr != nil {
 				return lastErr
 			}
