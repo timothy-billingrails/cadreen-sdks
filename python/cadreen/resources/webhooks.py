@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
 from typing import Any
 
 from ..client import HttpClient
@@ -61,3 +63,26 @@ class WebhooksResource:
 
     async def delete(self, id: str) -> None:
         await self._client.delete(f"/api/v1/cadreen/webhooks/{id}")
+
+    @staticmethod
+    def verify_signature(raw_body: str | bytes, signature: str, secret: str) -> bool:
+        """Verify the HMAC-SHA256 signature of a webhook payload.
+
+        Args:
+            raw_body: The raw request body (do NOT parse JSON first).
+            signature: The value of the X-Cadreen-Signature header.
+            secret: The secret you set when creating the webhook subscription.
+
+        Returns:
+            True if the signature is valid, False otherwise.
+        """
+        if not raw_body or not signature or not secret:
+            return False
+
+        try:
+            if isinstance(raw_body, str):
+                raw_body = raw_body.encode("utf-8")
+            expected = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
+            return hmac.compare_digest(signature, expected)
+        except Exception:
+            return False
