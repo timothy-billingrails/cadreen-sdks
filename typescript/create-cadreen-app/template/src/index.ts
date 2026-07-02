@@ -20,16 +20,16 @@ async function main() {
     messages: [{ role: "user", content: "Hello! What can you help me with?" }],
   });
 
-  console.log(`Status: ${result.status}`);
   console.log(`Type: ${result.type}`);
 
-  if (result.type === "direct") {
+  if (result.type === "direct" && result.message) {
     console.log(`Response: ${result.message.content}`);
   }
 
   // ── 3. Read the trace ──
-  console.log(`Trace: ${result.intelligence.summary}`);
-  console.log(`Confidence: ${result.intelligence.governance.confidence}`);
+  if (result.intelligence) {
+    console.log(`Trace ID: ${result.intelligence.process?.duration_ms ?? "N/A"}ms`);
+  }
 }
 
 main().catch(console.error);

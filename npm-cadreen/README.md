@@ -95,6 +95,9 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 
 ## Changelog
 
+### v0.3.2
+- Added reasoning display to `chat` and `ask` commands — thinking model reasoning shown in gray during streaming
+
 ### v0.3.1
 - Added `--user-id` flag to `ask` and `chat` commands — pass end-user identity for per-user context
 - Added `workspace users` command group: `list`, `invite`, `role`, `remove` — manage workspace team members

@@ -301,6 +301,15 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 
 ## Changelog
 
+### v0.6.2
+- Added `Intelligence` field to `ChatCompletionResponse` — full intelligence metadata
+- Added `ConversationID` field to `ChatCompletionResponse` — conversation continuity
+- Added `Reasoning` field to `ChatDelta` — streaming reasoning from thinking models
+- Added `ReasoningTokens`, `CacheWriteTokens`, `PromptTokensDetails` to `ChatUsage`
+- Added `Reasoning` field to `ChatStreamEvent` — non-empty on reasoning_delta events
+- Document `reasoning_delta` streaming event in README
+- IntelligenceMeta shape aligned with server
+
 ### v0.6.1
 - Added `UserID` field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
 - Added `ListWorkspaceUsers()`, `InviteUser()`, `UpdateUserRole()`, `RemoveUser()` — manage workspace team members
