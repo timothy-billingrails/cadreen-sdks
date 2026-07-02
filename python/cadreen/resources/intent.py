@@ -249,26 +249,21 @@ class IntentResource:
             body["mode"] = request.mode
 
         url = f"{self._client._base_url}/api/v1/cadreen/intent"
-        async with self._client._session.post(
-            url,
-            json=body,
-            headers={
-                "Authorization": f"Bearer {self._client._api_key}",
-                "Accept": "text/event-stream",
-            },
-        ) as resp:
-            resp.raise_for_status()
-            current_event = "message"
-            async for line in resp.content:
-                line_str = line.decode("utf-8").rstrip("\r\n")
-                if line_str.startswith("event:"):
-                    current_event = line_str[6:].strip()
-                elif line_str.startswith("data:"):
-                    data = line_str[5:].strip()
-                    if data == "[DONE]":
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self._client._api_key}",
+            "Accept": "text/event-stream",
+        }
+
+        import httpx
+        from httpx_sse import aconnect_sse
+
+        async with httpx.AsyncClient(timeout=None) as client:
+            async with aconnect_sse(client, "POST", url, headers=headers, json=body) as event_source:
+                async for event in event_source.aiter_sse():
+                    if event.data == "[DONE]":
                         return
                     try:
-                        yield {"type": current_event, "data": _json.loads(data)}
+                        yield {"type": event.event or "message", "data": _json.loads(event.data)}
                     except _json.JSONDecodeError:
-                        yield {"type": current_event, "data": {"raw": data}}
-                    current_event = "message"
+                        yield {"type": event.event or "message", "data": {"raw": event.data}}

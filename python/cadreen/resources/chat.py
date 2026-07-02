@@ -284,6 +284,8 @@ class ChatResource:
             body["context"] = request.context
         if request.conversation_id:
             body["conversation_id"] = request.conversation_id
+        if request.user_id:
+            body["user_id"] = request.user_id
         if request.max_tokens is not None:
             body["max_tokens"] = request.max_tokens
 
@@ -306,6 +308,8 @@ class ChatResource:
             body["context"] = request.context
         if request.conversation_id:
             body["conversation_id"] = request.conversation_id
+        if request.user_id:
+            body["user_id"] = request.user_id
         if request.max_tokens is not None:
             body["max_tokens"] = request.max_tokens
 
