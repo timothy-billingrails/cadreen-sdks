@@ -338,6 +338,14 @@ try {
 
 ## Changelog
 
+### v0.6.2
+- Added `intelligence` field to `ChatCompletionResponse` — full intelligence metadata (capability, reasoning, memory, governance, humility, process traces)
+- Added `conversation_id` field to `ChatCompletionResponse` — conversation continuity across requests
+- Added `reasoning` field to `ChatDelta` — streaming reasoning from thinking models
+- Added `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` to `ChatUsage`
+- Document `reasoning_delta` streaming event in README
+- IntelligenceMeta shape aligned with server
+
 ### v0.6.1
 - Added `user_id` optional field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
 - Added `WorkspaceUsersResource`: list, invite, updateRole, remove — manage workspace team members

@@ -281,6 +281,17 @@ print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
 
 ## Changelog
 
+### v0.6.2
+- Added `intelligence` field to `ChatCompletionResponse` — full intelligence metadata
+- Added `conversation_id` field to `ChatCompletionResponse` — conversation continuity
+- Added `reasoning` field to `ChatDelta` — streaming reasoning from thinking models
+- Added `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` to `ChatUsage`
+- Added `BlueprintsResource`: list, get, create, update, delete, run, get_runs
+- Added `SchedulesResource`: list, get, create, update, delete, pause, resume, get_runs
+- Added 16 new types: `Blueprint`, `BlueprintRun`, `Schedule`, `ScheduleRun`, etc.
+- Document `reasoning_delta` streaming event in README
+- IntelligenceMeta shape aligned with server
+
 ### v0.6.1
 - Added `user_id` optional field to `IntentRequest` and `ChatCompletionRequest` — pass end-user identity for per-user context and memory filtering
 - Added `WorkspaceUsersResource`: list, invite, update_role, remove — manage workspace team members
