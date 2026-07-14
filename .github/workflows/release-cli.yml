@@ -102,7 +102,9 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash
           git checkout master
+          git stash pop
           git add Formula/cadreen.rb
           git diff --cached --quiet || git commit -m "chore: update Homebrew formula SHA256 for v${{ steps.version.outputs.VERSION }}"
           git push origin master
