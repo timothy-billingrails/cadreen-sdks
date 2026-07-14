@@ -12,7 +12,6 @@ from cadreen.types import (
     ConnectSchemaRequiredDetail,
     ConnectManualDetail,
     ConnectUnknownDetail,
-    ConnectPathway,
     CatalogResponse,
     CatalogCategory,
     CatalogIntegration,
@@ -43,21 +42,10 @@ CONNECTIONS_FIXTURES = {
         "connections": [
             {
                 "capability": "payments",
-                "pathways": [
-                    {
-                        "id": "pw_1",
-                        "capability": "payments",
-                        "connector": "openapi",
-                        "transport": "http",
-                        "health": "healthy",
-                        "tool_id": "stripe_payments",
-                    }
-                ],
                 "status": "healthy",
             }
         ],
         "total_capabilities": 1,
-        "total_pathways": 1,
         "pagination": {"limit": 50, "offset": 0, "has_more": False},
     },
     "DELETE /api/v1/cadreen/connections/conn_1": None,
@@ -189,13 +177,9 @@ class TestConnectionsResource:
         assert isinstance(result, ListConnectionsResponse)
         assert len(result.connections) == 1
         assert result.total_capabilities == 1
-        assert result.total_pathways == 1
         cg = result.connections[0]
         assert cg.capability == "payments"
         assert cg.status == "healthy"
-        assert len(cg.pathways) == 1
-        assert cg.pathways[0].id == "pw_1"
-        assert cg.pathways[0].health == "healthy"
         assert result.pagination.limit == 50
         assert result.pagination.has_more is False
 
@@ -245,15 +229,9 @@ class TestConnectionsResource:
                 "type": "manual",
                 "capability": "database",
                 "detail": {
-                    "pathways": [
-                        {
-                            "id": "pw_manual",
-                            "connector": "native_rest",
-                            "tool_id": "pg_v1",
-                            "health": "unknown",
-                            "priority": 1,
-                        }
-                    ]
+                    "capability": "database",
+                    "available": True,
+                    "health": "unknown",
                 },
             }
         }
@@ -263,8 +241,9 @@ class TestConnectionsResource:
         result = await resource.connect("database")
         assert result.type == "manual"
         assert isinstance(result.detail, ConnectManualDetail)
-        assert len(result.detail.pathways) == 1
-        assert result.detail.pathways[0].connector == "native_rest"
+        assert result.detail.capability == "database"
+        assert result.detail.available is True
+        assert result.detail.health == "unknown"
 
     @pytest.mark.asyncio
     async def test_connect_unknown(self):
@@ -299,7 +278,6 @@ class TestConnectionsResource:
             "GET /api/v1/cadreen/connections": {
                 "connections": [],
                 "total_capabilities": 0,
-                "total_pathways": 0,
             }
         }
         config = CadreenConfig(api_key="key", sandbox=True, fixtures=fixtures)

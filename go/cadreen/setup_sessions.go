@@ -24,7 +24,6 @@ type SetupSessionApplyRequest struct {
 
 type SetupSession struct {
 	ID           string            `json:"id"`
-	WorkspaceID  string            `json:"workspace_id"`
 	Status       string            `json:"status"`
 	Purpose      string            `json:"purpose,omitempty"`
 	Constraints  []string          `json:"constraints,omitempty"`

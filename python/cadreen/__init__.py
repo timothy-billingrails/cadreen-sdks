@@ -19,7 +19,6 @@ from .types import (
     RecoveryStatus,
     IntentMode,
     Pagination,
-    Pathway,
     ConnectionGroup,
     ListConnectionsResponse,
     AtomContent,
@@ -86,7 +85,6 @@ from .types import (
     ConnectPrebuiltDetail,
     ConnectSchemaRequiredDetail,
     ConnectManualDetail,
-    ConnectPathway,
     ConnectUnknownDetail,
     intent_status,
     SetupRequest,
@@ -156,6 +154,54 @@ from .types import (
     ListScheduleRunsResponse,
     PauseScheduleResponse,
     ResumeScheduleResponse,
+    Agent,
+    AgentConfig,
+    AgentCapabilities,
+    AgentMessage,
+    AgentKnowledge,
+    AgentGovernancePolicy,
+    AgentAuditEntry,
+    AgentNegotiation,
+    CreateAgentRequest,
+    UpdateAgentRequest,
+    SendMessageRequest,
+    CreateExecutionRequest,
+    CreateAgentKnowledgeRequest,
+    CreateAgentGovernanceRequest,
+    UpdateAgentGovernanceRequest,
+    StartNegotiationRequest,
+    RespondNegotiationRequest,
+    ListAgentsResponse,
+    ListAgentMessagesResponse,
+    ListAgentExecutionsResponse,
+    ListAgentKnowledgeResponse,
+    ListAgentGovernanceResponse,
+    ListAgentAuditResponse,
+    ListAgentNegotiationsResponse,
+    SearchAgentKnowledgeResponse,
+    FederationLink,
+    FederationAgent,
+    FederationPermissions,
+    CreateFederationRequest,
+    SuspendFederationRequest,
+    RevokeFederationRequest,
+    UpdateFederationPermissionsRequest,
+    LinkFederationAgentRequest,
+    ListFederationResponse,
+    ListFederationAgentsResponse,
+    ResponseRequest,
+    Response,
+    ResponseOutputItem,
+    ResponseOutputContent,
+    ResponseUsage,
+    ResponseStreamEvent,
+    ExternalAgentSkill,
+    ExternalAgentCapabilities,
+    ExternalAgentConnection,
+    ExternalAgentInteraction,
+    ExternalAgentSettings,
+    ListExternalConnectionsResponse,
+    ListExternalInteractionsResponse,
 )
 
 from .client import HttpClient
@@ -178,6 +224,10 @@ from .resources.learning import LearningResource
 from .resources.credentials import CredentialsResource
 from .resources.blueprints import BlueprintsResource
 from .resources.schedules import SchedulesResource
+from .resources.agents import AgentsResource
+from .resources.federation import FederationResource
+from .resources.responses import ResponsesResource
+from .resources.external_agents import ExternalAgentsResource
 from .resources.chat import (
     ChatMessage,
     ChatToolCall,
@@ -221,6 +271,10 @@ class Cadreen:
         self.credentials = CredentialsResource(self._client)
         self.blueprints = BlueprintsResource(self._client)
         self.schedules = SchedulesResource(self._client)
+        self.agents = AgentsResource(self._client)
+        self.federation = FederationResource(self._client)
+        self.responses = ResponsesResource(self._client)
+        self.external_agents = ExternalAgentsResource(self._client)
 
     async def invoke(self, request: IntentRequest) -> IntentResult:
         return await self.intent.invoke(request)
@@ -320,7 +374,6 @@ class Cadreen:
         return SetupResult(
             connections=conns, credentials=creds, memory=mems, policies=pols,
             applied=resp["applied"], failed=resp["failed"],
-            workspace_id=resp.get("workspace_id"),
             proposals=props or None,
             notice=resp.get("notice"),
             dry_run=resp.get("dry_run"),

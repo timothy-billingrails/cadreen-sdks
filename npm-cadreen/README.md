@@ -67,6 +67,29 @@ cadreen doctor      # Check readiness
 | `cadreen workspace users invite [email]` | Invite a user to the workspace |
 | `cadreen workspace users role [id] [role]` | Update a user's role |
 | `cadreen workspace users remove [id]` | Remove a user from the workspace |
+| `cadreen agents create [name]` | Create an agent |
+| `cadreen agents list` | List agents |
+| `cadreen agents get [id]` | Get agent details |
+| `cadreen agents deploy [id]` | Deploy an agent |
+| `cadreen agents ask [id] "..."` | Ask an agent a question |
+| `cadreen agents messages [id]` | List agent messages |
+| `cadreen agents executions [id]` | List agent executions |
+| `cadreen agents knowledge [id]` | List agent knowledge |
+| `cadreen agents governance [id]` | List agent governance rules |
+| `cadreen agents audit [id]` | List agent audit entries |
+| `cadreen federation create` | Create a federation link |
+| `cadreen federation list` | List federation links |
+| `cadreen federation get [id]` | Get federation link details |
+| `cadreen federation approve [id]` | Approve a federation link |
+| `cadreen federation suspend [id]` | Suspend a federation link |
+| `cadreen external-agents connect [url]` | Connect to an external agent |
+| `cadreen external-agents list` | List external agent connections |
+| `cadreen external-agents approve [id]` | Approve an external agent |
+| `cadreen external-agents suspend [id]` | Suspend an external agent |
+| `cadreen external-agents revoke [id]` | Revoke an external agent |
+| `cadreen external-agents settings` | Manage external agent settings |
+| `cadreen responses create "..."` | Create a response |
+| `cadreen responses get [id]` | Get a response |
 | `cadreen config` | Local settings |
 | `cadreen update` | Update CLI |
 
@@ -94,6 +117,21 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
 ## Changelog
+
+### v0.4.0
+- **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.
+- **BREAKING:** Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
+- **BREAKING:** Changed `ConnectManualDetail` from `{pathways: [...]}` to `{capability, available, health}`.
+- **BREAKING:** Removed `workspace_id` from response types: `SetupResult`, `SetupSession`, `WebhookSubscription`, `WebhookPayload`. (Still accepted on request types.)
+- **BREAKING:** Removed `authScheme` from `ExternalAgentConnection` responses.
+- **BREAKING:** Removed `atoms_consulted`, `episodes_matched`, `precedents_applied` from memory trace in intelligence metadata.
+- **BREAKING:** `sources_consulted` renamed to `knowledge_queried` in MemoryTrace.
+- **BREAKING:** All entity responses (Agent, Knowledge, Governance, Federation, Negotiation, ExternalAgentConnection) no longer include `workspace_id` or `workspaceId`.
+- New MCP SSE endpoint: `GET /api/v1/cadreen/mcp/sse` + `POST /api/v1/cadreen/mcp/message`. Connect Cadreen as an MCP server without installing the npm package.
+- Fix: CLI federation command `target_workspace_id` → `targetWorkspaceId` (was reading wrong JSON key)
+- Added `cadreen agents` — 17 subcommands: create, list, get, update, delete, deploy, capabilities, ask, messages, executions, knowledge, knowledge-add, knowledge-search, governance, audit, negotiate, negotiations
+- Added `cadreen federation` — 9 subcommands: create, list, get, approve, suspend, revoke, permissions, link-agent, agents
+- Human language in all command descriptions
 
 ### v0.3.3
 - Fix: CLI version string was `0.2.5`, now matches npm package version

@@ -72,7 +72,6 @@ function fixtures() {
     },
     // Setup
     "POST /api/v1/cadreen/setup": {
-      workspace_id: "ws-int",
       connections: [],
       credentials: [],
       memory: [],
@@ -155,7 +154,6 @@ describe("Cadreen integration", () => {
 
   it("cadreen.setup() returns setup result", async () => {
     const result = await cadreen.setup({ workspace_id: "ws-int" });
-    expect(result.workspace_id).toBe("ws-int");
     expect(result.applied).toBe(0);
   });
 

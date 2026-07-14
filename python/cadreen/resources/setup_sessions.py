@@ -75,7 +75,6 @@ class SetupSessionsResource:
     def _parse_session(self, raw: dict[str, Any]) -> SetupSession:
         return SetupSession(
             id=raw["id"],
-            workspace_id=raw["workspace_id"],
             status=raw["status"],
             purpose=raw.get("purpose"),
             constraints=raw.get("constraints"),

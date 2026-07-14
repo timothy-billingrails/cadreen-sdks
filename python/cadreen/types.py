@@ -57,19 +57,8 @@ class Pagination:
 
 
 @dataclass
-class Pathway:
-    id: str
-    capability: str
-    connector: ConnectorType
-    transport: TransportType
-    health: HealthStatus
-    tool_id: str
-
-
-@dataclass
 class ConnectionGroup:
     capability: str
-    pathways: Optional[list[Pathway]] = None
     status: HealthStatus = "unknown"
 
 
@@ -77,7 +66,6 @@ class ConnectionGroup:
 class ListConnectionsResponse:
     connections: list[ConnectionGroup]
     total_capabilities: int
-    total_pathways: int
     pagination: Optional[Pagination] = None
 
 
@@ -839,17 +827,10 @@ class ConnectSchemaRequiredDetail:
 
 
 @dataclass
-class ConnectPathway:
-    id: str
-    connector: str
-    tool_id: str
-    health: str
-    priority: int
-
-
-@dataclass
 class ConnectManualDetail:
-    pathways: list[ConnectPathway]
+    capability: str
+    available: bool
+    health: Optional[str] = None
 
 
 @dataclass
@@ -962,7 +943,6 @@ class SetupResult:
     policies: list[SetupPolicyResult]
     applied: int
     failed: int
-    workspace_id: Optional[str] = None
     proposals: Optional[list[SetupProposal]] = None
     notice: Optional[str] = None
     dry_run: Optional[bool] = None
@@ -991,7 +971,6 @@ class SetupSessionApplyRequest:
 @dataclass
 class SetupSession:
     id: str
-    workspace_id: str
     status: str
     created_at: str
     updated_at: str
@@ -1344,6 +1323,301 @@ class ProposalStatsResponse:
     expired: int = 0
 
 
+# ---------------------------------------------------------------------------
+# Agent types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Agent:
+    id: str
+    name: str
+    status: str
+    created_at: str
+    updated_at: str
+    description: Optional[str] = None
+    model: Optional[str] = None
+    domain: Optional[str] = None
+    tags: Optional[list[str]] = None
+    version: Optional[int] = None
+
+
+@dataclass
+class AgentConfig:
+    model: str
+    domain: str
+    config: dict[str, Any]
+    version: int
+
+
+@dataclass
+class AgentCapabilities:
+    tools: list[str]
+    integrations: list[str]
+    knowledge_count: int
+    governance_count: int
+
+
+@dataclass
+class AgentMessage:
+    id: str
+    role: str
+    content: str
+    created_at: str
+    metadata: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class AgentKnowledge:
+    id: str
+    type: str
+    content: dict[str, Any]
+    created_at: str
+    domain: Optional[str] = None
+    tags: Optional[list[str]] = None
+    authority: Optional[int] = None
+
+
+@dataclass
+class AgentGovernancePolicy:
+    id: str
+    name: str
+    rules: list[dict[str, Any]]
+    created_at: str
+    domain: Optional[str] = None
+    priority: Optional[int] = None
+
+
+@dataclass
+class AgentAuditEntry:
+    id: str
+    action: str
+    timestamp: str
+    actor: str
+    detail: Optional[str] = None
+    policy_id: Optional[str] = None
+
+
+@dataclass
+class AgentNegotiation:
+    id: str
+    status: str
+    initiator_agent_id: str
+    target_agent_id: str
+    proposal: dict[str, Any]
+    created_at: str
+    updated_at: str
+    response: Optional[dict[str, Any]] = None
+    counter_proposal: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class CreateAgentRequest:
+    name: str
+    description: Optional[str] = None
+    model: Optional[str] = None
+    domain: Optional[str] = None
+    config: Optional[dict[str, Any]] = None
+    tags: Optional[list[str]] = None
+
+
+@dataclass
+class UpdateAgentRequest:
+    name: Optional[str] = None
+    description: Optional[str] = None
+    model: Optional[str] = None
+    domain: Optional[str] = None
+    config: Optional[dict[str, Any]] = None
+    tags: Optional[list[str]] = None
+    status: Optional[str] = None
+
+
+@dataclass
+class SendMessageRequest:
+    content: str
+    role: Optional[str] = None
+    metadata: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class CreateExecutionRequest:
+    task: str
+    context: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class CreateAgentKnowledgeRequest:
+    type: str
+    content: dict[str, Any]
+    domain: Optional[str] = None
+    tags: Optional[list[str]] = None
+    authority: Optional[int] = None
+
+
+@dataclass
+class CreateAgentGovernanceRequest:
+    name: str
+    rules: list[dict[str, Any]]
+    domain: Optional[str] = None
+    priority: Optional[int] = None
+
+
+@dataclass
+class UpdateAgentGovernanceRequest:
+    name: Optional[str] = None
+    rules: Optional[list[dict[str, Any]]] = None
+    domain: Optional[str] = None
+    priority: Optional[int] = None
+
+
+@dataclass
+class StartNegotiationRequest:
+    target_agent_id: str
+    proposal: dict[str, Any]
+    context: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class RespondNegotiationRequest:
+    response: str
+    counter_proposal: Optional[dict[str, Any]] = None
+
+
+@dataclass
+class ListAgentsResponse:
+    agents: list[Agent]
+    count: int
+
+
+@dataclass
+class ListAgentMessagesResponse:
+    messages: list[AgentMessage]
+    count: int
+
+
+@dataclass
+class ListAgentExecutionsResponse:
+    executions: list[ExecutionStatus]
+    count: int
+
+
+@dataclass
+class ListAgentKnowledgeResponse:
+    knowledge: list[AgentKnowledge]
+    count: int
+
+
+@dataclass
+class ListAgentGovernanceResponse:
+    policies: list[AgentGovernancePolicy]
+    count: int
+
+
+@dataclass
+class ListAgentAuditResponse:
+    entries: list[AgentAuditEntry]
+    count: int
+
+
+@dataclass
+class ListAgentNegotiationsResponse:
+    negotiations: list[AgentNegotiation]
+    count: int
+
+
+@dataclass
+class SearchAgentKnowledgeResponse:
+    results: list[AgentKnowledge]
+    count: int
+
+
+# ---------------------------------------------------------------------------
+# Federation types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class FederationLink:
+    id: str
+    name: str
+    status: str
+    target_workspace_id: str
+    created_at: str
+    updated_at: str
+    description: Optional[str] = None
+    permissions: Optional[list[str]] = None
+    created_by_user_id: Optional[str] = None
+    approved_by_user_id: Optional[str] = None
+    suspended_by_user_id: Optional[str] = None
+    suspension_reason: Optional[str] = None
+    last_activity_at: Optional[str] = None
+    revoked_at: Optional[str] = None
+    revoke_reason: Optional[str] = None
+    source_workspace_name: Optional[str] = None
+    source_workspace_slug: Optional[str] = None
+    target_workspace_name: Optional[str] = None
+
+
+@dataclass
+class FederationAgent:
+    id: str
+    agent_id: str
+    federation_id: str
+    status: str
+    created_at: str
+    updated_at: str
+    local_agent_name: Optional[str] = None
+    remote_agent_name: Optional[str] = None
+    capabilities: Optional[list[str]] = None
+
+
+@dataclass
+class FederationPermissions:
+    federation_id: str
+    permissions: list[str]
+    updated_at: Optional[str] = None
+
+
+@dataclass
+class CreateFederationRequest:
+    target_workspace_id: str
+    description: Optional[str] = None
+    permissions: Optional[list[str]] = None
+
+
+@dataclass
+class SuspendFederationRequest:
+    reason: Optional[str] = None
+
+
+@dataclass
+class RevokeFederationRequest:
+    reason: Optional[str] = None
+
+
+@dataclass
+class UpdateFederationPermissionsRequest:
+    permissions: list[str]
+
+
+@dataclass
+class LinkFederationAgentRequest:
+    local_agent_id: str
+    remote_agent_id: str
+
+
+@dataclass
+class ListFederationResponse:
+    links: list[FederationLink]
+    count: int
+
+
+@dataclass
+class ListFederationAgentsResponse:
+    agents: list[FederationAgent]
+    count: int
+
+
 WorkspaceRole = Literal["admin", "operator", "member", "viewer"]
 
 
@@ -1506,3 +1780,151 @@ class ResumeScheduleResponse:
     id: str
     status: str
     next_run_at: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Responses API types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class ResponseRequest:
+    model: str
+    input: Union[str, list]
+    instructions: Optional[str] = None
+    tools: Optional[list] = None
+    previous_response_id: Optional[str] = None
+    store: Optional[bool] = None
+    stream: bool = False
+    max_output_tokens: Optional[int] = None
+    temperature: Optional[float] = None
+    metadata: Optional[dict] = None
+
+
+@dataclass
+class Response:
+    id: str
+    object: str
+    created_at: int
+    model: str
+    output: list
+    output_text: Optional[str] = None
+    usage: Optional[dict] = None
+    status: str = "completed"
+    previous_response_id: Optional[str] = None
+    metadata: Optional[dict] = None
+
+
+@dataclass
+class ResponseOutputItem:
+    id: str
+    type: str
+    status: Optional[str] = None
+    role: Optional[str] = None
+    content: Optional[list] = None
+    name: Optional[str] = None
+    call_id: Optional[str] = None
+    arguments: Optional[str] = None
+
+
+@dataclass
+class ResponseOutputContent:
+    type: str
+    text: Optional[str] = None
+    annotations: Optional[list] = None
+
+
+@dataclass
+class ResponseUsage:
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+
+
+@dataclass
+class ResponseStreamEvent:
+    type: str
+    sequence: Optional[int] = None
+    response: Optional[dict] = None
+    item: Optional[dict] = None
+    output_index: Optional[int] = None
+    content_index: Optional[int] = None
+    delta: Optional[str] = None
+
+
+# ─── External Agents (A2A) ───
+
+
+@dataclass
+class ExternalAgentSkill:
+    id: str
+    name: str
+    description: Optional[str] = None
+    tags: Optional[list[str]] = None
+
+
+@dataclass
+class ExternalAgentCapabilities:
+    streaming: bool = False
+    push_notifications: bool = False
+    state_transition_history: bool = False
+
+
+@dataclass
+class ExternalAgentConnection:
+    id: str
+    agent_id: str
+    agent_card_url: str
+    agent_name: str
+    agent_description: str
+    agent_system: str
+    agent_version: str
+    agent_card_json: dict[str, Any]
+    skills: list[ExternalAgentSkill]
+    capabilities: ExternalAgentCapabilities
+    status: str
+    health: str
+    created_at: str
+    updated_at: str
+    last_used_at: Optional[str] = None
+    last_health_check_at: Optional[str] = None
+    error_message: Optional[str] = None
+    approved_by: Optional[str] = None
+    approved_at: Optional[str] = None
+
+
+@dataclass
+class ExternalAgentInteraction:
+    id: str
+    connection_id: str
+    agent_id: str
+    direction: str
+    operation: str
+    status: str
+    created_at: str
+    task_id: Optional[str] = None
+    message: Optional[str] = None
+    duration_ms: Optional[int] = None
+    error_message: Optional[str] = None
+    governance_result: Optional[str] = None
+
+
+@dataclass
+class ExternalAgentSettings:
+    enabled: bool
+
+
+@dataclass
+class ListExternalConnectionsResponse:
+    connections: list[ExternalAgentConnection]
+    total: int
+    limit: int
+    offset: int
+
+
+@dataclass
+class ListExternalInteractionsResponse:
+    interactions: list[ExternalAgentInteraction]
+    total: int
+    limit: int
+    offset: int

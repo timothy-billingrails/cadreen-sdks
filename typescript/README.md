@@ -146,7 +146,7 @@ Control how much intelligence metadata you get back:
 
 | Profile | What you get | Use when |
 |---------|-------------|----------|
-| `"full"` (default) | Full response metadata with capability, reasoning, memory, governance, humility, process | You want full transparency |
+| `"full"` (default) | Full response metadata | You want full transparency |
 | `"audit"` | Only governance decision + confidence + blocking gaps | You need to react to gates, not inspect internals |
 | `"lean"` | No envelope. `trace_id` in body + `X-Cadreen-Trace-ID` header | Hot-looping, minimal payload |
 
@@ -329,6 +329,20 @@ try {
 | `cadreen.proposals` | `list(options?)`, `get(id)`, `accept(id)`, `dismiss(id, reason?)`, `stats()` |
 | `cadreen.setupSessions` | `create(request)`, `list()`, `get(id)`, `addResources(id, request)`, `apply(id, request)` |
 | `cadreen.credentials` | `list()`, `create(request)`, `delete(id)` |
+| `cadreen.agents` | `create(req)`, `list()`, `get(id)`, `update(id, req)`, `delete(id)`, `deploy(id)`, `getConfig(id)`, `getCapabilities(id)` |
+| `cadreen.agents.messages` | `send(id, req)`, `list(id)` |
+| `cadreen.agents.executions` | `create(id, req)`, `list(id)` |
+| `cadreen.agents.knowledge` | `create(id, req)`, `search(id, req)`, `list(id)`, `delete(id, kid)` |
+| `cadreen.agents.governance` | `create(id, req)`, `update(id, pid, req)`, `list(id)`, `delete(id, pid)` |
+| `cadreen.agents.audit` | `list(id)` |
+| `cadreen.agents.negotiations` | `start(id, req)`, `list(id)`, `get(id, nid)`, `respond(id, nid, req)` |
+| `cadreen.federation` | `create(req)`, `list()`, `get(id)`, `approve(id)`, `suspend(id)`, `revoke(id)` |
+| `cadreen.federation.permissions` | `get(id)`, `update(id, req)` |
+| `cadreen.federation.agents` | `link(id, req)`, `list(id)`, `unlink(id, aid)` |
+| `cadreen.externalAgents` | `connect(aid, url)`, `list(aid)`, `get(aid, cid)`, `approve(aid, cid)`, `suspend(aid, cid)`, `revoke(aid, cid)`, `delete(aid, cid)` |
+| `cadreen.externalAgents.interactions` | `list(aid, cid)` |
+| `cadreen.externalAgents.settings` | `get()`, `update(enabled)`, `listAll()` |
+| `cadreen.responses` | `create(req)`, `get(id)`, `stream(req)` |
 | `cadreen.listCapabilities()` | List available capabilities |
 | `cadreen.assess(task, domain?)` | Assess task readiness |
 
@@ -337,6 +351,32 @@ try {
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.7.0
+- **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.
+- **BREAKING:** Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
+- **BREAKING:** Changed `ConnectManualDetail` from `{pathways: [...]}` to `{capability, available, health}`.
+- **BREAKING:** Removed `workspace_id` from response types: `SetupResult`, `SetupSession`, `WebhookSubscription`, `WebhookPayload`. (Still accepted on request types.)
+- **BREAKING:** Removed `authScheme` from `ExternalAgentConnection` responses.
+- **BREAKING:** Removed `atoms_consulted`, `episodes_matched`, `precedents_applied` from memory trace in intelligence metadata.
+- **BREAKING:** `sources_consulted` renamed to `knowledge_queried` in MemoryTrace.
+- **BREAKING:** All entity responses (Agent, Knowledge, Governance, Federation, Negotiation, ExternalAgentConnection) no longer include `workspace_id` or `workspaceId`.
+- New MCP SSE endpoint: `GET /api/v1/cadreen/mcp/sse` + `POST /api/v1/cadreen/mcp/message`. Connect Cadreen as an MCP server without installing the npm package.
+- Added `agents` namespace — full agent lifecycle (create, list, get, update, delete, deploy, config, capabilities)
+- Added `agents.messages` — send messages to agents, list message history
+- Added `agents.executions` — create and list executions for agents
+- Added `agents.knowledge` — write, list, search, delete agent knowledge
+- Added `agents.governance` — CRUD for governance policies
+- Added `agents.audit` — list audit log entries
+- Added `agents.negotiate` — start negotiations, list, get, respond (accept/reject/counter)
+- Added `federation` namespace — cross-workspace federation management
+- Added `federation.permissions` — get/update what's shared across workspaces
+- Added `federation.agents` — link/unlink agents across federated workspaces
+- Added `externalAgents` namespace — A2A external agent connections (connect, list, get, approve, suspend, revoke, delete)
+- Added `externalAgents.interactions` — list interactions for external agent connections
+- Added `externalAgents.settings` — get/update workspace external agent settings
+- Added `responses` namespace — OpenAI-compatible responses API (create, get, stream)
+- Added 45+ new types: `Agent`, `AgentKnowledge`, `AgentGovernancePolicy`, `AgentAuditEntry`, `AgentNegotiation`, `AgentMessage`, `FederationLink`, `FederationAgent`, `ExternalAgentConnection`, `ExternalAgentInteraction`, `ExternalAgentSettings`, `ExternalAgentSkill`, `ExternalAgentCapabilities`, etc.
 
 ### v0.6.3
 - Fix: add missing `reasoning_tokens`, `cache_write_tokens`, `prompt_tokens_details` fields to `ChatUsage`
@@ -395,7 +435,7 @@ try {
   - `/api/v1/chat/completions` → `/api/v1/cadreen/chat/completions`
   - `/api/v1/tools` → `/api/v1/cadreen/tools`
 - All external API calls now route through the Cadreen surface
-- Removed "response metadata" terminology (was "intelligence envelope")
+- Renamed response profile levels for clarity
 
 ### v0.4.0
 - Added `cadreen.chat.completions()` — OpenAI-compatible chat completions with governance

@@ -21,25 +21,14 @@ export interface Pagination {
   has_more: boolean;
 }
 
-export interface Pathway {
-  id: string;
-  capability: string;
-  connector: ConnectorType;
-  transport: TransportType;
-  health: HealthStatus;
-  tool_id: string;
-}
-
 export interface ConnectionGroup {
   capability: string;
-  pathways?: Pathway[];
   status: HealthStatus;
 }
 
 export interface ListConnectionsResponse {
   connections: ConnectionGroup[];
   total_capabilities: number;
-  total_pathways: number;
   pagination?: Pagination;
 }
 
@@ -622,15 +611,9 @@ export interface ConnectSchemaRequiredDetail {
 }
 
 export interface ConnectManualDetail {
-  pathways: ConnectPathway[];
-}
-
-export interface ConnectPathway {
-  id: string;
-  connector: string;
-  tool_id: string;
-  health: string;
-  priority: number;
+  capability: string;
+  available: boolean;
+  health?: string;
 }
 
 export interface ConnectUnknownDetail {
@@ -658,7 +641,6 @@ export interface SetupProposal {
 }
 
 export interface SetupResult {
-  workspace_id?: string;
   connections: Array<SetupConnectionResult>;
   credentials: Array<SetupCredentialResult>;
   memory: Array<SetupMemoryResult>;
@@ -720,7 +702,6 @@ export interface SetupSessionApplyRequest {
 
 export interface SetupSession {
   id: string;
-  workspace_id: string;
   status: "draft" | "applying" | "applied" | "failed";
   purpose?: string;
   constraints?: string[];
@@ -1073,4 +1054,511 @@ export interface UpdateRoleRequest {
 export interface ListWorkspaceUsersResponse {
   users: WorkspaceUser[];
   count: number;
+}
+
+// ---------------------------------------------------------------------------
+// Agent types
+// ---------------------------------------------------------------------------
+
+export type AgentStatus = "draft" | "active" | "deploying" | "deployed" | "paused" | "error" | "archived";
+export type AgentHealth = "healthy" | "degraded" | "unhealthy" | "unknown";
+export type AgentMessageType = "direct" | "broadcast" | "request" | "response" | "notification";
+export type AgentMessageStatus = "pending" | "delivered" | "read" | "failed" | "expired";
+export type NegotiationStatus = "pending" | "in_progress" | "accepted" | "rejected" | "counter_proposed" | "expired" | "cancelled";
+export type FactType = "fact" | "preference" | "constraint" | "instruction" | "context" | "relationship";
+export type GovernanceScope = "agent" | "workspace" | "federation";
+export type PolicyAction = "allow" | "deny" | "require_approval" | "log_only";
+
+export interface Agent {
+  id: string;
+  name: string;
+  description?: string;
+  status: AgentStatus;
+  health: AgentHealth;
+  model?: string;
+  system_prompt?: string;
+  capabilities?: string[];
+  tags?: string[];
+  config?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  deployed_at?: string;
+}
+
+export interface AgentConfig {
+  agent_id: string;
+  model?: string;
+  system_prompt?: string;
+  temperature?: number;
+  max_tokens?: number;
+  tools?: string[];
+  connections?: string[];
+  memory_scope?: string;
+  governance_policy_id?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface AgentCapabilities {
+  agent_id: string;
+  tools: string[];
+  connections: string[];
+  knowledge_count: number;
+  governance_policies: number;
+  can_execute: boolean;
+  can_federate: boolean;
+  can_negotiate: boolean;
+}
+
+export interface AgentKnowledge {
+  id: string;
+  agent_id: string;
+  fact_type: FactType;
+  subject: string;
+  predicate: string;
+  object: string;
+  source?: string;
+  confidence: number;
+  tags?: string[];
+  visibility: "private" | "workspace" | "federation";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgentGovernancePolicy {
+  id: string;
+  name: string;
+  description?: string;
+  scope: GovernanceScope;
+  agent_id?: string;
+  rules: Record<string, unknown>[];
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgentAuditEntry {
+  id: string;
+  agent_id: string;
+  action: string;
+  target_type?: string;
+  target_id?: string;
+  details?: Record<string, unknown>;
+  policy_action?: PolicyAction;
+  created_at: string;
+}
+
+export interface AgentNegotiation {
+  id: string;
+  from_agent_id: string;
+  to_agent_id: string;
+  proposal: Record<string, unknown>;
+  status: NegotiationStatus;
+  current_round: number;
+  max_rounds: number;
+  deadline?: string;
+  resolution?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgentMessage {
+  id: string;
+  from_agent_id: string;
+  to_agent_id: string;
+  content: string;
+  context?: Record<string, unknown>;
+  status: AgentMessageStatus;
+  response?: string;
+  message_type: AgentMessageType;
+  created_at: string;
+}
+
+export interface AgentExecution {
+  id: string;
+  agent_id: string;
+  status: string;
+  input?: Record<string, unknown>;
+  output?: Record<string, unknown>;
+  error?: string;
+  started_at: string;
+  completed_at?: string;
+}
+
+export interface ListAgentsResponse {
+  agents: Agent[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListAgentMessagesResponse {
+  messages: AgentMessage[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListAgentExecutionsResponse {
+  executions: AgentExecution[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListAgentKnowledgeResponse {
+  knowledge: AgentKnowledge[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListAgentGovernanceResponse {
+  policies: AgentGovernancePolicy[];
+  count: number;
+}
+
+export interface ListAgentAuditResponse {
+  entries: AgentAuditEntry[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface ListAgentNegotiationsResponse {
+  negotiations: AgentNegotiation[];
+  count: number;
+  pagination?: Pagination;
+}
+
+export interface CreateAgentRequest {
+  name: string;
+  description?: string;
+  model?: string;
+  system_prompt?: string;
+  capabilities?: string[];
+  tags?: string[];
+  config?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
+export interface UpdateAgentRequest {
+  name?: string;
+  description?: string;
+  model?: string;
+  system_prompt?: string;
+  capabilities?: string[];
+  tags?: string[];
+  config?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
+export interface SendMessageRequest {
+  content: string;
+  message_type?: AgentMessageType;
+  context?: Record<string, unknown>;
+}
+
+export interface CreateExecutionRequest {
+  input: Record<string, unknown>;
+  stream?: boolean;
+}
+
+export interface CreateKnowledgeRequest {
+  fact_type: FactType;
+  subject: string;
+  predicate: string;
+  object: string;
+  source?: string;
+  confidence?: number;
+  tags?: string[];
+  visibility?: "private" | "workspace" | "federation";
+}
+
+export interface SearchKnowledgeRequest {
+  query: string;
+  fact_type?: FactType;
+  limit?: number;
+}
+
+export interface CreateGovernanceRequest {
+  name: string;
+  description?: string;
+  scope: GovernanceScope;
+  rules: Record<string, unknown>[];
+  enabled?: boolean;
+}
+
+export interface UpdateGovernanceRequest {
+  name?: string;
+  description?: string;
+  rules?: Record<string, unknown>[];
+  enabled?: boolean;
+}
+
+export interface StartNegotiationRequest {
+  to_agent_id: string;
+  proposal: Record<string, unknown>;
+  max_rounds?: number;
+  deadline?: string;
+}
+
+export interface RespondNegotiationRequest {
+  action: "accept" | "reject" | "counter";
+  counter_proposal?: Record<string, unknown>;
+  reason?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Federation types
+// ---------------------------------------------------------------------------
+
+export type FederationStatus = "pending" | "active" | "suspended" | "revoked" | "expired";
+export type FederationAgentStatus = "active" | "paused" | "error" | "unlinked";
+
+export interface FederationLink {
+  id: string;
+  targetWorkspaceId: string;
+  status: FederationStatus;
+  permissions: Record<string, unknown>;
+  name?: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+  createdByUserId?: string;
+  approvedByUserId?: string;
+  suspendedByUserId?: string;
+  suspensionReason?: string;
+  lastActivityAt?: string;
+  revokedAt?: string;
+  revokeReason?: string;
+  sourceWorkspaceName?: string;
+  sourceWorkspaceSlug?: string;
+  targetWorkspaceName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FederationAgent {
+  id: string;
+  federationLinkId: string;
+  localAgentId: string;
+  remoteAgentId: string;
+  localAgentName?: string;
+  remoteAgentName?: string;
+  status: FederationAgentStatus;
+  capabilities?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FederationPermissions {
+  federation_link_id: string;
+  permissions: string[];
+  allowed_agents?: string[];
+  allowed_tools?: string[];
+  allowed_knowledge?: string[];
+  max_requests_per_day?: number;
+  updated_at: string;
+}
+
+export interface ListFederationResponse {
+  links: FederationLink[];
+  count: number;
+}
+
+export interface ListFederationAgentsResponse {
+  agents: FederationAgent[];
+  count: number;
+}
+
+export interface CreateFederationRequest {
+  target_workspace_id: string;
+  name?: string;
+  description?: string;
+  permissions?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+export interface SuspendFederationRequest {
+  reason?: string;
+}
+
+export interface RevokeFederationRequest {
+  reason?: string;
+}
+
+export interface UpdatePermissionsRequest {
+  permissions: string[];
+  allowed_agents?: string[];
+  allowed_tools?: string[];
+  allowed_knowledge?: string[];
+  max_requests_per_day?: number;
+}
+
+export interface LinkAgentRequest {
+  local_agent_id: string;
+  remote_agent_id: string;
+  capabilities?: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Responses API types
+// ---------------------------------------------------------------------------
+
+export interface ResponseRequest {
+  model: string;
+  input: string | ResponseInputItem[];
+  instructions?: string;
+  tools?: ResponseTool[];
+  previous_response_id?: string;
+  store?: boolean;
+  stream?: boolean;
+  max_output_tokens?: number;
+  temperature?: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ResponseInputItem {
+  type: 'message' | 'function_call_output';
+  role?: 'user' | 'assistant' | 'system';
+  content?: string | ResponseContentPart[];
+  call_id?: string;
+  output?: string;
+}
+
+export interface ResponseContentPart {
+  type: 'input_text' | 'output_text' | 'image_url';
+  text?: string;
+  image_url?: string;
+}
+
+export interface ResponseTool {
+  type: 'function';
+  name: string;
+  description?: string;
+  parameters?: Record<string, unknown>;
+  strict?: boolean;
+}
+
+export interface ResponsesCompletion {
+  id: string;
+  object: 'response';
+  created_at: number;
+  model: string;
+  output: ResponseOutputItem[];
+  output_text?: string;
+  usage?: ResponseUsage;
+  status: 'completed' | 'failed' | 'in_progress' | 'cancelled';
+  previous_response_id?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ResponseOutputItem {
+  id: string;
+  type: 'message' | 'reasoning' | 'function_call';
+  status?: 'completed' | 'in_progress' | 'incomplete';
+  role?: 'assistant';
+  content?: ResponseOutputContent[];
+  name?: string;
+  call_id?: string;
+  arguments?: string;
+}
+
+export interface ResponseOutputContent {
+  type: 'output_text' | 'refusal';
+  text?: string;
+  annotations?: ResponseAnnotation[];
+}
+
+export interface ResponseAnnotation {
+  type: 'url_citation' | 'file_citation';
+  url?: string;
+}
+
+export interface ResponseUsage {
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+}
+
+export interface ResponseStreamEvent {
+  type: string;
+  sequence?: number;
+  response?: ResponsesCompletion;
+  item?: ResponseOutputItem;
+  output_index?: number;
+  content_index?: number;
+  delta?: string;
+}
+
+// ─── External Agents (A2A) ───
+
+export type ExternalAgentStatus = "pending_approval" | "active" | "suspended" | "revoked" | "error";
+export type ExternalAgentHealth = "healthy" | "degraded" | "unhealthy" | "unknown";
+export type ExternalAgentDirection = "outbound" | "inbound";
+export type ExternalAgentOperation = "message/send" | "message/stream" | "tasks/get" | "tasks/list" | "tasks/cancel";
+export type ExternalAgentTaskStatus = "submitted" | "working" | "input-required" | "completed" | "failed" | "canceled" | "rejected";
+export type ExternalAgentGovernanceResult = "allowed" | "blocked" | "requires_approval" | "no_policies";
+
+export interface ExternalAgentSkill {
+  id: string;
+  name: string;
+  description?: string;
+  tags?: string[];
+}
+
+export interface ExternalAgentCapabilities {
+  streaming?: boolean;
+  pushNotifications?: boolean;
+  stateTransitionHistory?: boolean;
+}
+
+export interface ExternalAgentConnection {
+  id: string;
+  agentId: string;
+  agentCardUrl: string;
+  agentName: string;
+  agentDescription: string;
+  agentSystem: string;
+  agentVersion: string;
+  agentCardJson: Record<string, unknown>;
+  skills: ExternalAgentSkill[];
+  capabilities: ExternalAgentCapabilities;
+  status: ExternalAgentStatus;
+  health: ExternalAgentHealth;
+  lastUsedAt?: string;
+  lastHealthCheckAt?: string;
+  errorMessage?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExternalAgentInteraction {
+  id: string;
+  connectionId: string;
+  agentId: string;
+  direction: ExternalAgentDirection;
+  operation: ExternalAgentOperation;
+  taskId?: string;
+  message?: string;
+  status: ExternalAgentTaskStatus;
+  durationMs?: number;
+  errorMessage?: string;
+  governanceResult?: ExternalAgentGovernanceResult;
+  createdAt: string;
+}
+
+export interface ExternalAgentSettings {
+  enabled: boolean;
+}
+
+export interface ListExternalConnectionsResponse {
+  connections: ExternalAgentConnection[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface ListExternalInteractionsResponse {
+  interactions: ExternalAgentInteraction[];
+  total: number;
+  limit: number;
+  offset: number;
 }
