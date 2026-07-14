@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.7.0
+
+**Breaking Changes:**
+
+- Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.
+- Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
+- Changed `ConnectManualDetail` from `{pathways: [...]}` to `{capability, available, health}`.
+- Removed `workspace_id` from response types: `SetupResult`, `SetupSession`, `WebhookSubscription`, `WebhookPayload`. (Still accepted on request types.)
+- Removed `authScheme` from `ExternalAgentConnection` responses.
+- Removed `atoms_consulted`, `episodes_matched`, `precedents_applied` from memory trace in intelligence metadata.
+- `sources_consulted` renamed to `knowledge_queried` in MemoryTrace.
+- All entity responses (Agent, Knowledge, Governance, Federation, Negotiation, ExternalAgentConnection) no longer include `workspace_id` or `workspaceId`.
+- New MCP SSE endpoint: `GET /api/v1/cadreen/mcp/sse` + `POST /api/v1/cadreen/mcp/message`. Connect Cadreen as an MCP server without installing the npm package.
+
+**Features:**
+
+- Add `AgentsResource`: full agent lifecycle — create, list, get, update, delete, deploy, getConfig, getCapabilities
+- Add agent messaging: `sendMessage`, `listMessages`
+- Add agent executions: `createExecution`, `listExecutions`
+- Add agent knowledge: `createKnowledge`, `searchKnowledge`, `listKnowledge`, `deleteKnowledge`
+- Add agent governance: `createGovernance`, `updateGovernance`, `listGovernance`, `deleteGovernance`
+- Add agent audit: `listAudit`
+- Add agent negotiations: `startNegotiation`, `respondToNegotiation`, `getNegotiation`, `listNegotiations`
+- Add `FederationResource`: cross-workspace federation — create, list, get, approve, suspend, revoke
+- Add federation permissions: `getPermissions`, `updatePermissions`
+- Add federation agents: `linkAgent`, `listAgents`, `unlinkAgent`
+- Add `ExternalAgentsResource`: A2A external agent connections — connect, list, get, approve, suspend, revoke, delete
+- Add external agent interactions: `listInteractions`
+- Add external agent settings: `getSettings`, `updateSettings`, `listAll`
+- Add `ResponsesResource`: OpenAI-compatible responses API — create, retrieve, stream
+- Add types: `Agent`, `AgentKnowledge`, `AgentGovernancePolicy`, `AgentAuditEntry`, `AgentNegotiation`, `AgentMessage`, `AgentExecution`, `FederationLink`, `FederationAgent`, `FederationPermissions`, `ExternalAgentConnection`, `ExternalAgentInteraction`, `ExternalAgentSettings`, `ExternalAgentSkill`, `ExternalAgentCapabilities` and all related request/response types
+
 ## 0.6.3
 
 **Fixes:**

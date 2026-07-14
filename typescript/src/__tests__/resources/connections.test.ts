@@ -115,21 +115,10 @@ describe("ConnectionsResource list()", () => {
       connections: [
         {
           capability: "send_email",
-          pathways: [
-            {
-              id: "pw-1",
-              capability: "send_email",
-              connector: "native_rest",
-              transport: "http",
-              health: "healthy",
-              tool_id: "tool-1",
-            },
-          ],
           status: "healthy",
         },
       ],
       total_capabilities: 1,
-      total_pathways: 1,
     };
     const client = buildClient({ "GET /api/v1/cadreen/connections": fixture });
     const resource = new ConnectionsResource(client);

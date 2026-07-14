@@ -75,25 +75,14 @@ type Pagination struct {
 	HasMore bool `json:"has_more"`
 }
 
-type Pathway struct {
-	ID         string `json:"id"`
-	Capability string `json:"capability"`
-	Connector  string `json:"connector"`
-	Transport  string `json:"transport"`
-	Health     string `json:"health"`
-	ToolID     string `json:"tool_id"`
-}
-
 type ConnectionGroup struct {
-	Capability string    `json:"capability"`
-	Pathways   []Pathway `json:"pathways,omitempty"`
-	Status     string    `json:"status"`
+	Capability string `json:"capability"`
+	Status     string `json:"status"`
 }
 
 type ListConnectionsResponse struct {
 	Connections       []ConnectionGroup `json:"connections"`
 	TotalCapabilities int               `json:"total_capabilities"`
-	TotalPathways     int               `json:"total_pathways"`
 	Pagination        Pagination        `json:"pagination,omitempty"`
 }
 
@@ -600,7 +589,6 @@ type SetupPolicyResult struct {
 }
 
 type SetupResult struct {
-	WorkspaceID string                    `json:"workspace_id,omitempty"`
 	Connections []SetupConnectionResult `json:"connections"`
 	Credentials []SetupCredentialResult `json:"credentials"`
 	Memory      []SetupMemoryResult     `json:"memory"`
@@ -1007,4 +995,331 @@ type UpdateRoleRequest struct {
 type ListWorkspaceUsersResponse struct {
 	Users []WorkspaceUser `json:"users"`
 	Count int             `json:"count"`
+}
+
+// ---------------------------------------------------------------------------
+// Agent types
+// ---------------------------------------------------------------------------
+
+type Agent struct {
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description,omitempty"`
+	Status      string         `json:"status,omitempty"`
+	Type        string         `json:"type,omitempty"`
+	Config      map[string]any `json:"config,omitempty"`
+	CreatedAt   string         `json:"created_at,omitempty"`
+	UpdatedAt   string         `json:"updated_at,omitempty"`
+}
+
+type AgentKnowledge struct {
+	ID        string   `json:"id"`
+	AgentID   string   `json:"agent_id"`
+	Type      string   `json:"type"`
+	Content   string   `json:"content"`
+	Source    string   `json:"source,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+	CreatedAt string   `json:"created_at,omitempty"`
+}
+
+type AgentGovernancePolicy struct {
+	ID        string           `json:"id"`
+	AgentID   string           `json:"agent_id"`
+	Name      string           `json:"name"`
+	Rules     []map[string]any `json:"rules,omitempty"`
+	Priority  int              `json:"priority,omitempty"`
+	Active    bool             `json:"active"`
+	CreatedAt string           `json:"created_at,omitempty"`
+}
+
+type AgentAuditEntry struct {
+	ID         string  `json:"id"`
+	AgentID    string  `json:"agent_id"`
+	Action     string  `json:"action"`
+	Details    string  `json:"details,omitempty"`
+	Status     string  `json:"status,omitempty"`
+	CostUSD    float64 `json:"cost_usd,omitempty"`
+	DurationMs int     `json:"duration_ms,omitempty"`
+	Timestamp  string  `json:"timestamp,omitempty"`
+}
+
+type AgentNegotiation struct {
+	ID         string         `json:"id"`
+	AgentID    string         `json:"agent_id"`
+	Status     string         `json:"status"`
+	Initiator  string         `json:"initiator,omitempty"`
+	Responder  string         `json:"responder,omitempty"`
+	Topic      string         `json:"topic,omitempty"`
+	Proposal   map[string]any `json:"proposal,omitempty"`
+	Response   map[string]any `json:"response,omitempty"`
+	CreatedAt  string         `json:"created_at,omitempty"`
+	ResolvedAt string         `json:"resolved_at,omitempty"`
+}
+
+type AgentMessage struct {
+	ID        string `json:"id"`
+	AgentID   string `json:"agent_id"`
+	From      string `json:"from,omitempty"`
+	To        string `json:"to,omitempty"`
+	Content   string `json:"content"`
+	Type      string `json:"type,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+}
+
+type AgentCapabilitiesResponse struct {
+	AgentID      string   `json:"agent_id"`
+	Capabilities []string `json:"capabilities"`
+}
+
+type ListAgentsResponse struct {
+	Agents     []Agent    `json:"agents"`
+	Count      int        `json:"count"`
+	Pagination Pagination `json:"pagination,omitempty"`
+}
+
+type ListAgentMessagesResponse struct {
+	Messages   []AgentMessage `json:"messages"`
+	Count      int            `json:"count"`
+	Pagination Pagination     `json:"pagination,omitempty"`
+}
+
+type ListAgentExecutionsResponse struct {
+	Executions []map[string]any `json:"executions"`
+	Count      int              `json:"count"`
+	Pagination Pagination       `json:"pagination,omitempty"`
+}
+
+type ListAgentKnowledgeResponse struct {
+	Knowledge  []AgentKnowledge `json:"knowledge"`
+	Count      int              `json:"count"`
+	Pagination Pagination       `json:"pagination,omitempty"`
+}
+
+type SearchAgentKnowledgeResponse struct {
+	Results []AgentKnowledge `json:"results"`
+	Count   int              `json:"count"`
+}
+
+type ListAgentGovernanceResponse struct {
+	Policies []AgentGovernancePolicy `json:"policies"`
+	Count    int                     `json:"count"`
+}
+
+type ListAgentAuditResponse struct {
+	Entries    []AgentAuditEntry `json:"entries"`
+	Count      int               `json:"count"`
+	Pagination Pagination        `json:"pagination,omitempty"`
+}
+
+type ListNegotiationsResponse struct {
+	Negotiations []AgentNegotiation `json:"negotiations"`
+	Count        int                `json:"count"`
+	Pagination   Pagination         `json:"pagination,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// Responses API types
+// ---------------------------------------------------------------------------
+
+type ResponseRequest struct {
+	Model              string                 `json:"model"`
+	Input              interface{}            `json:"input"` // string or []ResponseInputItem
+	Instructions       string                 `json:"instructions,omitempty"`
+	Tools              []ResponseTool         `json:"tools,omitempty"`
+	PreviousResponseID string                 `json:"previous_response_id,omitempty"`
+	Store              *bool                  `json:"store,omitempty"`
+	Stream             bool                   `json:"stream,omitempty"`
+	MaxOutputTokens    int                    `json:"max_output_tokens,omitempty"`
+	Temperature        *float64               `json:"temperature,omitempty"`
+	Metadata           map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type ResponseInputItem struct {
+	Type    string      `json:"type"`              // "message", "function_call_output"
+	Role    string      `json:"role,omitempty"`    // "user", "assistant", "system"
+	Content interface{} `json:"content,omitempty"` // string or []ResponseContentPart
+	CallID  string      `json:"call_id,omitempty"` // for function_call_output
+	Output  string      `json:"output,omitempty"`  // for function_call_output
+}
+
+type ResponseContentPart struct {
+	Type     string `json:"type"` // "input_text", "output_text", "image_url"
+	Text     string `json:"text,omitempty"`
+	ImageURL string `json:"image_url,omitempty"`
+}
+
+type ResponseTool struct {
+	Type        string      `json:"type"` // "function"
+	Name        string      `json:"name"`
+	Description string      `json:"description,omitempty"`
+	Parameters  interface{} `json:"parameters,omitempty"`
+	Strict      *bool       `json:"strict,omitempty"`
+}
+
+type Response struct {
+	ID                 string                 `json:"id"`
+	Object             string                 `json:"object"` // "response"
+	CreatedAt          int64                  `json:"created_at"`
+	Model              string                 `json:"model"`
+	Output             []ResponseOutputItem   `json:"output"`
+	OutputText         string                 `json:"output_text,omitempty"`
+	Usage              *ResponseUsage         `json:"usage,omitempty"`
+	Status             string                 `json:"status"` // "completed", "failed", "in_progress", "cancelled"
+	PreviousResponseID string                 `json:"previous_response_id,omitempty"`
+	Metadata           map[string]interface{} `json:"metadata,omitempty"`
+}
+
+type ResponseOutputItem struct {
+	ID        string                  `json:"id"`
+	Type      string                  `json:"type"`               // "message", "reasoning", "function_call"
+	Status    string                  `json:"status,omitempty"`   // "completed", "in_progress", "incomplete"
+	Role      string                  `json:"role,omitempty"`     // "assistant"
+	Content   []ResponseOutputContent `json:"content,omitempty"`
+	Name      string                  `json:"name,omitempty"`      // for function_call
+	CallID    string                  `json:"call_id,omitempty"`   // for function_call
+	Arguments string                  `json:"arguments,omitempty"` // for function_call
+}
+
+type ResponseOutputContent struct {
+	Type        string               `json:"type"` // "output_text", "refusal"
+	Text        string               `json:"text,omitempty"`
+	Annotations []ResponseAnnotation `json:"annotations,omitempty"`
+}
+
+type ResponseAnnotation struct {
+	Type string `json:"type"` // "url_citation", "file_citation"
+	URL  string `json:"url,omitempty"`
+}
+
+type ResponseUsage struct {
+	InputTokens  int `json:"input_tokens"`
+	OutputTokens int `json:"output_tokens"`
+	TotalTokens  int `json:"total_tokens"`
+}
+
+type ResponseStreamEvent struct {
+	Type         string              `json:"type"`
+	Sequence     int                 `json:"sequence,omitempty"`
+	Response     *Response           `json:"response,omitempty"`
+	Item         *ResponseOutputItem `json:"item,omitempty"`
+	OutputIndex  int                 `json:"output_index,omitempty"`
+	ContentIndex int                 `json:"content_index,omitempty"`
+	Delta        string              `json:"delta,omitempty"`
+}
+
+// ---------------------------------------------------------------------------
+// Federation types
+// ---------------------------------------------------------------------------
+
+type FederationLink struct {
+	ID                         string          `json:"id"`
+	TargetWorkspaceID          string          `json:"targetWorkspaceId,omitempty"`
+	Status                     string          `json:"status,omitempty"`
+	Permissions                json.RawMessage `json:"permissions,omitempty"`
+	CreatedByUserID            string          `json:"createdByUserId,omitempty"`
+	ApprovedByUserID           string          `json:"approvedByUserId,omitempty"`
+	SuspendedByUserID          string          `json:"suspendedByUserId,omitempty"`
+	SuspensionReason           string          `json:"suspensionReason,omitempty"`
+	LastActivityAt             string          `json:"lastActivityAt,omitempty"`
+	RevokedAt                  string          `json:"revokedAt,omitempty"`
+	RevokeReason               string          `json:"revokeReason,omitempty"`
+	SourceWorkspaceName        string          `json:"sourceWorkspaceName,omitempty"`
+	SourceWorkspaceSlug        string          `json:"sourceWorkspaceSlug,omitempty"`
+	TargetWorkspaceName        string          `json:"targetWorkspaceName,omitempty"`
+	CreatedAt                  string          `json:"createdAt,omitempty"`
+	UpdatedAt                  string          `json:"updatedAt,omitempty"`
+}
+
+type FederationAgent struct {
+	ID           string `json:"id"`
+	FederationLinkID string `json:"federationLinkId"`
+	LocalAgentID     string `json:"localAgentId"`
+	RemoteAgentID    string `json:"remoteAgentId"`
+	LocalAgentName   string `json:"localAgentName,omitempty"`
+	RemoteAgentName  string `json:"remoteAgentName,omitempty"`
+	Status           string `json:"status,omitempty"`
+	CreatedAt        string `json:"createdAt,omitempty"`
+	UpdatedAt        string `json:"updatedAt,omitempty"`
+}
+
+type ListFederationsResponse struct {
+	Federations []FederationLink `json:"federations"`
+	Count       int              `json:"count"`
+}
+
+type ListFederationAgentsResponse struct {
+	Agents []FederationAgent `json:"agents"`
+	Count  int               `json:"count"`
+}
+
+// ---------------------------------------------------------------------------
+// External Agent (A2A) types
+// ---------------------------------------------------------------------------
+
+type ExternalAgentSkill struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+}
+
+type ExternalAgentCapabilities struct {
+	Streaming              bool `json:"streaming"`
+	PushNotifications      bool `json:"pushNotifications"`
+	StateTransitionHistory bool `json:"stateTransitionHistory"`
+}
+
+type ExternalAgentConnection struct {
+	ID               string                  `json:"id"`
+	AgentID          string                  `json:"agentId"`
+	AgentCardURL     string                  `json:"agentCardUrl"`
+	AgentName        string                  `json:"agentName"`
+	AgentDescription string                  `json:"agentDescription"`
+	AgentSystem      string                  `json:"agentSystem"`
+	AgentVersion     string                  `json:"agentVersion"`
+	AgentCardJSON    map[string]any          `json:"agentCardJson"`
+	Skills           []ExternalAgentSkill    `json:"skills"`
+	Capabilities     ExternalAgentCapabilities `json:"capabilities"`
+	Status           string                    `json:"status"`
+	Health           string                  `json:"health"`
+	LastUsedAt       string                  `json:"lastUsedAt,omitempty"`
+	LastHealthCheckAt string                 `json:"lastHealthCheckAt,omitempty"`
+	ErrorMessage     string                  `json:"errorMessage,omitempty"`
+	ApprovedBy       string                  `json:"approvedBy,omitempty"`
+	ApprovedAt       string                  `json:"approvedAt,omitempty"`
+	CreatedAt        string                  `json:"createdAt"`
+	UpdatedAt        string                  `json:"updatedAt"`
+}
+
+type ExternalAgentInteraction struct {
+	ID               string `json:"id"`
+	ConnectionID     string `json:"connectionId"`
+	AgentID          string `json:"agentId"`
+	Direction        string `json:"direction"`
+	Operation        string `json:"operation"`
+	TaskID           string `json:"taskId,omitempty"`
+	Message          string `json:"message,omitempty"`
+	Status           string `json:"status"`
+	DurationMs       int    `json:"durationMs,omitempty"`
+	ErrorMessage     string `json:"errorMessage,omitempty"`
+	GovernanceResult string `json:"governanceResult,omitempty"`
+	CreatedAt        string `json:"createdAt"`
+}
+
+type ExternalAgentSettings struct {
+	Enabled bool `json:"enabled"`
+}
+
+type ListExternalConnectionsResponse struct {
+	Connections []ExternalAgentConnection `json:"connections"`
+	Total       int                       `json:"total"`
+	Limit       int                       `json:"limit"`
+	Offset      int                       `json:"offset"`
+}
+
+type ListExternalInteractionsResponse struct {
+	Interactions []ExternalAgentInteraction `json:"interactions"`
+	Total        int                        `json:"total"`
+	Limit        int                        `json:"limit"`
+	Offset       int                        `json:"offset"`
 }

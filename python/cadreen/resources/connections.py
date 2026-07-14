@@ -10,13 +10,11 @@ from ..types import (
     RegisterMCPResponse,
     ListConnectionsResponse,
     ConnectionGroup,
-    Pathway,
     Pagination,
     ConnectResult,
     ConnectPrebuiltDetail,
     ConnectSchemaRequiredDetail,
     ConnectManualDetail,
-    ConnectPathway,
     ConnectUnknownDetail,
     CatalogResponse,
     CatalogCategory,
@@ -85,22 +83,8 @@ class ConnectionsResource:
         raw = await self._client.get("/api/v1/cadreen/connections")
         connections: list[ConnectionGroup] = []
         for cg in raw.get("connections", []):
-            pathways = None
-            if cg.get("pathways"):
-                pathways = [
-                    Pathway(
-                        id=p["id"],
-                        capability=p["capability"],
-                        connector=p["connector"],
-                        transport=p["transport"],
-                        health=p["health"],
-                        tool_id=p["tool_id"],
-                    )
-                    for p in cg["pathways"]
-                ]
             connections.append(ConnectionGroup(
                 capability=cg["capability"],
-                pathways=pathways,
                 status=cg.get("status", "unknown"),
             ))
         pagination = None
@@ -113,7 +97,6 @@ class ConnectionsResource:
         return ListConnectionsResponse(
             connections=connections,
             total_capabilities=raw.get("total_capabilities", 0),
-            total_pathways=raw.get("total_pathways", 0),
             pagination=pagination,
         )
 
@@ -144,17 +127,11 @@ class ConnectionsResource:
                 connector=detail_raw.get("connector", ""),
             )
         elif result_type == "manual":
-            pathways = [
-                ConnectPathway(
-                    id=p["id"],
-                    connector=p["connector"],
-                    tool_id=p["tool_id"],
-                    health=p["health"],
-                    priority=p["priority"],
-                )
-                for p in detail_raw.get("pathways", [])
-            ]
-            detail = ConnectManualDetail(pathways=pathways)
+            detail = ConnectManualDetail(
+                capability=detail_raw.get("capability", ""),
+                available=detail_raw.get("available", False),
+                health=detail_raw.get("health"),
+            )
         else:
             detail = ConnectUnknownDetail(
                 searched=detail_raw.get("searched", ""),

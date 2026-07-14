@@ -20,6 +20,10 @@ import { SchedulesResource } from "./resources/schedules";
 import { ProposalsResource } from "./resources/proposals";
 import { SetupSessionsResource } from "./resources/setup-sessions";
 import { WorkspaceUsersResource } from "./resources/workspace-users";
+import { AgentsResource } from "./resources/agents";
+import { FederationResource } from "./resources/federation";
+import { ResponsesResource } from "./resources/responses";
+import { ExternalAgentsResource } from "./resources/external-agents";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -65,6 +69,10 @@ export class Cadreen {
   public readonly proposals: ProposalsResource;
   public readonly setupSessions: SetupSessionsResource;
   public readonly workspaceUsers: WorkspaceUsersResource;
+  public readonly agents: AgentsResource;
+  public readonly federation: FederationResource;
+  public readonly responses: ResponsesResource;
+  public readonly externalAgents: ExternalAgentsResource;
 
   private readonly client: HttpClient;
 
@@ -91,6 +99,10 @@ export class Cadreen {
     this.proposals = new ProposalsResource(this.client);
     this.setupSessions = new SetupSessionsResource(this.client);
     this.workspaceUsers = new WorkspaceUsersResource(this.client);
+    this.agents = new AgentsResource(this.client);
+    this.federation = new FederationResource(this.client);
+    this.responses = new ResponsesResource(this.client);
+    this.externalAgents = new ExternalAgentsResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -171,7 +183,6 @@ export type {
   RecoveryStatus,
   IntentMode,
   Pagination,
-  Pathway,
   ConnectionGroup,
   ListConnectionsResponse,
   AtomContent,
@@ -239,7 +250,6 @@ export type {
   ConnectPrebuiltDetail,
   ConnectSchemaRequiredDetail,
   ConnectManualDetail,
-  ConnectPathway,
   ConnectUnknownDetail,
   SetupRequest,
   SetupResult,
@@ -291,6 +301,75 @@ export type {
   InviteUserRequest,
   UpdateRoleRequest,
   ListWorkspaceUsersResponse,
+  AgentStatus,
+  AgentHealth,
+  AgentMessageType,
+  AgentMessageStatus,
+  NegotiationStatus,
+  FactType,
+  GovernanceScope,
+  PolicyAction,
+  Agent,
+  AgentConfig,
+  AgentCapabilities,
+  AgentKnowledge,
+  AgentGovernancePolicy,
+  AgentAuditEntry,
+  AgentNegotiation,
+  AgentMessage,
+  AgentExecution,
+  ListAgentsResponse,
+  ListAgentMessagesResponse,
+  ListAgentExecutionsResponse,
+  ListAgentKnowledgeResponse,
+  ListAgentGovernanceResponse,
+  ListAgentAuditResponse,
+  ListAgentNegotiationsResponse,
+  CreateAgentRequest,
+  UpdateAgentRequest,
+  SendMessageRequest,
+  CreateExecutionRequest,
+  CreateKnowledgeRequest,
+  SearchKnowledgeRequest,
+  CreateGovernanceRequest,
+  UpdateGovernanceRequest,
+  StartNegotiationRequest,
+  RespondNegotiationRequest,
+  FederationStatus,
+  FederationAgentStatus,
+  FederationLink,
+  FederationAgent,
+  FederationPermissions,
+  ListFederationResponse,
+  ListFederationAgentsResponse,
+  CreateFederationRequest,
+  SuspendFederationRequest,
+  RevokeFederationRequest,
+  UpdatePermissionsRequest,
+  LinkAgentRequest,
+  ResponseRequest,
+  ResponseInputItem,
+  ResponseContentPart,
+  ResponseTool,
+  ResponsesCompletion,
+  ResponseOutputItem,
+  ResponseOutputContent,
+  ResponseAnnotation,
+  ResponseUsage,
+  ResponseStreamEvent,
+  ExternalAgentStatus,
+  ExternalAgentHealth,
+  ExternalAgentDirection,
+  ExternalAgentOperation,
+  ExternalAgentTaskStatus,
+  ExternalAgentGovernanceResult,
+  ExternalAgentSkill,
+  ExternalAgentCapabilities,
+  ExternalAgentConnection,
+  ExternalAgentInteraction,
+  ExternalAgentSettings,
+  ListExternalConnectionsResponse,
+  ListExternalInteractionsResponse,
 } from "./types";
 
 export { ProposalsResource } from "./resources/proposals";
@@ -304,6 +383,10 @@ export { EscalationsResource } from "./resources/escalations";
 export { HealingResource } from "./resources/healing";
 export { LearningResource } from "./resources/learning";
 export { CredentialsResource } from "./resources/credentials";
+export { AgentsResource } from "./resources/agents";
+export { FederationResource } from "./resources/federation";
+export { ResponsesResource } from "./resources/responses";
+export { ExternalAgentsResource } from "./resources/external-agents";
 export type {
   ChatMessage,
   ChatToolCall,

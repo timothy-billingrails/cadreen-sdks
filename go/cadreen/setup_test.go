@@ -9,7 +9,6 @@ func TestSetup(t *testing.T) {
 	ctx := context.Background()
 	client := newSandboxClient(map[string]any{
 		"POST /api/v1/cadreen/setup": map[string]any{
-			"workspace_id": "ws_001",
 			"connections": []map[string]any{
 				{
 					"capability": "email",
@@ -96,9 +95,6 @@ func TestSetup(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if result.WorkspaceID != "ws_001" {
-		t.Errorf("WorkspaceID = %q, want 'ws_001'", result.WorkspaceID)
-	}
 	if result.Applied != 3 {
 		t.Errorf("Applied = %d, want 3", result.Applied)
 	}
@@ -173,7 +169,6 @@ func TestSetup_Minimal(t *testing.T) {
 	ctx := context.Background()
 	client := newSandboxClient(map[string]any{
 		"POST /api/v1/cadreen/setup": map[string]any{
-			"workspace_id": "ws_minimal",
 			"connections":  []map[string]any{},
 			"credentials":  []map[string]any{},
 			"memory":       []map[string]any{},
@@ -188,9 +183,6 @@ func TestSetup_Minimal(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.WorkspaceID != "ws_minimal" {
-		t.Errorf("WorkspaceID = %q, want 'ws_minimal'", result.WorkspaceID)
 	}
 	if result.Applied != 0 {
 		t.Errorf("Applied = %d, want 0", result.Applied)

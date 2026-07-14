@@ -298,8 +298,193 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 | `Client.GetPolicy()` | Get policy bundle |
 | `Client.ListCapabilities()` | List capabilities |
 | `Client.Assess()` | Assess task readiness |
+| `Client.CreateAgent()` | Create an agent |
+| `Client.ListAgents()` | List agents |
+| `Client.GetAgent()` | Get agent details |
+| `Client.UpdateAgent()` | Update agent |
+| `Client.DeleteAgent()` | Delete agent |
+| `Client.DeployAgent()` | Deploy agent |
+| `Client.GetAgentConfig()` | Get agent config |
+| `Client.GetAgentCapabilities()` | Get agent capabilities |
+| `Client.SendAgentMessage()` | Send message to agent |
+| `Client.ListAgentMessages()` | List agent messages |
+| `Client.CreateAgentExecution()` | Create agent execution |
+| `Client.ListAgentExecutions()` | List agent executions |
+| `Client.CreateAgentKnowledge()` | Add knowledge |
+| `Client.SearchAgentKnowledge()` | Search knowledge |
+| `Client.CreateAgentGovernance()` | Create governance policy |
+| `Client.ListAgentGovernance()` | List governance policies |
+| `Client.StartNegotiation()` | Start negotiation |
+| `Client.ListNegotiations()` | List negotiations |
+| `Client.CreateFederation()` | Create federation link |
+| `Client.ListFederations()` | List federation links |
+| `Client.ApproveFederation()` | Approve federation |
+| `Client.ConnectExternalAgent()` | Connect to external agent |
+| `Client.ListExternalConnections()` | List external connections |
+| `Client.ApproveExternalConnection()` | Approve external connection |
+| `Client.CreateResponse()` | Create response (OpenAI-compatible) |
+| `Client.CreateResponseStreaming()` | Create streaming response |
+
+## Agents
+
+Agents are autonomous workers that handle tasks, follow rules, and learn from outcomes.
+
+```go
+// Create an agent
+agent, _ := c.CreateAgent(ctx, cadreen.CreateAgentRequest{
+    Name:        "Support Agent",
+    Description: "Handles customer support requests",
+})
+fmt.Printf("Agent created: %s\n", agent.ID)
+
+// List agents
+result, _ := c.ListAgents(ctx, cadreen.ListAgentsParams{})
+for _, a := range result.Agents {
+    fmt.Printf("%s (%s)\n", a.Name, a.Status)
+}
+
+// Deploy an agent
+_, _ = c.DeployAgent(ctx, "agent_123")
+
+// Send a message
+msg, _ := c.SendAgentMessage(ctx, "agent_123", cadreen.SendAgentMessageRequest{
+    From:    "agent_456",
+    Content: "What's the refund policy?",
+})
+
+// Create an execution
+exec, _ := c.CreateAgentExecution(ctx, "agent_123", cadreen.CreateAgentExecutionRequest{
+    Task: "Process refund for order #1234",
+})
+
+// Add knowledge
+_, _ = c.CreateAgentKnowledge(ctx, "agent_123", cadreen.CreateAgentKnowledgeRequest{
+    Type:    "reference",
+    Content: "Refunds require manager approval for amounts over $100",
+})
+
+// Search knowledge
+results, _ := c.SearchAgentKnowledge(ctx, "agent_123", cadreen.SearchAgentKnowledgeRequest{
+    Query: "refund policy",
+})
+
+// Create governance policy
+_, _ = c.CreateAgentGovernance(ctx, "agent_123", cadreen.CreateAgentGovernanceRequest{
+    Name:  "Refund Approval",
+    Rules: []map[string]any{{"action": "refund", "condition": "amount > 100", "decision": "handoff"}},
+})
+```
+
+## Federation
+
+Federation lets workspaces share agents and knowledge across boundaries.
+
+```go
+// Create a federation link
+link, _ := c.CreateFederation(ctx, cadreen.CreateFederationRequest{
+    TargetWorkspaceID: "ws_456",
+})
+fmt.Printf("Link created: %s (status: %s)\n", link.ID, link.Status)
+
+// List federation links
+result, _ := c.ListFederations(ctx)
+for _, link := range result.Federations {
+    fmt.Printf("%s → %s\n", link.Name, link.Status)
+}
+
+// Approve a pending link
+_, _ = c.ApproveFederation(ctx, "link_123")
+```
+
+## External Agents (A2A)
+
+Connect to agents from other systems (LangChain, CrewAI, etc.) using the A2A protocol.
+
+```go
+// Enable external agents
+_, _ = c.UpdateExternalAgentSettings(ctx, true)
+
+// Connect to an external agent
+conn, _ := c.ConnectExternalAgent(ctx, "agent_123", cadreen.ConnectExternalAgentRequest{
+    AgentCardURL: "https://example.com/.well-known/agent.json",
+})
+fmt.Printf("Connection: %s (status: %s)\n", conn.ID, conn.Status)
+
+// List connections
+result, _ := c.ListExternalConnections(ctx, "agent_123", cadreen.ListExternalConnectionsParams{})
+for _, c := range result.Connections {
+    fmt.Printf("%s → %s (%s)\n", c.AgentName, c.Status, c.Health)
+}
+
+// Approve a pending connection
+_, _ = c.ApproveExternalConnection(ctx, "agent_123", "conn_456")
+
+// List interactions
+interactions, _ := c.ListExternalInteractions(ctx, "agent_123", "conn_456", cadreen.ListExternalInteractionsParams{})
+for _, i := range interactions.Interactions {
+    fmt.Printf("%s %s: %s\n", i.Direction, i.Operation, i.Status)
+}
+```
+
+## Responses API
+
+OpenAI-compatible responses API with built-in governance and memory.
+
+```go
+// Create a response
+response, _ := c.CreateResponse(ctx, cadreen.ResponseRequest{
+    Model: "cadreen",
+    Input: "What tools do I have?",
+})
+fmt.Println(response.OutputText)
+
+// Conversation state (server-managed)
+response2, _ := c.CreateResponse(ctx, cadreen.ResponseRequest{
+    Model:              "cadreen",
+    Input:              "What about refund tools?",
+    PreviousResponseID: &response.ID,
+})
+
+// Streaming
+iter, _ := c.CreateResponseStreaming(ctx, cadreen.ResponseRequest{
+    Model: "cadreen",
+    Input: "Explain quantum computing",
+})
+for iter.Next() {
+    event := iter.Current()
+    if event.Type == "response.output_text.delta" {
+        fmt.Print(event.Delta)
+    }
+}
+```
 
 ## Changelog
+
+### v0.7.0
+- **BREAKING:** Removed `Pathways` and `TotalPathways` from connection responses. `ConnectionGroup` now returns only `Capability` and `Status`.
+- **BREAKING:** Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
+- **BREAKING:** Changed `ConnectManualDetail` from `{Pathways: [...]}` to `{Capability, Available, Health}`.
+- **BREAKING:** Removed `WorkspaceID` from response types: `SetupResult`, `SetupSession`, `WebhookSubscription`, `WebhookPayload`. (Still accepted on request types.)
+- **BREAKING:** Removed `AuthScheme` from `ExternalAgentConnection` responses.
+- **BREAKING:** Removed `AtomsConsulted`, `EpisodesMatched`, `PrecedentsApplied` from memory trace in intelligence metadata.
+- **BREAKING:** `SourcesConsulted` renamed to `KnowledgeQueried` in MemoryTrace.
+- **BREAKING:** All entity responses (Agent, Knowledge, Governance, Federation, Negotiation, ExternalAgentConnection) no longer include `WorkspaceID`.
+- New MCP SSE endpoint: `GET /api/v1/cadreen/mcp/sse` + `POST /api/v1/cadreen/mcp/message`. Connect Cadreen as an MCP server without installing the npm package.
+- Added `agents.go` — full agent lifecycle (CreateAgent, ListAgents, GetAgent, UpdateAgent, DeleteAgent, DeployAgent, GetAgentConfig, GetAgentCapabilities)
+- Added agent messaging (SendAgentMessage, ListAgentMessages)
+- Added agent executions (CreateAgentExecution, ListAgentExecutions)
+- Added agent knowledge (CreateAgentKnowledge, ListAgentKnowledge, SearchAgentKnowledge, DeleteAgentKnowledge)
+- Added agent governance (CreateAgentGovernance, ListAgentGovernance, UpdateAgentGovernance, DeleteAgentGovernance)
+- Added agent audit (ListAgentAudit)
+- Added negotiations (StartNegotiation, ListNegotiations, GetNegotiation, RespondToNegotiation)
+- Added `federation.go` — cross-workspace federation (CreateFederation, ListFederations, GetFederation, ApproveFederation, SuspendFederation, RevokeFederation)
+- Added federation permissions (GetFederationPermissions, UpdateFederationPermissions)
+- Added federation agent linking (LinkFederationAgent, ListFederationAgents, UnlinkFederationAgent)
+- Added `external_agents.go` — A2A external agent connections (ConnectExternalAgent, ListExternalConnections, GetExternalConnection, ApproveExternalConnection, SuspendExternalConnection, RevokeExternalConnection, DeleteExternalConnection)
+- Added external agent interactions (ListExternalInteractions)
+- Added external agent settings (GetExternalAgentSettings, UpdateExternalAgentSettings, ListAllExternalConnections)
+- Added `responses.go` — OpenAI-compatible responses API (CreateResponse, GetResponse, CreateResponseStreaming)
+- Added 31 new types: Agent, AgentKnowledge, AgentGovernancePolicy, AgentAuditEntry, AgentNegotiation, FederationLink, FederationAgent, ExternalAgentConnection, ExternalAgentInteraction, ExternalAgentSettings, ExternalAgentSkill, ExternalAgentCapabilities, etc.
 
 ### v0.6.3
 - Fix: retry body reuse bug — retries were sending empty body because `bytes.Reader` was consumed on first attempt
@@ -357,7 +542,7 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
   - `/api/v1/chat/completions` → `/api/v1/cadreen/chat/completions`
   - `/api/v1/tools` → `/api/v1/cadreen/tools`
 - All external API calls now route through the Cadreen surface
-- Removed "response metadata" terminology (was "intelligence envelope")
+- Renamed response profile levels for clarity
 
 ### v0.4.1
 - Added `ChatStreamEvent.RawJSON` — raw JSON bytes before typed parsing; enables extracting `pending_actions`, `conversation_id`, and `intelligence` fields without SDK type changes

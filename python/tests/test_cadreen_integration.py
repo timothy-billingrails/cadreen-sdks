@@ -47,7 +47,6 @@ INTEGRATION_FIXTURES = {
     "GET /api/v1/cadreen/connections": {
         "connections": [],
         "total_capabilities": 0,
-        "total_pathways": 0,
     },
     "POST /api/v1/cadreen/connections": {
         "type": "prebuilt",
@@ -68,7 +67,6 @@ INTEGRATION_FIXTURES = {
         "policies": [],
         "applied": 3,
         "failed": 0,
-        "workspace_id": "ws_test",
     },
 }
 
@@ -145,7 +143,6 @@ class TestCadreenIntegration:
         assert isinstance(result, SetupResult)
         assert result.applied == 3
         assert result.failed == 0
-        assert result.workspace_id == "ws_test"
 
     @pytest.mark.asyncio
     async def test_invoke_delegates_to_intent(self, cadreen):

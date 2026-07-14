@@ -273,6 +273,154 @@ stats = await cadreen.proposals.stats()
 print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
 ```
 
+## Agents
+
+Agents are autonomous workers that handle tasks, follow rules, and learn from outcomes.
+
+```python
+# Create an agent
+agent = await cadreen.agents.create(CreateAgentRequest(
+    name="Support Agent",
+    description="Handles customer support requests",
+))
+print(f"Agent created: {agent.id}")
+
+# List agents
+result = await cadreen.agents.list()
+for a in result.agents:
+    print(f"{a.name} ({a.status})")
+
+# Get agent details
+agent = await cadreen.agents.get("agent_123")
+
+# Deploy an agent (creates immutable version)
+await cadreen.agents.deploy("agent_123")
+
+# Send a message to an agent
+msg = await cadreen.agents.send_message("agent_123", SendMessageRequest(
+    content="What's the refund policy?",
+    from_agent_id="agent_456",
+))
+
+# Create an execution
+exec = await cadreen.agents.create_execution("agent_123", CreateExecutionRequest(
+    task="Process refund for order #1234",
+))
+
+# Knowledge — teach the agent
+await cadreen.agents.create_knowledge("agent_123", CreateAgentKnowledgeRequest(
+    type="reference",
+    content="Refunds require manager approval for amounts over $100",
+))
+
+# Search knowledge
+results = await cadreen.agents.search_knowledge("agent_123", SearchAgentKnowledgeRequest(
+    query="refund policy",
+))
+
+# Governance — set rules
+await cadreen.agents.create_governance("agent_123", CreateAgentGovernanceRequest(
+    name="Refund Approval",
+    rules=[{"action": "refund", "condition": "amount > 100", "decision": "handoff"}],
+))
+
+# Negotiations — agent-to-agent
+negotiation = await cadreen.agents.start_negotiation("agent_123", StartNegotiationRequest(
+    target_agent_id="agent_456",
+    topic="Resource allocation",
+    proposal={"resource": "GPU-1", "duration": "2h"},
+))
+```
+
+## Federation
+
+Federation lets workspaces share agents and knowledge across boundaries.
+
+```python
+# Create a federation link
+link = await cadreen.federation.create(CreateFederationRequest(
+    target_workspace_id="ws_456",
+))
+print(f"Link created: {link.id} (status: {link.status})")
+
+# List federation links
+result = await cadreen.federation.list()
+for link in result.federations:
+    print(f"{link.name} → {link.status}")
+
+# Approve a pending link (target workspace only)
+await cadreen.federation.approve("link_123")
+
+# Link agents across workspaces
+await cadreen.federation.link_agent("link_123", LinkFederationAgentRequest(
+    local_agent_id="agent_123",
+    remote_agent_id="agent_456",
+))
+
+# Update permissions
+await cadreen.federation.update_permissions("link_123", FederationPermissions(
+    share_knowledge=True,
+    share_capabilities=True,
+))
+```
+
+## External Agents (A2A)
+
+Connect to agents from other systems (LangChain, CrewAI, etc.) using the A2A protocol.
+
+```python
+# Enable external agents (workspace setting)
+await cadreen.external_agents.update_settings(enabled=True)
+
+# Connect to an external agent
+connection = await cadreen.external_agents.connect("agent_123", "https://example.com/.well-known/agent.json")
+print(f"Connection: {connection.id} (status: {connection.status})")
+
+# List connections
+result = await cadreen.external_agents.list("agent_123")
+for c in result.connections:
+    print(f"{c.agent_name} → {c.status} ({c.health})")
+
+# Approve a pending connection
+await cadreen.external_agents.approve("agent_123", "conn_456")
+
+# List interactions
+interactions = await cadreen.external_agents.list_interactions("agent_123", "conn_456")
+for i in interactions.interactions:
+    print(f"{i.direction} {i.operation}: {i.status}")
+
+# List all connections across workspace
+all_conns = await cadreen.external_agents.list_all()
+```
+
+## Responses API
+
+OpenAI-compatible responses API with built-in governance and memory.
+
+```python
+# Create a response
+response = await cadreen.responses.create(ResponseRequest(
+    model="cadreen",
+    input="What tools do I have?",
+))
+print(response.output_text)
+
+# Conversation state (server-managed)
+response2 = await cadreen.responses.create(ResponseRequest(
+    model="cadreen",
+    input="What about refund tools?",
+    previous_response_id=response.id,
+))
+
+# Streaming
+async for event in cadreen.responses.stream(ResponseRequest(
+    model="cadreen",
+    input="Explain quantum computing",
+)):
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="", flush=True)
+```
+
 ## Requirements
 
 - Python 3.10+
@@ -280,6 +428,32 @@ print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
 - httpx-sse >= 0.4
 
 ## Changelog
+
+### v0.7.0
+- **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.
+- **BREAKING:** Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
+- **BREAKING:** Changed `ConnectManualDetail` from `{pathways: [...]}` to `{capability, available, health}`.
+- **BREAKING:** Removed `workspace_id` from response types: `SetupResult`, `SetupSession`, `WebhookSubscription`, `WebhookPayload`. (Still accepted on request types.)
+- **BREAKING:** Removed `authScheme` from `ExternalAgentConnection` responses.
+- **BREAKING:** Removed `atoms_consulted`, `episodes_matched`, `precedents_applied` from memory trace in intelligence metadata.
+- **BREAKING:** `sources_consulted` renamed to `knowledge_queried` in MemoryTrace.
+- **BREAKING:** All entity responses (Agent, Knowledge, Governance, Federation, Negotiation, ExternalAgentConnection) no longer include `workspace_id` or `workspaceId`.
+- New MCP SSE endpoint: `GET /api/v1/cadreen/mcp/sse` + `POST /api/v1/cadreen/mcp/message`. Connect Cadreen as an MCP server without installing the npm package.
+- Added `cadreen.agents` — full agent lifecycle (create, list, get, update, delete, deploy, get_config, get_capabilities)
+- Added agent messaging (send_message, list_messages)
+- Added agent executions (create_execution, list_executions)
+- Added agent knowledge (create_knowledge, list_knowledge, search_knowledge, delete_knowledge)
+- Added agent governance (create_governance, list_governance, update_governance, delete_governance)
+- Added agent audit trail (list_audit)
+- Added agent negotiations (start_negotiation, list_negotiations, get_negotiation, respond_to_negotiation)
+- Added `cadreen.federation` — cross-workspace federation (create, list, get, approve, suspend, revoke)
+- Added federation permissions (get_permissions, update_permissions)
+- Added federation agent linking (link_agent, list_agents, unlink_agent)
+- Added `cadreen.external_agents` — A2A external agent connections (connect, list, get, approve, suspend, revoke, delete)
+- Added external agent interactions (list_interactions)
+- Added external agent settings (get_settings, update_settings, list_all)
+- Added `cadreen.responses` — OpenAI-compatible responses API (create, retrieve, stream)
+- Added 37 new types: `Agent`, `AgentKnowledge`, `AgentGovernancePolicy`, `AgentNegotiation`, `FederationLink`, `FederationAgent`, `ExternalAgentConnection`, `ExternalAgentInteraction`, `ExternalAgentSettings`, `ExternalAgentSkill`, `ExternalAgentCapabilities`, etc.
 
 ### v0.6.3
 - Fix: `invoke_stream()` crash — was using nonexistent `_client._session`, now uses `httpx-sse`
@@ -341,7 +515,7 @@ print(f"Waiting: {stats.proposed}, Accepted: {stats.accepted}")
   - `/api/v1/chat/completions` → `/api/v1/cadreen/chat/completions`
   - `/api/v1/tools` → `/api/v1/cadreen/tools`
 - All external API calls now route through the Cadreen surface
-- Removed "response metadata" terminology (was "intelligence envelope")
+- Renamed response profile levels for clarity
 
 ### v0.4.0
 - Added `cadreen.chat.completions()` — OpenAI-compatible chat completions with governance

@@ -189,21 +189,10 @@ func TestListConnections(t *testing.T) {
 			"connections": []map[string]any{
 				{
 					"capability": "email",
-					"pathways": []map[string]any{
-						{
-							"id":         "pw_001",
-							"capability": "email",
-							"connector":  "gmail",
-							"transport":  "oauth2",
-							"health":     "healthy",
-							"tool_id":    "tool_send_email",
-						},
-					},
-					"status": "active",
+					"status":     "active",
 				},
 			},
 			"total_capabilities": 1,
-			"total_pathways":     1,
 			"pagination": map[string]any{
 				"limit":    20,
 				"offset":   0,
@@ -219,9 +208,6 @@ func TestListConnections(t *testing.T) {
 	if result.TotalCapabilities != 1 {
 		t.Errorf("TotalCapabilities = %d, want 1", result.TotalCapabilities)
 	}
-	if result.TotalPathways != 1 {
-		t.Errorf("TotalPathways = %d, want 1", result.TotalPathways)
-	}
 	if len(result.Connections) != 1 {
 		t.Fatalf("Connections length = %d, want 1", len(result.Connections))
 	}
@@ -231,15 +217,6 @@ func TestListConnections(t *testing.T) {
 	}
 	if conn.Status != "active" {
 		t.Errorf("Status = %q, want 'active'", conn.Status)
-	}
-	if len(conn.Pathways) != 1 {
-		t.Fatalf("Pathways length = %d, want 1", len(conn.Pathways))
-	}
-	if conn.Pathways[0].ID != "pw_001" {
-		t.Errorf("Pathways[0].ID = %q, want 'pw_001'", conn.Pathways[0].ID)
-	}
-	if conn.Pathways[0].Health != "healthy" {
-		t.Errorf("Pathways[0].Health = %q, want 'healthy'", conn.Pathways[0].Health)
 	}
 	if result.Pagination.Limit != 20 {
 		t.Errorf("Pagination.Limit = %d, want 20", result.Pagination.Limit)

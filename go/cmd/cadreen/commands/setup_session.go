@@ -224,7 +224,6 @@ func init() {
 func printSetupSession(s *cadreen.SetupSession) {
 	fmt.Printf("Session: %s\n", s.ID)
 	fmt.Printf("  Status:      %s\n", s.Status)
-	fmt.Printf("  Workspace:   %s\n", s.WorkspaceID)
 	if s.Purpose != "" {
 		fmt.Printf("  Purpose:     %s\n", s.Purpose)
 	}

@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.7.0
+
+**Breaking Changes:**
+
+- Removed `Pathways` and `TotalPathways` from connection responses. `ConnectionGroup` now returns only `Capability` and `Status`.
+- Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
+- Changed `ConnectManualDetail` from `{Pathways: [...]}` to `{Capability, Available, Health}`.
+- Removed `WorkspaceID` from response types: `SetupResult`, `SetupSession`, `WebhookSubscription`, `WebhookPayload`. (Still accepted on request types.)
+- Removed `AuthScheme` from `ExternalAgentConnection` responses.
+- Removed `AtomsConsulted`, `EpisodesMatched`, `PrecedentsApplied` from memory trace in intelligence metadata.
+- `SourcesConsulted` renamed to `KnowledgeQueried` in MemoryTrace.
+- All entity responses (Agent, Knowledge, Governance, Federation, Negotiation, ExternalAgentConnection) no longer include `WorkspaceID`.
+- New MCP SSE endpoint: `GET /api/v1/cadreen/mcp/sse` + `POST /api/v1/cadreen/mcp/message`. Connect Cadreen as an MCP server without installing the npm package.
+
+**Features:**
+
+- Add Agents resource — full agent lifecycle management:
+  - `CreateAgent`, `GetAgent`, `ListAgents`, `UpdateAgent`, `DeleteAgent`
+  - `GetAgentConfig`, `DeployAgent`, `GetAgentCapabilities`
+  - `SendAgentMessage`, `ListAgentMessages`
+  - `ListAgentExecutions`, `CreateAgentExecution`
+  - `ListAgentKnowledge`, `CreateAgentKnowledge`, `SearchAgentKnowledge`, `DeleteAgentKnowledge`
+  - `ListAgentGovernance`, `CreateAgentGovernance`, `UpdateAgentGovernance`, `DeleteAgentGovernance`
+  - `ListAgentAudit`
+  - `StartNegotiation`, `ListNegotiations`, `GetNegotiation`, `RespondToNegotiation`
+- Add Federation resource — cross-organization agent linking:
+  - `CreateFederation`, `GetFederation`, `ListFederations`
+  - `ApproveFederation`, `SuspendFederation`, `RevokeFederation`
+  - `GetFederationPermissions`, `UpdateFederationPermissions`
+  - `LinkFederationAgent`, `ListFederationAgents`, `UnlinkFederationAgent`
+- Add External Agents resource — A2A external agent connections:
+  - `ConnectExternalAgent`, `ListExternalConnections`, `GetExternalConnection`
+  - `ApproveExternalConnection`, `SuspendExternalConnection`, `RevokeExternalConnection`, `DeleteExternalConnection`
+  - `ListExternalInteractions`
+  - `GetExternalAgentSettings`, `UpdateExternalAgentSettings`, `ListAllExternalConnections`
+- Add Responses resource — OpenAI-compatible responses API:
+  - `CreateResponse`, `GetResponse`, `CreateResponseStreaming`
+- Add types: `Agent`, `AgentKnowledge`, `AgentGovernancePolicy`, `AgentAuditEntry`, `AgentNegotiation`, `AgentMessage`, `FederationLink`, `FederationAgent`, `ExternalAgentConnection`, `ExternalAgentInteraction`, `ExternalAgentSettings`, `ExternalAgentSkill`, `ExternalAgentCapabilities`
+
 ## 0.6.3
 
 **Fixes:**
