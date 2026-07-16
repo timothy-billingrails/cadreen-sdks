@@ -66,6 +66,42 @@ describe("HttpClient sandbox POST", () => {
   });
 });
 
+describe("HttpClient sandbox stream rejection", () => {
+  it("postStream throws in sandbox mode", async () => {
+    const client = buildClient();
+    await expect(client.postStream("/api/v1/stream", {})).rejects.toThrow(CadreenError);
+  });
+
+  it("postStream error message mentions sandbox", async () => {
+    const client = buildClient();
+    try {
+      await client.postStream("/api/v1/stream", {});
+      throw new Error("expected rejection");
+    } catch (e) {
+      expect(e).toBeInstanceOf(CadreenError);
+      expect((e as Error).message).toMatch(/sandbox/i);
+    }
+  });
+
+  it("stream throws in sandbox mode", async () => {
+    const client = buildClient();
+    const gen = client.stream("/api/v1/stream");
+    await expect(gen.next()).rejects.toThrow(CadreenError);
+  });
+
+  it("stream error message mentions sandbox", async () => {
+    const client = buildClient();
+    const gen = client.stream("/api/v1/stream");
+    try {
+      await gen.next();
+      throw new Error("expected rejection");
+    } catch (e) {
+      expect(e).toBeInstanceOf(CadreenError);
+      expect((e as Error).message).toMatch(/sandbox/i);
+    }
+  });
+});
+
 describe("CadreenError parsing", () => {
   it("constructs with all fields", () => {
     const err = new CadreenError(422, "needs_input", "clarify", "System needs clarification", [

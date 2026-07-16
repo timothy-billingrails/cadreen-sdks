@@ -215,6 +215,13 @@ class HttpClient:
         return await self.request("DELETE", path)
 
     async def stream(self, path: str) -> Any:
+        if self._sandbox:
+            raise CadreenError(
+                404,
+                "not_found",
+                "not_found",
+                "Streaming is not available in sandbox mode.",
+            )
         url = f"{self._base_url}{path}"
         headers = {
             "Authorization": f"Bearer {self._api_key}",

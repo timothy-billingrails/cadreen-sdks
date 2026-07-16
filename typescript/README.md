@@ -134,7 +134,7 @@ const response = await cadreen.chat.completions({
 const cadreen = new Cadreen({
   apiKey: "sk_cadreen_...",                       // required
   baseUrl: "https://accomplishanything.today",    // optional, default shown
-  maxRetries: 2,                                  // optional, default 2
+  maxRetries: 3,                                  // optional, default 3
   timeout: 30000,                                 // optional, default 30s
   profile: "lean",                                // optional: "lean" | "audit" | "full" (default "full")
 });

@@ -2,7 +2,7 @@
 set -e
 
 # Cadreen CLI installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/timothy-billingrails/cadreen-sdks/main/install.sh | sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/timothy-billingrails/cadreen-sdks/master/install.sh | sh
 
 REPO="timothy-billingrails/cadreen-sdks"
 BINARY="cadreen"

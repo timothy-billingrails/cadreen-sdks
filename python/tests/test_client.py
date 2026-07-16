@@ -210,13 +210,13 @@ class TestTimeoutHandling:
 
 class TestSSEParsing:
     @pytest.mark.asyncio
-    async def test_sandbox_stream_raises_on_sandbox(self):
-        """In sandbox mode, stream() bypasses sandbox checks and makes real HTTP calls.
-        The sandbox intentionally only intercepts request() — stream() uses httpx directly.
-        Verify that stream() does not crash during instantiation in sandbox config."""
+    async def test_sandbox_stream_raises_in_sandbox(self):
+        """In sandbox mode, stream() raises rather than making real HTTP calls."""
         config = CadreenConfig(api_key="key", sandbox=True, fixtures={})
         client = HttpClient(config)
         assert client._sandbox is True
         generator = client.stream("/api/v1/stream")
-        assert generator is not None
-        await generator.aclose()
+        with pytest.raises(CadreenError) as exc:
+            await generator.__anext__()
+        assert exc.value.status == 404
+        assert "sandbox" in str(exc.value).lower()
