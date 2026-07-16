@@ -429,6 +429,11 @@ async for event in cadreen.responses.stream(ResponseRequest(
 
 ## Changelog
 
+### v0.7.1
+- Fix: sandbox mode now raises `CadreenError(404)` for `post_stream` and `stream` instead of making network requests
+- Fix: release workflow Homebrew formula update ordering
+- Documented new server-side execution events: `execution_steps_complete`, `mission_completed_with_gaps`
+
 ### v0.7.0
 - **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.
 - **BREAKING:** Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.

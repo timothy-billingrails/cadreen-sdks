@@ -460,6 +460,11 @@ for iter.Next() {
 
 ## Changelog
 
+### v0.7.1
+- Fix: sandbox mode now returns `ErrSandboxStreaming` for `PostStream` and `Stream` instead of making network requests
+- Fix: release workflow Homebrew formula update ordering
+- Documented new server-side execution events: `execution_steps_complete`, `mission_completed_with_gaps`
+
 ### v0.7.0
 - **BREAKING:** Removed `Pathways` and `TotalPathways` from connection responses. `ConnectionGroup` now returns only `Capability` and `Status`.
 - **BREAKING:** Removed `Pathway` type. Internal routing details (connector, transport, tool_id) are no longer exposed.
