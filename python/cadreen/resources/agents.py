@@ -105,8 +105,11 @@ class AgentsResource:
             version=raw.get("version", 0),
         )
 
-    async def deploy(self, agent_id: str) -> Agent:
-        raw = await self._client.post(f"/api/v1/cadreen/agents/{agent_id}/deploy")
+    async def deploy(self, agent_id: str, config_snapshot: dict[str, Any], change_summary: str | None = None) -> Agent:
+        body: dict[str, Any] = {"configSnapshot": config_snapshot}
+        if change_summary is not None:
+            body["changeSummary"] = change_summary
+        raw = await self._client.post(f"/api/v1/cadreen/agents/{agent_id}/deploy", body)
         return _parse_agent(raw)
 
     async def get_capabilities(self, agent_id: str) -> AgentCapabilities:
@@ -119,11 +122,11 @@ class AgentsResource:
         )
 
     async def send_message(self, agent_id: str, request: SendMessageRequest) -> AgentMessage:
-        body: dict[str, Any] = {"content": request.content}
-        if request.role is not None:
-            body["role"] = request.role
-        if request.metadata is not None:
-            body["metadata"] = request.metadata
+        body: dict[str, Any] = {"fromAgentId": request.from_agent_id, "content": request.content}
+        if request.context is not None:
+            body["context"] = request.context
+        if request.execution_id is not None:
+            body["executionId"] = request.execution_id
         raw = await self._client.post(f"/api/v1/cadreen/agents/{agent_id}/send", body)
         return _parse_agent_message(raw)
 
@@ -175,9 +178,11 @@ class AgentsResource:
         return ListAgentExecutionsResponse(executions=executions, count=raw.get("count", 0))
 
     async def create_execution(self, agent_id: str, request: CreateExecutionRequest) -> ExecutionStatus:
-        body: dict[str, Any] = {"task": request.task}
+        body: dict[str, Any] = {"intent": request.intent}
         if request.context is not None:
             body["context"] = request.context
+        if request.max_budget_usd is not None:
+            body["maxBudgetUsd"] = request.max_budget_usd
         raw = await self._client.post(f"/api/v1/cadreen/agents/{agent_id}/executions", body)
         return ExecutionStatus(
             id=raw["id"],
@@ -207,13 +212,17 @@ class AgentsResource:
         return ListAgentKnowledgeResponse(knowledge=items, count=raw.get("count", 0))
 
     async def create_knowledge(self, agent_id: str, request: CreateAgentKnowledgeRequest) -> AgentKnowledge:
-        body: dict[str, Any] = {"type": request.type, "content": request.content}
-        if request.domain is not None:
-            body["domain"] = request.domain
+        body: dict[str, Any] = {"factType": request.fact_type, "subject": request.subject}
+        if request.predicate is not None:
+            body["predicate"] = request.predicate
+        if request.object is not None:
+            body["object"] = request.object
+        if request.source is not None:
+            body["source"] = request.source
+        if request.confidence is not None:
+            body["confidence"] = request.confidence
         if request.tags is not None:
             body["tags"] = request.tags
-        if request.authority is not None:
-            body["authority"] = request.authority
         raw = await self._client.post(f"/api/v1/cadreen/agents/{agent_id}/knowledge", body)
         return _parse_agent_knowledge(raw)
 
@@ -350,9 +359,16 @@ def _parse_agent_message(raw: dict[str, Any]) -> AgentMessage:
 def _parse_agent_knowledge(raw: dict[str, Any]) -> AgentKnowledge:
     return AgentKnowledge(
         id=raw["id"],
-        type=raw["type"],
-        content=raw.get("content", {}),
+        fact_type=raw.get("factType", raw.get("fact_type", "")),
+        subject=raw.get("subject", ""),
+        predicate=raw.get("predicate"),
+        object=raw.get("object"),
+        source=raw.get("source"),
+        confidence=raw.get("confidence"),
         created_at=raw.get("created_at", ""),
+        agent_id=raw.get("agent_id"),
+        visibility=raw.get("visibility"),
+        updated_at=raw.get("updated_at"),
         domain=raw.get("domain"),
         tags=raw.get("tags"),
         authority=raw.get("authority"),

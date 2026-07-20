@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.2
+
+**Features:**
+
+- Add `devices` command group: list, create, get, delete, status, state, map, map-stats, tasks, create-task, complete-task, assign, collisions, avoidance, diagnose, ask, model-stats, capabilities, sync-status, sync-pending, sync-conflicts, blackboard
+
 ## 0.4.0
 
 **Breaking Changes:**

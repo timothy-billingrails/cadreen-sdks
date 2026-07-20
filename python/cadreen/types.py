@@ -1370,12 +1370,36 @@ class AgentMessage:
 @dataclass
 class AgentKnowledge:
     id: str
-    type: str
-    content: dict[str, Any]
-    created_at: str
+    fact_type: str
+    subject: str
+    predicate: Optional[str] = None
+    object: Optional[str] = None
+    source: Optional[str] = None
+    confidence: Optional[float] = None
+    created_at: str = ""
+    agent_id: Optional[str] = None
+    visibility: Optional[str] = None
+    updated_at: Optional[str] = None
     domain: Optional[str] = None
     tags: Optional[list[str]] = None
     authority: Optional[int] = None
+
+    # Aliases for camelCase backend fields
+    _aliases = {
+        "factType": "fact_type",
+        "agentId": "agent_id",
+        "createdAt": "created_at",
+        "updatedAt": "updated_at",
+        "workspaceId": "workspace_id",
+        "missionId": "mission_id",
+    }
+
+    def __init__(self, **kwargs: Any) -> None:
+        for camel, snake in self._aliases.items():
+            if camel in kwargs and snake not in kwargs:
+                kwargs[snake] = kwargs.pop(camel)
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
 
 @dataclass
@@ -1386,6 +1410,20 @@ class AgentGovernancePolicy:
     created_at: str
     domain: Optional[str] = None
     priority: Optional[int] = None
+
+    _aliases = {
+        "workspaceId": "workspace_id",
+        "agentId": "agent_id",
+        "createdAt": "created_at",
+        "updatedAt": "updated_at",
+    }
+
+    def __init__(self, **kwargs: Any) -> None:
+        for camel, snake in self._aliases.items():
+            if camel in kwargs and snake not in kwargs:
+                kwargs[snake] = kwargs.pop(camel)
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
 
 @dataclass
@@ -1434,24 +1472,28 @@ class UpdateAgentRequest:
 
 @dataclass
 class SendMessageRequest:
+    from_agent_id: str
     content: str
-    role: Optional[str] = None
-    metadata: Optional[dict[str, Any]] = None
+    context: Optional[str] = None
+    execution_id: Optional[str] = None
 
 
 @dataclass
 class CreateExecutionRequest:
-    task: str
-    context: Optional[dict[str, Any]] = None
+    intent: str
+    context: Optional[str] = None
+    max_budget_usd: Optional[float] = None
 
 
 @dataclass
 class CreateAgentKnowledgeRequest:
-    type: str
-    content: dict[str, Any]
-    domain: Optional[str] = None
+    fact_type: str
+    subject: str
+    predicate: Optional[str] = None
+    object: Optional[str] = None
+    source: Optional[str] = None
+    confidence: Optional[float] = None
     tags: Optional[list[str]] = None
-    authority: Optional[int] = None
 
 
 @dataclass
@@ -1793,7 +1835,7 @@ class ResponseRequest:
     input: Union[str, list]
     instructions: Optional[str] = None
     tools: Optional[list] = None
-    previous_response_id: Optional[str] = None
+    previous_response_id: Optional[str] = None  # Deprecated: server accepts but ignores; no continuation logic yet
     store: Optional[bool] = None
     stream: bool = False
     max_output_tokens: Optional[int] = None
@@ -1811,7 +1853,7 @@ class Response:
     output_text: Optional[str] = None
     usage: Optional[dict] = None
     status: str = "completed"
-    previous_response_id: Optional[str] = None
+    previous_response_id: Optional[str] = None  # Deprecated: server does not persist responses; continuation not implemented
     metadata: Optional[dict] = None
 
 
@@ -1928,3 +1970,194 @@ class ListExternalInteractionsResponse:
     total: int
     limit: int
     offset: int
+
+
+# Device types — hardware fleet management
+
+
+@dataclass
+class Point3D:
+    x: float
+    y: float
+    z: float
+
+
+@dataclass
+class Point2D:
+    x: float
+    y: float
+
+
+@dataclass
+class Quaternion:
+    x: float
+    y: float
+    z: float
+    w: float
+
+
+@dataclass
+class Pose:
+    position: Point3D
+    orientation: Optional[Quaternion] = None
+
+
+@dataclass
+class Twist:
+    linear: Point3D
+    angular: Point3D
+
+
+@dataclass
+class BatteryState:
+    percentage: Optional[float] = None
+    voltage: Optional[float] = None
+    current: Optional[float] = None
+
+
+@dataclass
+class Device:
+    id: str
+    pose: Optional[Pose] = None
+    twist: Optional[Twist] = None
+    battery: Optional[BatteryState] = None
+    last_update: Optional[str] = None
+
+
+@dataclass
+class DeviceStatus:
+    id: str
+    status: str  # "working" | "needs_attention" | "offline"
+    pose: Optional[Pose] = None
+    battery: Optional[BatteryState] = None
+    last_update: Optional[str] = None
+
+
+@dataclass
+class OccupancyGrid:
+    width: int
+    height: int
+    resolution: float
+    cells: Optional[list[int]] = None
+
+
+@dataclass
+class Task:
+    id: str
+    type: str
+    status: str  # "pending" | "assigned" | "in_progress" | "completed" | "failed"
+    target: Optional[Point2D] = None
+    assigned_to: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+@dataclass
+class TaskStats:
+    total: int
+    pending: int
+    assigned: int
+    in_progress: int
+    completed: int
+    failed: int
+
+
+@dataclass
+class CollisionWarning:
+    agent1: str
+    agent2: str
+    distance: float
+    severity: str  # "warning" | "critical"
+    recommended_maneuver: Optional[str] = None
+
+
+@dataclass
+class SensorReading:
+    name: str
+    value: float
+    unit: Optional[str] = None
+    device_id: Optional[str] = None
+    timestamp: Optional[str] = None
+
+
+@dataclass
+class FaultDiagnosis:
+    fault_id: str
+    fault_type: str
+    severity: str  # "info" | "warning" | "critical"
+    confidence: float
+    description: str
+    root_cause: Optional[str] = None
+    remediation: Optional[str] = None
+
+
+@dataclass
+class DiagnosisResponse:
+    diagnoses: list[FaultDiagnosis]
+    total: int
+
+
+@dataclass
+class AskResponse:
+    answer: str
+    confidence: float
+    model: str
+    cost_cents: float
+
+
+@dataclass
+class GridStats:
+    total_cells: int
+    observed_cells: int
+    free_cells: int
+    occupied_cells: int
+    total_sources: int
+    avg_confidence: float
+
+
+@dataclass
+class SyncStatus:
+    status: str
+    message: Optional[str] = None
+    connected: Optional[bool] = None
+    latency: Optional[float] = None
+
+
+@dataclass
+class BlackboardEntry:
+    id: str
+    category: str
+    key: str
+    value: str
+    source: str
+    confidence: Optional[float] = None
+    timestamp: Optional[str] = None
+
+
+@dataclass
+class CreateDeviceRequest:
+    id: Optional[str] = None
+    pose: Optional[Pose] = None
+
+
+@dataclass
+class DeviceDiagnoseRequest:
+    readings: list[SensorReading]
+
+
+@dataclass
+class CreateTaskRequest:
+    type: str
+    target: Point2D
+    priority: Optional[int] = None
+
+
+@dataclass
+class ListDevicesResponse:
+    devices: list[Device]
+    total: int
+
+
+@dataclass
+class ListTasksResponse:
+    tasks: list[Task]
+    total: int

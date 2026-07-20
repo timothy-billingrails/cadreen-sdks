@@ -2,6 +2,8 @@
 
 Cadreen CLI — intelligence infrastructure for developers.
 
+> **⚠️ Compatibility Advisory:** Version 0.4.0 has known contract mismatches with the server. Version 0.4.0 is unsupported. **Upgrade to 0.4.2.**
+
 Cadreen remembers things, follows rules, connects to services, and heals itself when things go wrong. All governed. All observable.
 
 ## Install
@@ -90,6 +92,9 @@ cadreen doctor      # Check readiness
 | `cadreen external-agents settings` | Manage external agent settings |
 | `cadreen responses create "..."` | Create a response |
 | `cadreen responses get [id]` | Get a response |
+| `cadreen devices list` | List devices |
+| `cadreen devices get [id]` | Get device details |
+| `cadreen devices diagnose` | Diagnose a device |
 | `cadreen config` | Local settings |
 | `cadreen update` | Update CLI |
 
@@ -117,6 +122,9 @@ go install github.com/timothy-billingrails/cadreen-sdks/go/cmd/cadreen@latest
 - [GitHub](https://github.com/timothy-billingrails/cadreen-sdks)
 
 ## Changelog
+
+### v0.4.2
+- Added `devices` command group — full device management (list, create, get, delete, status, state, map, tasks, collisions, avoidance, diagnose, ask, sync, blackboard)
 
 ### v0.4.0
 - **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.7.2
+
+**Features:**
+
+- Add `devices.go` — full device lifecycle (CreateDevice, ListDevices, GetDevice, DeleteDevice, GetDeviceStatus, UpdateDeviceState, GetDeviceMap, GetDeviceMapStats, UpdateDeviceMap, ListDeviceTasks, CreateDeviceTask, CompleteDeviceTask, AssignDeviceTasks, DetectDeviceCollisions, GetDeviceAvoidance, DiagnoseDevice, AskDevice, GetDeviceModelStats, GetDeviceCapabilities, GetDeviceSyncStatus, GetDeviceSyncPending, GetDeviceSyncConflicts, GetDeviceBlackboard)
+
+**Fixes:**
+
+- `GetAgentConfig` now returns `*AgentConfig` instead of `map[string]any`
+- `CreateAgentExecution` now returns `*AgentExecution` instead of `map[string]any`
+- `GetFederationPermissions` and `UpdateFederationPermissions` now return `*FederationPermissions` instead of `map[string]any`
+- `ListAgentExecutionsResponse.Executions` now uses `[]AgentExecution` instead of `[]map[string]any`
+- Added typed structs: `AgentConfig`, `AgentExecution`, `FederationPermissions`
+
 ## 0.7.1
 
 **Fixes:**

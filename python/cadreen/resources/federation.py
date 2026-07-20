@@ -22,7 +22,7 @@ class FederationResource:
         self._client = client
 
     async def create(self, request: CreateFederationRequest) -> FederationLink:
-        body: dict[str, Any] = {"target_workspace_id": request.target_workspace_id}
+        body: dict[str, Any] = {"targetWorkspaceId": request.target_workspace_id}
         if request.description is not None:
             body["description"] = request.description
         if request.permissions is not None:

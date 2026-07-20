@@ -137,6 +137,14 @@ Use cadreen_governance_create with:
   description: "Require approval for refunds over $50"
 ```
 
+## Changelog
+
+### v0.1.2
+- Removed incorrect compatibility advisory referencing 0.7.0/0.7.1 — MCP uses its own version scheme
+
+### v0.1.0
+- Initial release
+
 ## License
 
 MIT

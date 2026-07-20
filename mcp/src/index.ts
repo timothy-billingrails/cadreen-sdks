@@ -234,7 +234,7 @@ server.tool(
   },
   async ({ target_workspace_id }) => {
     const result = await cadreenRequest("POST", "/api/v1/cadreen/federation", {
-      target_workspace_id,
+      targetWorkspaceId: target_workspace_id,
     });
     return {
       content: [{

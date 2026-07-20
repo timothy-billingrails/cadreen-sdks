@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.2
+
+**Features:**
+
+- Add `DevicesResource`: full device lifecycle — list, create, get, delete, getStatus, updateState, getMap, getMapStats, updateMap, listTasks, createTask, completeTask, assignTasks, detectCollisions, getAvoidance, diagnose, ask, getModelStats, getCapabilities, getSyncStatus, getSyncPending, getSyncConflicts, getBlackboard
+
+**Fixes:**
+
+- Fixed `DiagnoseRequest` type shadowing — renamed device-specific `DiagnoseRequest` (with `readings: SensorReading[]`) to `DeviceDiagnoseRequest` to avoid conflict with healing `DiagnoseRequest`
+
 ## 0.7.1
 
 **Fixes:**

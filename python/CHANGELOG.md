@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.2
+
+**Features:**
+
+- Add `DevicesResource`: full device lifecycle — list, create, get, delete, get_status, update_state, get_map, get_map_stats, update_map, list_tasks, create_task, complete_task, assign_tasks, detect_collisions, get_avoidance, diagnose, ask, get_model_stats, get_capabilities, get_sync_status, get_sync_pending, get_sync_conflicts, get_blackboard
+
+**Fixes:**
+
+- Fixed `DiagnoseRequest` type shadowing — renamed device-specific `DiagnoseRequest` (with `readings`) to `DeviceDiagnoseRequest` to avoid conflict with healing `DiagnoseRequest`
+- Fixed missing `AsyncIterator` import in `resources/intent.py`
+- Fixed Python connection pooling — `HttpClient` now reuses a persistent `httpx.AsyncClient` instead of creating a new one per request; added `__aenter__`/`__aexit__` for async context manager support
+
 ## 0.7.1
 
 **Fixes:**

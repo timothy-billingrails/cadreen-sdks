@@ -2,6 +2,8 @@
 
 Go SDK for [Cadreen](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
 
+> **⚠️ Compatibility Advisory:** Version 0.7.0 has known contract mismatches with the server. Version 0.7.0 is unsupported. **Upgrade to 0.7.2.** See [CHANGELOG](#v072) for details.
+
 Cadreen is a cognitive operating system. Send messages describing what you want done, and Cadreen reasons, connects tools, recalls knowledge, governs actions, and escalates to humans when needed. The SDK handles authentication, retries, idempotency, streaming, sandbox mode, and error classification.
 
 ## Install
@@ -324,6 +326,16 @@ fmt.Printf("Status: %s, Size: %d bytes\n", doc.Status, doc.Size)
 | `Client.ApproveExternalConnection()` | Approve external connection |
 | `Client.CreateResponse()` | Create response (OpenAI-compatible) |
 | `Client.CreateResponseStreaming()` | Create streaming response |
+| `Client.ListDevices()` | List devices |
+| `Client.GetDevice()` | Get device by ID |
+| `Client.CreateDevice()` | Create device |
+| `Client.DeleteDevice()` | Delete device |
+| `Client.GetDeviceStatus()` | Get device status |
+| `Client.DiagnoseDevice()` | Diagnose device |
+| `Client.AskDevice()` | Ask device a question |
+| `Client.GetDeviceMapStats()` | Get device map stats |
+| `Client.ListDeviceTasks()` | List device tasks |
+| `Client.CreateDeviceTask()` | Create device task |
 
 ## Agents
 
@@ -459,6 +471,13 @@ for iter.Next() {
 ```
 
 ## Changelog
+
+### v0.7.2
+- Added `devices.go` — full device lifecycle (CreateDevice, ListDevices, GetDevice, DeleteDevice, GetDeviceStatus, UpdateDeviceState, GetDeviceMap, etc.)
+- `GetAgentConfig` now returns `*AgentConfig` instead of `map[string]any`
+- `CreateAgentExecution` now returns `*AgentExecution` instead of `map[string]any`
+- `GetFederationPermissions` and `UpdateFederationPermissions` now return `*FederationPermissions` instead of `map[string]any`
+- Added typed structs: `AgentConfig`, `AgentExecution`, `FederationPermissions`
 
 ### v0.7.1
 - Fix: sandbox mode now returns `ErrSandboxStreaming` for `PostStream` and `Stream` instead of making network requests
