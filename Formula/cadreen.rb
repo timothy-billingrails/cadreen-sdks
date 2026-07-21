@@ -7,22 +7,22 @@ class Cadreen < Formula
   on_macos do
     on_arm do
       url "https://github.com/timothy-billingrails/cadreen-sdks/releases/download/cli-v#{VERSION}/cadreen_darwin_arm64"
-      sha256 "1bb75dc7ce83b82767629adb8087d654b2a4abfcbdafc8e542507be57aeb9c1a"
+      sha256 "9c5a7b9f94c08a5ab86ed92a6513a327bbc135cfa6bec759e17515a1332cc6f5"
     end
     on_intel do
       url "https://github.com/timothy-billingrails/cadreen-sdks/releases/download/cli-v#{VERSION}/cadreen_darwin_amd64"
-      sha256 "974ecb60e419c2f04ba2992dc03e21062f339c066d4953d2c9b283b6ea977fe9"
+      sha256 "5b346fed65b9a5fbfeaed95fe5ef651b6ae52f94281ffb8264bbe1486ba1ffdf"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/timothy-billingrails/cadreen-sdks/releases/download/cli-v#{VERSION}/cadreen_linux_arm64"
-      sha256 "a2753aef2437b1e618415a2063934bc5d1eebf1bab39fa07b7b21a977fd656b2"
+      sha256 "a9e183290c5387e6dd41fcbb21624dd0c66babf2b153192f0124b83e4c0480c9"
     end
     on_intel do
       url "https://github.com/timothy-billingrails/cadreen-sdks/releases/download/cli-v#{VERSION}/cadreen_linux_amd64"
-      sha256 "151ea83c81a15c95e68ca385aed3996507005e272ec5732306f2246fd183f5a1"
+      sha256 "ddc2e2047e8345d48431e811f591a470c865d80d67c01ede74bc2c1292855d40"
     end
   end
 
