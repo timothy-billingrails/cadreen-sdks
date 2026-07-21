@@ -496,7 +496,7 @@ server.prompt(
     const messages = [
       {
         role: "user" as const,
-        content: `Create an agent called "${name}" that ${purpose}.${rules ? ` Rules: ${rules}` : ""}`,
+        content: { type: "text" as const, text: `Create an agent called "${name}" that ${purpose}.${rules ? ` Rules: ${rules}` : ""}` },
       },
     ];
     return { messages };
@@ -515,7 +515,7 @@ server.prompt(
     const messages = [
       {
         role: "user" as const,
-        content: `Add knowledge to agent ${agent_id}: ${subject} = ${content}`,
+        content: { type: "text" as const, text: `Add knowledge to agent ${agent_id}: ${subject} = ${content}` },
       },
     ];
     return { messages };
