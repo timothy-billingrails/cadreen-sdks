@@ -36,6 +36,58 @@ class CadreenError(Exception):
         self.intelligence = intelligence
 
 
+class CadreenBlockedError(CadreenError):
+    reason_code: Optional[str]
+    policy_id: Optional[str]
+    trace_id: str
+    intelligence: Any
+
+    def __init__(
+        self,
+        *,
+        reason_code: Optional[str] = None,
+        policy_id: Optional[str] = None,
+        intelligence: Any,
+        trace_id: str,
+    ) -> None:
+        super().__init__(
+            status=403,
+            code=reason_code or "blocked_by_policy",
+            error_type="blocked",
+            message=f"Action blocked by governance policy{f': {policy_id}' if policy_id else ''}",
+        )
+        self.reason_code = reason_code
+        self.policy_id = policy_id
+        self.intelligence = intelligence
+        self.trace_id = trace_id
+
+
+class CadreenClarifyError(CadreenError):
+    questions: list[dict[str, Any]]
+    conversation_id: str
+    trace_id: str
+    intelligence: Any
+
+    def __init__(
+        self,
+        *,
+        questions: list[dict[str, Any]],
+        conversation_id: str,
+        intelligence: Any,
+        trace_id: str,
+    ) -> None:
+        super().__init__(
+            status=422,
+            code="needs_input",
+            error_type="clarify",
+            message="System needs clarification before proceeding",
+        )
+        self.questions = questions
+        self.conversation_id = conversation_id
+        self.intelligence = intelligence
+        self.trace_id = trace_id
+
+
 DEFAULT_BASE_URL = "https://accomplishanything.today"
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_TIMEOUT = 30

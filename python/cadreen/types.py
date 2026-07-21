@@ -1258,6 +1258,9 @@ class DiagnoseRequest:
 # Proposal types
 # ---------------------------------------------------------------------------
 
+ProposalType = Literal["automation", "governance", "learning", "blueprint", "task"]
+ProposalStatus = Literal["proposed", "accepted", "dismissed", "expired", "superseded"]
+
 
 @dataclass
 class ProposalEvidence:
@@ -1291,6 +1294,12 @@ class TaskProposal:
     execution_id: Optional[str] = None
     dedup_key: Optional[str] = None
     requires_review: Optional[bool] = None
+
+
+@dataclass
+class ListProposalsOptions:
+    status: Optional[str] = None
+    limit: Optional[int] = None
 
 
 @dataclass
@@ -1328,6 +1337,16 @@ class ProposalStatsResponse:
 # ---------------------------------------------------------------------------
 
 
+AgentStatus = Literal["draft", "active", "deploying", "deployed", "paused", "error", "archived"]
+AgentHealth = Literal["healthy", "degraded", "unhealthy", "unknown"]
+AgentMessageType = Literal["direct", "broadcast", "request", "response", "notification"]
+AgentMessageStatus = Literal["pending", "delivered", "read", "failed", "expired"]
+NegotiationStatus = Literal["pending", "in_progress", "accepted", "rejected", "counter_proposed", "expired", "cancelled"]
+FactType = Literal["fact", "preference", "constraint", "instruction", "context", "relationship"]
+GovernanceScope = Literal["agent", "workspace", "federation"]
+PolicyAction = Literal["allow", "deny", "require_approval", "log_only"]
+
+
 @dataclass
 class Agent:
     id: str
@@ -1337,34 +1356,52 @@ class Agent:
     updated_at: str
     description: Optional[str] = None
     model: Optional[str] = None
-    domain: Optional[str] = None
+    health: Optional[str] = None
+    system_prompt: Optional[str] = None
+    capabilities: Optional[list[str]] = None
     tags: Optional[list[str]] = None
-    version: Optional[int] = None
+    config: Optional[dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
+    deployed_at: Optional[str] = None
 
 
 @dataclass
 class AgentConfig:
-    model: str
-    domain: str
-    config: dict[str, Any]
-    version: int
+    agent_id: str
+    model: Optional[str] = None
+    system_prompt: Optional[str] = None
+    temperature: Optional[float] = None
+    max_tokens: Optional[int] = None
+    tools: Optional[list[str]] = None
+    connections: Optional[list[str]] = None
+    memory_scope: Optional[str] = None
+    governance_policy_id: Optional[str] = None
+    metadata: Optional[dict[str, Any]] = None
 
 
 @dataclass
 class AgentCapabilities:
+    agent_id: str
     tools: list[str]
-    integrations: list[str]
+    connections: list[str]
     knowledge_count: int
-    governance_count: int
+    governance_policies: int
+    can_execute: bool
+    can_federate: bool
+    can_negotiate: bool
 
 
 @dataclass
 class AgentMessage:
     id: str
-    role: str
+    from_agent_id: str
+    to_agent_id: str
     content: str
+    status: str
+    message_type: str
     created_at: str
-    metadata: Optional[dict[str, Any]] = None
+    context: Optional[dict[str, Any]] = None
+    response: Optional[str] = None
 
 
 @dataclass
@@ -1406,10 +1443,13 @@ class AgentKnowledge:
 class AgentGovernancePolicy:
     id: str
     name: str
+    scope: str
     rules: list[dict[str, Any]]
     created_at: str
-    domain: Optional[str] = None
-    priority: Optional[int] = None
+    updated_at: str
+    description: Optional[str] = None
+    agent_id: Optional[str] = None
+    enabled: bool = True
 
     _aliases = {
         "workspaceId": "workspace_id",
@@ -1429,24 +1469,28 @@ class AgentGovernancePolicy:
 @dataclass
 class AgentAuditEntry:
     id: str
+    agent_id: str
     action: str
-    timestamp: str
-    actor: str
-    detail: Optional[str] = None
-    policy_id: Optional[str] = None
+    created_at: str
+    target_type: Optional[str] = None
+    target_id: Optional[str] = None
+    details: Optional[dict[str, Any]] = None
+    policy_action: Optional[str] = None
 
 
 @dataclass
 class AgentNegotiation:
     id: str
-    status: str
-    initiator_agent_id: str
-    target_agent_id: str
+    from_agent_id: str
+    to_agent_id: str
     proposal: dict[str, Any]
+    status: str
+    current_round: int
+    max_rounds: int
     created_at: str
     updated_at: str
-    response: Optional[dict[str, Any]] = None
-    counter_proposal: Optional[dict[str, Any]] = None
+    deadline: Optional[str] = None
+    resolution: Optional[dict[str, Any]] = None
 
 
 @dataclass
@@ -1454,9 +1498,11 @@ class CreateAgentRequest:
     name: str
     description: Optional[str] = None
     model: Optional[str] = None
-    domain: Optional[str] = None
-    config: Optional[dict[str, Any]] = None
+    system_prompt: Optional[str] = None
+    capabilities: Optional[list[str]] = None
     tags: Optional[list[str]] = None
+    config: Optional[dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
 
 
 @dataclass
@@ -1464,10 +1510,11 @@ class UpdateAgentRequest:
     name: Optional[str] = None
     description: Optional[str] = None
     model: Optional[str] = None
-    domain: Optional[str] = None
-    config: Optional[dict[str, Any]] = None
+    system_prompt: Optional[str] = None
+    capabilities: Optional[list[str]] = None
     tags: Optional[list[str]] = None
-    status: Optional[str] = None
+    config: Optional[dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
 
 
 @dataclass
@@ -1494,35 +1541,51 @@ class CreateAgentKnowledgeRequest:
     source: Optional[str] = None
     confidence: Optional[float] = None
     tags: Optional[list[str]] = None
+    visibility: Optional[str] = None
 
 
 @dataclass
 class CreateAgentGovernanceRequest:
     name: str
+    scope: str
     rules: list[dict[str, Any]]
-    domain: Optional[str] = None
-    priority: Optional[int] = None
+    description: Optional[str] = None
+    enabled: Optional[bool] = None
 
 
 @dataclass
 class UpdateAgentGovernanceRequest:
     name: Optional[str] = None
+    description: Optional[str] = None
     rules: Optional[list[dict[str, Any]]] = None
-    domain: Optional[str] = None
-    priority: Optional[int] = None
+    enabled: Optional[bool] = None
 
 
 @dataclass
 class StartNegotiationRequest:
-    target_agent_id: str
+    to_agent_id: str
     proposal: dict[str, Any]
-    context: Optional[dict[str, Any]] = None
+    max_rounds: Optional[int] = None
+    deadline: Optional[str] = None
 
 
 @dataclass
 class RespondNegotiationRequest:
-    response: str
+    action: str
     counter_proposal: Optional[dict[str, Any]] = None
+    reason: Optional[str] = None
+
+
+@dataclass
+class AgentExecution:
+    id: str
+    agent_id: str
+    status: str
+    started_at: str
+    input: Optional[dict[str, Any]] = None
+    output: Optional[dict[str, Any]] = None
+    error: Optional[str] = None
+    completed_at: Optional[str] = None
 
 
 @dataclass
@@ -1539,7 +1602,7 @@ class ListAgentMessagesResponse:
 
 @dataclass
 class ListAgentExecutionsResponse:
-    executions: list[ExecutionStatus]
+    executions: list[AgentExecution]
     count: int
 
 
@@ -1577,6 +1640,9 @@ class SearchAgentKnowledgeResponse:
 # Federation types
 # ---------------------------------------------------------------------------
 
+FederationStatus = Literal["pending", "active", "suspended", "revoked", "expired"]
+FederationAgentStatus = Literal["active", "paused", "error", "unlinked"]
+
 
 @dataclass
 class FederationLink:
@@ -1603,8 +1669,9 @@ class FederationLink:
 @dataclass
 class FederationAgent:
     id: str
-    agent_id: str
-    federation_id: str
+    federation_link_id: str
+    local_agent_id: str
+    remote_agent_id: str
     status: str
     created_at: str
     updated_at: str
@@ -1615,9 +1682,13 @@ class FederationAgent:
 
 @dataclass
 class FederationPermissions:
-    federation_id: str
+    federation_link_id: str
     permissions: list[str]
-    updated_at: Optional[str] = None
+    updated_at: str
+    allowed_agents: Optional[list[str]] = None
+    allowed_tools: Optional[list[str]] = None
+    allowed_knowledge: Optional[list[str]] = None
+    max_requests_per_day: Optional[int] = None
 
 
 @dataclass
@@ -1640,12 +1711,17 @@ class RevokeFederationRequest:
 @dataclass
 class UpdateFederationPermissionsRequest:
     permissions: list[str]
+    allowed_agents: Optional[list[str]] = None
+    allowed_tools: Optional[list[str]] = None
+    allowed_knowledge: Optional[list[str]] = None
+    max_requests_per_day: Optional[int] = None
 
 
 @dataclass
 class LinkFederationAgentRequest:
     local_agent_id: str
     remote_agent_id: str
+    capabilities: Optional[list[str]] = None
 
 
 @dataclass

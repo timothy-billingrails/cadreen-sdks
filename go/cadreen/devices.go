@@ -9,11 +9,30 @@ import (
 
 // Device represents a registered hardware device.
 type Device struct {
-	ID     string         `json:"id"`
-	Name   string         `json:"name"`
-	Type   string         `json:"type"`
-	Status string         `json:"status,omitempty"`
-	Config map[string]any `json:"config,omitempty"`
+	ID         string        `json:"id"`
+	Pose       *Pose         `json:"pose,omitempty"`
+	Twist      *Twist        `json:"twist,omitempty"`
+	Battery    *BatteryState `json:"battery,omitempty"`
+	LastUpdate string        `json:"last_update,omitempty"`
+}
+
+// Twist represents linear and angular velocity.
+type Twist struct {
+	Linear  Point3D `json:"linear"`
+	Angular Point3D `json:"angular"`
+}
+
+// BatteryState represents a device's battery status.
+type BatteryState struct {
+	Percentage *float64 `json:"percentage,omitempty"`
+	Voltage    *float64 `json:"voltage,omitempty"`
+	Current    *float64 `json:"current,omitempty"`
+}
+
+// Point2D represents a 2D point.
+type Point2D struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
 // DeviceStatus represents a device's current status.
@@ -123,11 +142,12 @@ type ListTasksParams struct {
 
 // Task represents a swarm task.
 type Task struct {
-	ID         string         `json:"id"`
-	Type       string         `json:"type"`
-	Status     string         `json:"status"`
-	Target     map[string]any `json:"target,omitempty"`
-	AssignedTo string         `json:"assigned_to,omitempty"`
+	ID         string    `json:"id"`
+	Type       string    `json:"type"`
+	Status     string    `json:"status"`
+	Target     *Point2D  `json:"target,omitempty"`
+	AssignedTo string    `json:"assigned_to,omitempty"`
+	CreatedAt  string    `json:"created_at,omitempty"`
 }
 
 // ListTasksResponse is the response from the list tasks endpoint.
@@ -138,8 +158,8 @@ type ListTasksResponse struct {
 
 // CreateTaskRequest contains parameters for creating a task.
 type CreateTaskRequest struct {
-	Type   string         `json:"type"`
-	Target map[string]any `json:"target"`
+	Type   string   `json:"type"`
+	Target *Point2D `json:"target"`
 }
 
 // ListDevices lists all registered devices.

@@ -388,7 +388,7 @@ type FieldStability struct {
 }
 
 type IntelligenceMeta struct {
-	Version        string              `json:"version"`
+	Version        *string             `json:"version,omitempty"`
 	Summary        string              `json:"summary,omitempty"`
 	Capability     CapabilityTrace     `json:"capability"`
 	Reasoning      ReasoningTrace      `json:"reasoning"`
@@ -1002,20 +1002,26 @@ type ListWorkspaceUsersResponse struct {
 // ---------------------------------------------------------------------------
 
 type Agent struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	Status      string         `json:"status,omitempty"`
-	Type        string         `json:"type,omitempty"`
-	Config      map[string]any `json:"config,omitempty"`
-	CreatedAt   string         `json:"created_at,omitempty"`
-	UpdatedAt   string         `json:"updated_at,omitempty"`
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description,omitempty"`
+	Status       string         `json:"status"`
+	Health       string         `json:"health"`
+	Model        *string        `json:"model,omitempty"`
+	SystemPrompt *string        `json:"system_prompt,omitempty"`
+	Capabilities []string       `json:"capabilities,omitempty"`
+	Tags         []string       `json:"tags,omitempty"`
+	Config       map[string]any `json:"config,omitempty"`
+	Metadata     map[string]any `json:"metadata,omitempty"`
+	CreatedAt    string         `json:"created_at"`
+	UpdatedAt    string         `json:"updated_at"`
+	DeployedAt   *string        `json:"deployed_at,omitempty"`
 }
 
 type AgentKnowledge struct {
 	ID        string   `json:"id"`
 	AgentID   string   `json:"agent_id,omitempty"`
-	FactType  string   `json:"factType"`
+	FactType  string   `json:"fact_type"`
 	Subject   string   `json:"subject"`
 	Predicate string   `json:"predicate,omitempty"`
 	Object    string   `json:"object,omitempty"`
@@ -1028,13 +1034,15 @@ type AgentKnowledge struct {
 }
 
 type AgentGovernancePolicy struct {
-	ID        string           `json:"id"`
-	AgentID   string           `json:"agent_id"`
-	Name      string           `json:"name"`
-	Rules     []map[string]any `json:"rules,omitempty"`
-	Priority  int              `json:"priority,omitempty"`
-	Active    bool             `json:"active"`
-	CreatedAt string           `json:"created_at,omitempty"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description,omitempty"`
+	Scope       string           `json:"scope"`
+	AgentID     string           `json:"agent_id,omitempty"`
+	Rules       []map[string]any `json:"rules"`
+	Enabled     bool             `json:"enabled"`
+	CreatedAt   string           `json:"created_at"`
+	UpdatedAt   string           `json:"updated_at"`
 }
 
 type AgentAuditEntry struct {
@@ -1260,15 +1268,16 @@ type FederationLink struct {
 }
 
 type FederationAgent struct {
-	ID           string `json:"id"`
-	FederationLinkID string `json:"federationLinkId"`
-	LocalAgentID     string `json:"localAgentId"`
-	RemoteAgentID    string `json:"remoteAgentId"`
-	LocalAgentName   string `json:"localAgentName,omitempty"`
-	RemoteAgentName  string `json:"remoteAgentName,omitempty"`
-	Status           string `json:"status,omitempty"`
-	CreatedAt        string `json:"createdAt,omitempty"`
-	UpdatedAt        string `json:"updatedAt,omitempty"`
+	ID               string   `json:"id"`
+	FederationLinkID string   `json:"federation_link_id"`
+	LocalAgentID     string   `json:"local_agent_id"`
+	RemoteAgentID    string   `json:"remote_agent_id"`
+	LocalAgentName   string   `json:"local_agent_name,omitempty"`
+	RemoteAgentName  string   `json:"remote_agent_name,omitempty"`
+	Status           string   `json:"status"`
+	Capabilities     []string `json:"capabilities,omitempty"`
+	CreatedAt        string   `json:"created_at"`
+	UpdatedAt        string   `json:"updated_at"`
 }
 
 type FederationPermissions struct {
@@ -1282,8 +1291,8 @@ type FederationPermissions struct {
 }
 
 type ListFederationsResponse struct {
-	Federations []FederationLink `json:"federations"`
-	Count       int              `json:"count"`
+	Links []FederationLink `json:"links"`
+	Count int              `json:"count"`
 }
 
 type ListFederationAgentsResponse struct {

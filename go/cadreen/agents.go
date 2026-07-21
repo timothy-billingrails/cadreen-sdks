@@ -94,9 +94,10 @@ type ListAgentAuditParams struct {
 }
 
 type StartNegotiationRequest struct {
-	Responder string         `json:"responder"`
-	Topic     string         `json:"topic,omitempty"`
-	Proposal  map[string]any `json:"proposal,omitempty"`
+	ToAgentID string         `json:"to_agent_id"`
+	Proposal  map[string]any `json:"proposal"`
+	MaxRounds *int           `json:"max_rounds,omitempty"`
+	Deadline  *string        `json:"deadline,omitempty"`
 }
 
 type ListNegotiationsParams struct {
@@ -106,9 +107,9 @@ type ListNegotiationsParams struct {
 }
 
 type RespondToNegotiationRequest struct {
-	Accepted bool           `json:"accepted"`
-	Response map[string]any `json:"response,omitempty"`
-	Reason   string         `json:"reason,omitempty"`
+	Action          string         `json:"action"`
+	CounterProposal map[string]any `json:"counter_proposal,omitempty"`
+	Reason          string         `json:"reason,omitempty"`
 }
 
 func (c *Client) CreateAgent(ctx context.Context, req CreateAgentRequest, opts ...RequestOption) (*Agent, error) {

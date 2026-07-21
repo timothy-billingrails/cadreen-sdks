@@ -1,4 +1,4 @@
-from .client import CadreenError
+from .client import CadreenError, CadreenBlockedError, CadreenClarifyError
 from .types import (
     CadreenConfig,
     HealthStatus,
@@ -18,6 +18,14 @@ from .types import (
     GovernanceDecisionType,
     RecoveryStatus,
     IntentMode,
+    AgentStatus,
+    AgentHealth,
+    AgentMessageType,
+    AgentMessageStatus,
+    NegotiationStatus,
+    FactType,
+    GovernanceScope,
+    PolicyAction,
     Pagination,
     ConnectionGroup,
     ListConnectionsResponse,
@@ -130,6 +138,7 @@ from .types import (
     DiagnoseRequest,
     ProposalEvidence,
     TaskProposal,
+    ListProposalsOptions,
     ListProposalsResponse,
     AcceptProposalResponse,
     DismissProposalResponse,
@@ -162,6 +171,7 @@ from .types import (
     AgentGovernancePolicy,
     AgentAuditEntry,
     AgentNegotiation,
+    AgentExecution,
     CreateAgentRequest,
     UpdateAgentRequest,
     SendMessageRequest,

@@ -108,7 +108,7 @@ brew install cadreen
 
 **curl:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/timothy-billingrails/cadreen-sdks/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/timothy-billingrails/cadreen-sdks/master/install.sh | sh
 ```
 
 **Go:**
