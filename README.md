@@ -2,7 +2,6 @@
 
 Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
 
-> **⚠️ Compatibility Advisory:** Version 0.7.0 has known contract mismatches with the server (broken request/response shapes for agents, messaging, execution, knowledge, and federation). Version 0.7.0 is unsupported. **Upgrade to 0.7.2**.
 
 ## Packages
 
