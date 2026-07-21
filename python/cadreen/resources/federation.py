@@ -22,7 +22,7 @@ class FederationResource:
         self._client = client
 
     async def create(self, request: CreateFederationRequest) -> FederationLink:
-        body: dict[str, Any] = {"target_workspace_id": request.target_workspace_id}
+        body: dict[str, Any] = {"targetWorkspaceId": request.target_workspace_id}
         if request.description is not None:
             body["description"] = request.description
         if request.permissions is not None:
@@ -67,29 +67,31 @@ class FederationResource:
 
     async def get_permissions(self, federation_id: str) -> FederationPermissions:
         raw = await self._client.get(f"/api/v1/cadreen/federation/{federation_id}/permissions")
-        return FederationPermissions(
-            federation_id=raw.get("federation_id", federation_id),
-            permissions=raw.get("permissions", []),
-            updated_at=raw.get("updated_at"),
-        )
+        return _parse_federation_permissions(raw, federation_id)
 
     async def update_permissions(
         self, federation_id: str, request: UpdateFederationPermissionsRequest
     ) -> FederationPermissions:
         body: dict[str, Any] = {"permissions": request.permissions}
+        if request.allowed_agents is not None:
+            body["allowed_agents"] = request.allowed_agents
+        if request.allowed_tools is not None:
+            body["allowed_tools"] = request.allowed_tools
+        if request.allowed_knowledge is not None:
+            body["allowed_knowledge"] = request.allowed_knowledge
+        if request.max_requests_per_day is not None:
+            body["max_requests_per_day"] = request.max_requests_per_day
         raw = await self._client.put(
             f"/api/v1/cadreen/federation/{federation_id}/permissions", body
         )
-        return FederationPermissions(
-            federation_id=raw.get("federation_id", federation_id),
-            permissions=raw.get("permissions", []),
-            updated_at=raw.get("updated_at"),
-        )
+        return _parse_federation_permissions(raw, federation_id)
 
     async def link_agent(
         self, federation_id: str, request: LinkFederationAgentRequest
     ) -> FederationAgent:
         body: dict[str, Any] = {"local_agent_id": request.local_agent_id, "remote_agent_id": request.remote_agent_id}
+        if request.capabilities is not None:
+            body["capabilities"] = request.capabilities
         raw = await self._client.post(
             f"/api/v1/cadreen/federation/{federation_id}/agents", body
         )
@@ -132,12 +134,25 @@ def _parse_federation_link(raw: dict[str, Any]) -> FederationLink:
 def _parse_federation_agent(raw: dict[str, Any]) -> FederationAgent:
     return FederationAgent(
         id=raw["id"],
-        agent_id=raw.get("localAgentId", ""),
-        federation_id=raw.get("federationLinkId", ""),
+        federation_link_id=raw.get("federationLinkId", ""),
+        local_agent_id=raw.get("localAgentId", ""),
+        remote_agent_id=raw.get("remoteAgentId", ""),
         status=raw.get("status", ""),
         created_at=raw.get("createdAt", ""),
         updated_at=raw.get("updatedAt", ""),
         local_agent_name=raw.get("localAgentName"),
         remote_agent_name=raw.get("remoteAgentName"),
         capabilities=raw.get("capabilities"),
+    )
+
+
+def _parse_federation_permissions(raw: dict[str, Any], federation_id: str) -> FederationPermissions:
+    return FederationPermissions(
+        federation_link_id=raw.get("federation_link_id", raw.get("federationLinkId", federation_id)),
+        permissions=raw.get("permissions", []),
+        updated_at=raw.get("updated_at", raw.get("updatedAt", "")),
+        allowed_agents=raw.get("allowed_agents", raw.get("allowedAgents")),
+        allowed_tools=raw.get("allowed_tools", raw.get("allowedTools")),
+        allowed_knowledge=raw.get("allowed_knowledge", raw.get("allowedKnowledge")),
+        max_requests_per_day=raw.get("max_requests_per_day", raw.get("maxRequestsPerDay")),
     )

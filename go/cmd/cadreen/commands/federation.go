@@ -33,7 +33,7 @@ Examples:
 		}
 
 		payload := map[string]any{
-			"target_workspace_id": targetWorkspace,
+			"targetWorkspaceId": targetWorkspace,
 		}
 
 		resp, err := rawDo("POST", "/api/v1/cadreen/federation", payload)

@@ -1,4 +1,4 @@
-from .client import CadreenError
+from .client import CadreenError, CadreenBlockedError, CadreenClarifyError
 from .types import (
     CadreenConfig,
     HealthStatus,
@@ -18,6 +18,14 @@ from .types import (
     GovernanceDecisionType,
     RecoveryStatus,
     IntentMode,
+    AgentStatus,
+    AgentHealth,
+    AgentMessageType,
+    AgentMessageStatus,
+    NegotiationStatus,
+    FactType,
+    GovernanceScope,
+    PolicyAction,
     Pagination,
     ConnectionGroup,
     ListConnectionsResponse,
@@ -130,6 +138,7 @@ from .types import (
     DiagnoseRequest,
     ProposalEvidence,
     TaskProposal,
+    ListProposalsOptions,
     ListProposalsResponse,
     AcceptProposalResponse,
     DismissProposalResponse,
@@ -162,6 +171,7 @@ from .types import (
     AgentGovernancePolicy,
     AgentAuditEntry,
     AgentNegotiation,
+    AgentExecution,
     CreateAgentRequest,
     UpdateAgentRequest,
     SendMessageRequest,
@@ -202,6 +212,30 @@ from .types import (
     ExternalAgentSettings,
     ListExternalConnectionsResponse,
     ListExternalInteractionsResponse,
+    Device,
+    DeviceStatus,
+    Point3D,
+    Point2D,
+    Quaternion,
+    Pose,
+    Twist,
+    BatteryState,
+    OccupancyGrid,
+    Task,
+    TaskStats,
+    CollisionWarning,
+    SensorReading,
+    FaultDiagnosis,
+    DiagnosisResponse,
+    AskResponse,
+    GridStats,
+    SyncStatus,
+    BlackboardEntry,
+    CreateDeviceRequest,
+    DeviceDiagnoseRequest,
+    CreateTaskRequest,
+    ListDevicesResponse,
+    ListTasksResponse,
 )
 
 from .client import HttpClient
@@ -228,6 +262,7 @@ from .resources.agents import AgentsResource
 from .resources.federation import FederationResource
 from .resources.responses import ResponsesResource
 from .resources.external_agents import ExternalAgentsResource
+from .resources.devices import DevicesResource
 from .resources.chat import (
     ChatMessage,
     ChatToolCall,
@@ -275,6 +310,7 @@ class Cadreen:
         self.federation = FederationResource(self._client)
         self.responses = ResponsesResource(self._client)
         self.external_agents = ExternalAgentsResource(self._client)
+        self.devices = DevicesResource(self._client)
 
     async def invoke(self, request: IntentRequest) -> IntentResult:
         return await self.intent.invoke(request)

@@ -96,9 +96,8 @@ class ResponsesResource:
         raw = await self._client.post("/api/v1/cadreen/responses", body)
         return _parse_response(raw)
 
-    async def retrieve(self, response_id: str) -> Response:
-        raw = await self._client.get(f"/api/v1/cadreen/responses/{response_id}")
-        return _parse_response(raw)
+    # P0-SDK-02: retrieve() removed — server has no GET /responses/{id} route.
+    # Re-add when persistence and retrieval are implemented server-side.
 
     async def stream(self, request: ResponseRequest) -> AsyncIterator[ResponseStreamEvent]:
         body = _request_to_body(request)

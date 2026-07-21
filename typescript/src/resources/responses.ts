@@ -27,18 +27,8 @@ export class ResponsesResource {
     });
   }
 
-  /**
-   * Retrieve a response by ID.
-   *
-   * @example
-   * ```ts
-   * const response = await cadreen.responses.retrieve("resp_abc123");
-   * console.log(response.status);
-   * ```
-   */
-  async retrieve(responseId: string): Promise<ResponsesCompletion> {
-    return this.client.get<ResponsesCompletion>(`/api/v1/cadreen/responses/${responseId}`);
-  }
+  // P0-SDK-02: retrieve() removed — server has no GET /responses/{id} route.
+  // Re-add when persistence and retrieval are implemented server-side.
 
   /**
    * Create a streaming response.

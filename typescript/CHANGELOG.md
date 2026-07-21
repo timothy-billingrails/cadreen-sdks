@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.7.2
+
+**Features:**
+
+- Add `DevicesResource`: full device lifecycle — list, create, get, delete, getStatus, updateState, getMap, getMapStats, updateMap, listTasks, createTask, completeTask, assignTasks, detectCollisions, getAvoidance, diagnose, ask, getModelStats, getCapabilities, getSyncStatus, getSyncPending, getSyncConflicts, getBlackboard
+
+**Fixes:**
+
+- Fixed `DiagnoseRequest` type shadowing — renamed device-specific `DiagnoseRequest` (with `readings: SensorReading[]`) to `DeviceDiagnoseRequest` to avoid conflict with healing `DiagnoseRequest`
+
+## 0.7.1
+
+**Fixes:**
+
+- Sandbox mode: `postStream` and `stream` now throw `CadreenError(404)` instead of making network requests in sandbox mode.
+- Release workflow: fixed `git stash pop` ordering in Homebrew formula update step.
+- Homebrew formula SHA256 update now runs before commit in release workflow.
+
+**Known server-side events (for consumers polling/streaming executions):**
+
+- `execution_steps_complete` — step loop finished; synthesis, quality review, and delivery governance still follow. NOT terminal.
+- `mission_complete` — mission completed successfully. Terminal.
+- `mission_completed_with_gaps` — steps succeeded but delivery governance blocked the deliverable. Terminal.
+- `mission_blocked` — execution failed. Terminal.
+- `mission_partial` — execution partially completed. Terminal.
+- `execution_complete` — legacy event; prefer `execution_steps_complete`.
+
 ## 0.7.0
 
 **Breaking Changes:**

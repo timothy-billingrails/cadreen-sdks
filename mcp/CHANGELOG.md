@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+**Fixes:**
+
+- Removed incorrect compatibility advisory referencing 0.7.0/0.7.1 — MCP uses its own version scheme
+
 ## 0.1.0
 
 - Initial release

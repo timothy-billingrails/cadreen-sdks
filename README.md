@@ -2,15 +2,16 @@
 
 Official SDKs for the [Cadreen API](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
 
+> **⚠️ Compatibility Advisory:** Version 0.7.0 has known contract mismatches with the server (broken request/response shapes for agents, messaging, execution, knowledge, and federation). Version 0.7.0 is unsupported. **Upgrade to 0.7.2**.
 
 ## Packages
 
 | Language | Package | Version | Install |
 |----------|---------|---------|---------|
-| TypeScript | `@cadreen/sdk` | 0.7.0 | `npm install @cadreen/sdk` |
-| Python | `cadreen-sdk` | 0.7.0 | `pip install cadreen-sdk` |
-| Go | `cadreen` | 0.7.0 | `go get github.com/timothy-billingrails/cadreen-sdks/go/cadreen@latest` |
-| CLI | `@cadreen/cli` | 0.4.0 | `npm install -g @cadreen/cli` |
+| TypeScript | `@cadreen/sdk` | 0.7.2 | `npm install @cadreen/sdk` |
+| Python | `cadreen-sdk` | 0.7.2 | `pip install cadreen-sdk` |
+| Go | `cadreen` | 0.7.2 | `go get github.com/timothy-billingrails/cadreen-sdks/go/cadreen@latest` |
+| CLI | `@cadreen/cli` | 0.4.2 | `npm install -g @cadreen/cli` |
 
 ## Quick Start
 

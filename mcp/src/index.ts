@@ -35,7 +35,7 @@ async function cadreenRequest(method: string, path: string, body?: Record<string
 
 const server = new McpServer({
   name: "cadreen",
-  version: "0.1.0",
+  version: "0.1.2",
   description: "MCP server for Cadreen — intelligence infrastructure for AI agents",
 });
 
@@ -234,7 +234,7 @@ server.tool(
   },
   async ({ target_workspace_id }) => {
     const result = await cadreenRequest("POST", "/api/v1/cadreen/federation", {
-      target_workspace_id,
+      targetWorkspaceId: target_workspace_id,
     });
     return {
       content: [{
@@ -496,7 +496,7 @@ server.prompt(
     const messages = [
       {
         role: "user" as const,
-        content: `Create an agent called "${name}" that ${purpose}.${rules ? ` Rules: ${rules}` : ""}`,
+        content: { type: "text" as const, text: `Create an agent called "${name}" that ${purpose}.${rules ? ` Rules: ${rules}` : ""}` },
       },
     ];
     return { messages };
@@ -515,7 +515,7 @@ server.prompt(
     const messages = [
       {
         role: "user" as const,
-        content: `Add knowledge to agent ${agent_id}: ${subject} = ${content}`,
+        content: { type: "text" as const, text: `Add knowledge to agent ${agent_id}: ${subject} = ${content}` },
       },
     ];
     return { messages };

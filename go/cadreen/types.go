@@ -388,7 +388,7 @@ type FieldStability struct {
 }
 
 type IntelligenceMeta struct {
-	Version        string              `json:"version"`
+	Version        *string             `json:"version,omitempty"`
 	Summary        string              `json:"summary,omitempty"`
 	Capability     CapabilityTrace     `json:"capability"`
 	Reasoning      ReasoningTrace      `json:"reasoning"`
@@ -1002,34 +1002,47 @@ type ListWorkspaceUsersResponse struct {
 // ---------------------------------------------------------------------------
 
 type Agent struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	Status      string         `json:"status,omitempty"`
-	Type        string         `json:"type,omitempty"`
-	Config      map[string]any `json:"config,omitempty"`
-	CreatedAt   string         `json:"created_at,omitempty"`
-	UpdatedAt   string         `json:"updated_at,omitempty"`
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description,omitempty"`
+	Status       string         `json:"status"`
+	Health       string         `json:"health"`
+	Model        *string        `json:"model,omitempty"`
+	SystemPrompt *string        `json:"system_prompt,omitempty"`
+	Capabilities []string       `json:"capabilities,omitempty"`
+	Tags         []string       `json:"tags,omitempty"`
+	Config       map[string]any `json:"config,omitempty"`
+	Metadata     map[string]any `json:"metadata,omitempty"`
+	CreatedAt    string         `json:"created_at"`
+	UpdatedAt    string         `json:"updated_at"`
+	DeployedAt   *string        `json:"deployed_at,omitempty"`
 }
 
 type AgentKnowledge struct {
 	ID        string   `json:"id"`
-	AgentID   string   `json:"agent_id"`
-	Type      string   `json:"type"`
-	Content   string   `json:"content"`
+	AgentID   string   `json:"agent_id,omitempty"`
+	FactType  string   `json:"fact_type"`
+	Subject   string   `json:"subject"`
+	Predicate string   `json:"predicate,omitempty"`
+	Object    string   `json:"object,omitempty"`
 	Source    string   `json:"source,omitempty"`
+	Confidence float64 `json:"confidence,omitempty"`
 	Tags      []string `json:"tags,omitempty"`
+	Visibility string  `json:"visibility,omitempty"`
 	CreatedAt string   `json:"created_at,omitempty"`
+	UpdatedAt string   `json:"updated_at,omitempty"`
 }
 
 type AgentGovernancePolicy struct {
-	ID        string           `json:"id"`
-	AgentID   string           `json:"agent_id"`
-	Name      string           `json:"name"`
-	Rules     []map[string]any `json:"rules,omitempty"`
-	Priority  int              `json:"priority,omitempty"`
-	Active    bool             `json:"active"`
-	CreatedAt string           `json:"created_at,omitempty"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description,omitempty"`
+	Scope       string           `json:"scope"`
+	AgentID     string           `json:"agent_id,omitempty"`
+	Rules       []map[string]any `json:"rules"`
+	Enabled     bool             `json:"enabled"`
+	CreatedAt   string           `json:"created_at"`
+	UpdatedAt   string           `json:"updated_at"`
 }
 
 type AgentAuditEntry struct {
@@ -1071,6 +1084,30 @@ type AgentCapabilitiesResponse struct {
 	Capabilities []string `json:"capabilities"`
 }
 
+type AgentConfig struct {
+	AgentID            string         `json:"agent_id"`
+	Model              string         `json:"model,omitempty"`
+	SystemPrompt       string         `json:"system_prompt,omitempty"`
+	Temperature        *float64       `json:"temperature,omitempty"`
+	MaxTokens          *int           `json:"max_tokens,omitempty"`
+	Tools              []string       `json:"tools,omitempty"`
+	Connections        []string       `json:"connections,omitempty"`
+	MemoryScope        string         `json:"memory_scope,omitempty"`
+	GovernancePolicyID string         `json:"governance_policy_id,omitempty"`
+	Metadata           map[string]any `json:"metadata,omitempty"`
+}
+
+type AgentExecution struct {
+	ID          string         `json:"id"`
+	AgentID     string         `json:"agent_id"`
+	Status      string         `json:"status"`
+	Input       map[string]any `json:"input,omitempty"`
+	Output      map[string]any `json:"output,omitempty"`
+	Error       string         `json:"error,omitempty"`
+	StartedAt   string         `json:"started_at"`
+	CompletedAt string         `json:"completed_at,omitempty"`
+}
+
 type ListAgentsResponse struct {
 	Agents     []Agent    `json:"agents"`
 	Count      int        `json:"count"`
@@ -1084,7 +1121,7 @@ type ListAgentMessagesResponse struct {
 }
 
 type ListAgentExecutionsResponse struct {
-	Executions []map[string]any `json:"executions"`
+	Executions []AgentExecution `json:"executions"`
 	Count      int              `json:"count"`
 	Pagination Pagination       `json:"pagination,omitempty"`
 }
@@ -1126,7 +1163,7 @@ type ResponseRequest struct {
 	Input              interface{}            `json:"input"` // string or []ResponseInputItem
 	Instructions       string                 `json:"instructions,omitempty"`
 	Tools              []ResponseTool         `json:"tools,omitempty"`
-	PreviousResponseID string                 `json:"previous_response_id,omitempty"`
+	PreviousResponseID string                 `json:"previous_response_id,omitempty"` // Deprecated: server accepts but ignores; no continuation logic yet
 	Store              *bool                  `json:"store,omitempty"`
 	Stream             bool                   `json:"stream,omitempty"`
 	MaxOutputTokens    int                    `json:"max_output_tokens,omitempty"`
@@ -1165,7 +1202,7 @@ type Response struct {
 	OutputText         string                 `json:"output_text,omitempty"`
 	Usage              *ResponseUsage         `json:"usage,omitempty"`
 	Status             string                 `json:"status"` // "completed", "failed", "in_progress", "cancelled"
-	PreviousResponseID string                 `json:"previous_response_id,omitempty"`
+	PreviousResponseID string                 `json:"previous_response_id,omitempty"` // Deprecated: server does not persist responses; continuation not implemented
 	Metadata           map[string]interface{} `json:"metadata,omitempty"`
 }
 
@@ -1231,20 +1268,31 @@ type FederationLink struct {
 }
 
 type FederationAgent struct {
-	ID           string `json:"id"`
-	FederationLinkID string `json:"federationLinkId"`
-	LocalAgentID     string `json:"localAgentId"`
-	RemoteAgentID    string `json:"remoteAgentId"`
-	LocalAgentName   string `json:"localAgentName,omitempty"`
-	RemoteAgentName  string `json:"remoteAgentName,omitempty"`
-	Status           string `json:"status,omitempty"`
-	CreatedAt        string `json:"createdAt,omitempty"`
-	UpdatedAt        string `json:"updatedAt,omitempty"`
+	ID               string   `json:"id"`
+	FederationLinkID string   `json:"federation_link_id"`
+	LocalAgentID     string   `json:"local_agent_id"`
+	RemoteAgentID    string   `json:"remote_agent_id"`
+	LocalAgentName   string   `json:"local_agent_name,omitempty"`
+	RemoteAgentName  string   `json:"remote_agent_name,omitempty"`
+	Status           string   `json:"status"`
+	Capabilities     []string `json:"capabilities,omitempty"`
+	CreatedAt        string   `json:"created_at"`
+	UpdatedAt        string   `json:"updated_at"`
+}
+
+type FederationPermissions struct {
+	FederationLinkID  string   `json:"federation_link_id"`
+	Permissions       []string `json:"permissions"`
+	AllowedAgents     []string `json:"allowed_agents,omitempty"`
+	AllowedTools      []string `json:"allowed_tools,omitempty"`
+	AllowedKnowledge  []string `json:"allowed_knowledge,omitempty"`
+	MaxRequestsPerDay *int     `json:"max_requests_per_day,omitempty"`
+	UpdatedAt         string   `json:"updated_at"`
 }
 
 type ListFederationsResponse struct {
-	Federations []FederationLink `json:"federations"`
-	Count       int              `json:"count"`
+	Links []FederationLink `json:"links"`
+	Count int              `json:"count"`
 }
 
 type ListFederationAgentsResponse struct {

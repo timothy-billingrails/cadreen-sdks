@@ -54,8 +54,8 @@ export class AgentsResource {
     return this.client.get<AgentConfig>(`/api/v1/cadreen/agents/${encodeURIComponent(agentId)}/config`);
   }
 
-  async deploy(agentId: string): Promise<Agent> {
-    return this.client.post<Agent>(`/api/v1/cadreen/agents/${encodeURIComponent(agentId)}/deploy`);
+  async deploy(agentId: string, request: { configSnapshot: unknown; changeSummary?: string }): Promise<Agent> {
+    return this.client.post<Agent>(`/api/v1/cadreen/agents/${encodeURIComponent(agentId)}/deploy`, request);
   }
 
   async getCapabilities(agentId: string): Promise<AgentCapabilities> {

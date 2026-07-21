@@ -6,7 +6,7 @@ import (
 )
 
 type CreateFederationRequest struct {
-	TargetWorkspaceID string         `json:"target_workspace_id"`
+	TargetWorkspaceID string         `json:"targetWorkspaceId"`
 	Description       string         `json:"description,omitempty"`
 	Permissions       map[string]any `json:"permissions,omitempty"`
 }
@@ -24,8 +24,8 @@ type UpdateFederationPermissionsRequest struct {
 }
 
 type LinkFederationAgentRequest struct {
-	LocalAgentID  string `json:"local_agent_id"`
-	RemoteAgentID string `json:"remote_agent_id"`
+	LocalAgentID  string `json:"localAgentId"`
+	RemoteAgentID string `json:"remoteAgentId"`
 }
 
 func (c *Client) CreateFederation(ctx context.Context, req CreateFederationRequest, opts ...RequestOption) (*FederationLink, error) {
@@ -76,20 +76,20 @@ func (c *Client) RevokeFederation(ctx context.Context, federationID string, req 
 	return &result, nil
 }
 
-func (c *Client) GetFederationPermissions(ctx context.Context, federationID string, opts ...RequestOption) (map[string]any, error) {
-	var result map[string]any
+func (c *Client) GetFederationPermissions(ctx context.Context, federationID string, opts ...RequestOption) (*FederationPermissions, error) {
+	var result FederationPermissions
 	if err := c.do(ctx, "GET", "/api/v1/cadreen/federation/"+federationID+"/permissions", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get federation permissions: %w", err)
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (c *Client) UpdateFederationPermissions(ctx context.Context, federationID string, req UpdateFederationPermissionsRequest, opts ...RequestOption) (map[string]any, error) {
-	var result map[string]any
+func (c *Client) UpdateFederationPermissions(ctx context.Context, federationID string, req UpdateFederationPermissionsRequest, opts ...RequestOption) (*FederationPermissions, error) {
+	var result FederationPermissions
 	if err := c.do(ctx, "PUT", "/api/v1/cadreen/federation/"+federationID+"/permissions", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("update federation permissions: %w", err)
 	}
-	return result, nil
+	return &result, nil
 }
 
 func (c *Client) LinkFederationAgent(ctx context.Context, federationID string, req LinkFederationAgentRequest, opts ...RequestOption) (*FederationAgent, error) {

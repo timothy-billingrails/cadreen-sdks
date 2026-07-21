@@ -2,6 +2,7 @@ package cadreen
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -28,9 +29,10 @@ type ListAgentsParams struct {
 }
 
 type SendAgentMessageRequest struct {
-	To      string `json:"to"`
-	Content string `json:"content"`
-	Type    string `json:"type,omitempty"`
+	FromAgentID string `json:"fromAgentId"`
+	Content     string `json:"content"`
+	Context     string `json:"context,omitempty"`
+	ExecutionID string `json:"executionId,omitempty"`
 }
 
 type ListAgentMessagesParams struct {
@@ -45,8 +47,9 @@ type ListAgentExecutionsParams struct {
 }
 
 type CreateAgentExecutionRequest struct {
-	Task   string         `json:"task"`
-	Config map[string]any `json:"config,omitempty"`
+	Intent       string  `json:"intent"`
+	Context      string  `json:"context,omitempty"`
+	MaxBudgetUSD float64 `json:"maxBudgetUsd,omitempty"`
 }
 
 type ListAgentKnowledgeParams struct {
@@ -56,10 +59,13 @@ type ListAgentKnowledgeParams struct {
 }
 
 type CreateAgentKnowledgeRequest struct {
-	Type    string   `json:"type"`
-	Content string   `json:"content"`
-	Source  string   `json:"source,omitempty"`
-	Tags    []string `json:"tags,omitempty"`
+	FactType    string   `json:"factType"`
+	Subject     string   `json:"subject"`
+	Predicate   string   `json:"predicate,omitempty"`
+	Object      string   `json:"object,omitempty"`
+	Source      string   `json:"source,omitempty"`
+	Confidence  float64  `json:"confidence,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 type SearchAgentKnowledgeRequest struct {
@@ -88,9 +94,10 @@ type ListAgentAuditParams struct {
 }
 
 type StartNegotiationRequest struct {
-	Responder string         `json:"responder"`
-	Topic     string         `json:"topic,omitempty"`
-	Proposal  map[string]any `json:"proposal,omitempty"`
+	ToAgentID string         `json:"to_agent_id"`
+	Proposal  map[string]any `json:"proposal"`
+	MaxRounds *int           `json:"max_rounds,omitempty"`
+	Deadline  *string        `json:"deadline,omitempty"`
 }
 
 type ListNegotiationsParams struct {
@@ -100,9 +107,9 @@ type ListNegotiationsParams struct {
 }
 
 type RespondToNegotiationRequest struct {
-	Accepted bool           `json:"accepted"`
-	Response map[string]any `json:"response,omitempty"`
-	Reason   string         `json:"reason,omitempty"`
+	Action          string         `json:"action"`
+	CounterProposal map[string]any `json:"counter_proposal,omitempty"`
+	Reason          string         `json:"reason,omitempty"`
 }
 
 func (c *Client) CreateAgent(ctx context.Context, req CreateAgentRequest, opts ...RequestOption) (*Agent, error) {
@@ -161,17 +168,22 @@ func (c *Client) DeleteAgent(ctx context.Context, agentID string, opts ...Reques
 	return nil
 }
 
-func (c *Client) GetAgentConfig(ctx context.Context, agentID string, opts ...RequestOption) (map[string]any, error) {
-	var result map[string]any
+func (c *Client) GetAgentConfig(ctx context.Context, agentID string, opts ...RequestOption) (*AgentConfig, error) {
+	var result AgentConfig
 	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+agentID+"/config", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get agent config: %w", err)
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (c *Client) DeployAgent(ctx context.Context, agentID string, opts ...RequestOption) (*Agent, error) {
+type DeployAgentRequest struct {
+	ConfigSnapshot json.RawMessage `json:"configSnapshot"`
+	ChangeSummary  string          `json:"changeSummary,omitempty"`
+}
+
+func (c *Client) DeployAgent(ctx context.Context, agentID string, req DeployAgentRequest, opts ...RequestOption) (*Agent, error) {
 	var result Agent
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/deploy", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/deploy", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("deploy agent: %w", err)
 	}
 	return &result, nil
@@ -234,12 +246,12 @@ func (c *Client) ListAgentExecutions(ctx context.Context, agentID string, params
 	return &result, nil
 }
 
-func (c *Client) CreateAgentExecution(ctx context.Context, agentID string, req CreateAgentExecutionRequest, opts ...RequestOption) (map[string]any, error) {
-	var result map[string]any
+func (c *Client) CreateAgentExecution(ctx context.Context, agentID string, req CreateAgentExecutionRequest, opts ...RequestOption) (*AgentExecution, error) {
+	var result AgentExecution
 	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/executions", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("create agent execution: %w", err)
 	}
-	return result, nil
+	return &result, nil
 }
 
 func (c *Client) ListAgentKnowledge(ctx context.Context, agentID string, params ListAgentKnowledgeParams, opts ...RequestOption) (*ListAgentKnowledgeResponse, error) {

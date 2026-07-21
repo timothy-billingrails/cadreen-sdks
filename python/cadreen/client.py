@@ -36,6 +36,58 @@ class CadreenError(Exception):
         self.intelligence = intelligence
 
 
+class CadreenBlockedError(CadreenError):
+    reason_code: Optional[str]
+    policy_id: Optional[str]
+    trace_id: str
+    intelligence: Any
+
+    def __init__(
+        self,
+        *,
+        reason_code: Optional[str] = None,
+        policy_id: Optional[str] = None,
+        intelligence: Any,
+        trace_id: str,
+    ) -> None:
+        super().__init__(
+            status=403,
+            code=reason_code or "blocked_by_policy",
+            error_type="blocked",
+            message=f"Action blocked by governance policy{f': {policy_id}' if policy_id else ''}",
+        )
+        self.reason_code = reason_code
+        self.policy_id = policy_id
+        self.intelligence = intelligence
+        self.trace_id = trace_id
+
+
+class CadreenClarifyError(CadreenError):
+    questions: list[dict[str, Any]]
+    conversation_id: str
+    trace_id: str
+    intelligence: Any
+
+    def __init__(
+        self,
+        *,
+        questions: list[dict[str, Any]],
+        conversation_id: str,
+        intelligence: Any,
+        trace_id: str,
+    ) -> None:
+        super().__init__(
+            status=422,
+            code="needs_input",
+            error_type="clarify",
+            message="System needs clarification before proceeding",
+        )
+        self.questions = questions
+        self.conversation_id = conversation_id
+        self.intelligence = intelligence
+        self.trace_id = trace_id
+
+
 DEFAULT_BASE_URL = "https://accomplishanything.today"
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_TIMEOUT = 30
@@ -62,6 +114,23 @@ class HttpClient:
         self._profile = getattr(config, "profile", None) or "full"
         provider = config.telemetry if config.telemetry else NoOpProvider()
         self._telemetry = TelemetryHooks(provider=provider)
+        self._client: httpx.AsyncClient | None = None
+
+    async def _get_client(self) -> httpx.AsyncClient:
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(timeout=self._timeout)
+        return self._client
+
+    async def close(self) -> None:
+        if self._client is not None and not self._client.is_closed:
+            await self._client.aclose()
+            self._client = None
+
+    async def __aenter__(self) -> "HttpClient":
+        return self
+
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        await self.close()
 
     async def request(
         self,
@@ -106,13 +175,13 @@ class HttpClient:
                 await asyncio.sleep(delay)
 
             try:
-                async with httpx.AsyncClient(timeout=self._timeout) as client:
-                    response = await client.request(
-                        method=method,
-                        url=url,
-                        headers=headers,
-                        json=body if body is not None else None,
-                    )
+                client = await self._get_client()
+                response = await client.request(
+                    method=method,
+                    url=url,
+                    headers=headers,
+                    json=body if body is not None else None,
+                )
 
                 if not response.is_success:
                     error_body: Optional[dict[str, Any]] = None
@@ -183,8 +252,8 @@ class HttpClient:
             "Accept": f'application/json; profile="{self._profile}"',
         }
 
-        async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(url=url, headers=headers, files=files)
+        client = await self._get_client()
+        response = await client.post(url=url, headers=headers, files=files)
 
         if not response.is_success:
             error_body: Optional[dict[str, Any]] = None
@@ -215,18 +284,25 @@ class HttpClient:
         return await self.request("DELETE", path)
 
     async def stream(self, path: str) -> Any:
+        if self._sandbox:
+            raise CadreenError(
+                404,
+                "not_found",
+                "not_found",
+                "Streaming is not available in sandbox mode.",
+            )
         url = f"{self._base_url}{path}"
         headers = {
             "Authorization": f"Bearer {self._api_key}",
             "Accept": "text/event-stream",
         }
 
-        async with httpx.AsyncClient(timeout=None) as client:
-            async with aconnect_sse(client, "GET", url, headers=headers) as event_source:
-                async for event in event_source.aiter_sse():
-                    try:
-                        import json
-                        data = json.loads(event.data)
-                    except Exception:
-                        data = {"raw": event.data}
-                    yield {"type": event.event or "message", "data": data}
+        client = await self._get_client()
+        async with aconnect_sse(client, "GET", url, headers=headers) as event_source:
+            async for event in event_source.aiter_sse():
+                try:
+                    import json
+                    data = json.loads(event.data)
+                except Exception:
+                    data = {"raw": event.data}
+                yield {"type": event.event or "message", "data": data}

@@ -22,16 +22,8 @@ func (c *Client) CreateResponse(ctx context.Context, req ResponseRequest, opts .
 	return &resp, nil
 }
 
-// GetResponse retrieves a previously created response by ID.
-// Endpoint: GET /api/v1/cadreen/responses/{responseID}
-func (c *Client) GetResponse(ctx context.Context, responseID string, opts ...RequestOption) (*Response, error) {
-	var resp Response
-	path := "/api/v1/cadreen/responses/" + responseID
-	if err := c.do(ctx, "GET", path, nil, &resp, opts...); err != nil {
-		return nil, fmt.Errorf("get response: %w", err)
-	}
-	return &resp, nil
-}
+// P0-SDK-02: GetResponse removed — server has no GET /responses/{id} route.
+// Re-add when persistence and retrieval are implemented server-side.
 
 // ResponseStreamIterator iterates over SSE events from a streaming Responses API call.
 type ResponseStreamIterator struct {

@@ -24,6 +24,7 @@ import { AgentsResource } from "./resources/agents";
 import { FederationResource } from "./resources/federation";
 import { ResponsesResource } from "./resources/responses";
 import { ExternalAgentsResource } from "./resources/external-agents";
+import { DevicesResource } from "./resources/devices";
 import type {
   CadreenConfig,
   IntentRequest,
@@ -73,6 +74,7 @@ export class Cadreen {
   public readonly federation: FederationResource;
   public readonly responses: ResponsesResource;
   public readonly externalAgents: ExternalAgentsResource;
+  public readonly devices: DevicesResource;
 
   private readonly client: HttpClient;
 
@@ -103,6 +105,7 @@ export class Cadreen {
     this.federation = new FederationResource(this.client);
     this.responses = new ResponsesResource(this.client);
     this.externalAgents = new ExternalAgentsResource(this.client);
+    this.devices = new DevicesResource(this.client);
   }
 
   async invoke(request: IntentRequest): Promise<IntentResult> {
@@ -287,6 +290,7 @@ export type {
   CreateCredentialRequest,
   ResolveEscalationRequest,
   DiagnoseRequest,
+  DeviceDiagnoseRequest,
   TaskProposal,
   ProposalType,
   ProposalStatus,

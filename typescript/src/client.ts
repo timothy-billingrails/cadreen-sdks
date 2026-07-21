@@ -90,7 +90,7 @@ const DEFAULT_BASE_URL = "https://accomplishanything.today";
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_TIMEOUT = 30000;
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
-const IDEMPOTENT_METHODS = new Set<HttpMethod>(["GET", "PUT"]);
+const IDEMPOTENT_METHODS = new Set<HttpMethod>(["GET", "PUT", "PATCH"]);
 
 function generateIdempotencyKey(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -263,6 +263,9 @@ export class HttpClient {
   }
 
   async postStream(path: string, body?: unknown): Promise<Response> {
+    if (this.sandbox) {
+      throw new CadreenError(404, "not_found", "not_found", "Streaming is not available in sandbox mode.");
+    }
     const url = `${this.baseUrl}${path}`;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -336,6 +339,9 @@ export class HttpClient {
   }
 
   async *stream(path: string): AsyncGenerator<{ type: string; data: Record<string, unknown> }> {
+    if (this.sandbox) {
+      throw new CadreenError(404, "not_found", "not_found", "Streaming is not available in sandbox mode.");
+    }
     const url = `${this.baseUrl}${path}`;
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,

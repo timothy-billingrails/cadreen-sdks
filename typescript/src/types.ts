@@ -1112,17 +1112,17 @@ export interface AgentCapabilities {
 
 export interface AgentKnowledge {
   id: string;
-  agent_id: string;
-  fact_type: FactType;
+  agent_id?: string;
+  factType: FactType;
   subject: string;
-  predicate: string;
-  object: string;
+  predicate?: string;
+  object?: string;
   source?: string;
-  confidence: number;
+  confidence?: number;
   tags?: string[];
-  visibility: "private" | "workspace" | "federation";
+  visibility?: "private" | "workspace" | "federation";
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export interface AgentGovernancePolicy {
@@ -1249,18 +1249,20 @@ export interface UpdateAgentRequest {
 }
 
 export interface SendMessageRequest {
+  fromAgentId: string;
   content: string;
-  message_type?: AgentMessageType;
-  context?: Record<string, unknown>;
+  context?: string;
+  executionId?: string;
 }
 
 export interface CreateExecutionRequest {
-  input: Record<string, unknown>;
-  stream?: boolean;
+  intent: string;
+  context?: string;
+  maxBudgetUsd?: number;
 }
 
 export interface CreateKnowledgeRequest {
-  fact_type: FactType;
+  factType: FactType;
   subject: string;
   predicate: string;
   object: string;
@@ -1367,11 +1369,8 @@ export interface ListFederationAgentsResponse {
 }
 
 export interface CreateFederationRequest {
-  target_workspace_id: string;
-  name?: string;
-  description?: string;
+  targetWorkspaceId: string;
   permissions?: string[];
-  metadata?: Record<string, unknown>;
 }
 
 export interface SuspendFederationRequest {
@@ -1405,7 +1404,7 @@ export interface ResponseRequest {
   input: string | ResponseInputItem[];
   instructions?: string;
   tools?: ResponseTool[];
-  previous_response_id?: string;
+  previous_response_id?: string; // @deprecated — server accepts but ignores; no continuation logic yet
   store?: boolean;
   stream?: boolean;
   max_output_tokens?: number;
@@ -1444,7 +1443,7 @@ export interface ResponsesCompletion {
   output_text?: string;
   usage?: ResponseUsage;
   status: 'completed' | 'failed' | 'in_progress' | 'cancelled';
-  previous_response_id?: string;
+  previous_response_id?: string; // @deprecated — server does not persist responses; continuation not implemented
   metadata?: Record<string, unknown>;
 }
 
@@ -1561,4 +1560,176 @@ export interface ListExternalInteractionsResponse {
   total: number;
   limit: number;
   offset: number;
+}
+
+// Device types — hardware fleet management
+
+export interface Device {
+  id: string;
+  pose?: Pose;
+  twist?: Twist;
+  battery?: BatteryState;
+  last_update?: string;
+}
+
+export interface DeviceStatus {
+  id: string;
+  status: "working" | "needs_attention" | "offline";
+  pose?: Pose;
+  battery?: BatteryState;
+  last_update?: string;
+}
+
+export interface Pose {
+  position: Point3D;
+  orientation?: Quaternion;
+}
+
+export interface Point3D {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface Point2D {
+  x: number;
+  y: number;
+}
+
+export interface Quaternion {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+}
+
+export interface Twist {
+  linear: Point3D;
+  angular: Point3D;
+}
+
+export interface BatteryState {
+  percentage?: number;
+  voltage?: number;
+  current?: number;
+}
+
+export interface OccupancyGrid {
+  width: number;
+  height: number;
+  resolution: number;
+  cells?: number[];
+}
+
+export interface Task {
+  id: string;
+  type: string;
+  status: "pending" | "assigned" | "in_progress" | "completed" | "failed";
+  target?: Point2D;
+  assigned_to?: string;
+  created_at?: string;
+}
+
+export interface TaskStats {
+  total: number;
+  pending: number;
+  assigned: number;
+  in_progress: number;
+  completed: number;
+  failed: number;
+}
+
+export interface CollisionWarning {
+  agent1: string;
+  agent2: string;
+  distance: number;
+  severity: "warning" | "critical";
+  recommended_maneuver?: string;
+}
+
+export interface AvoidanceManeuver {
+  agent_id: string;
+  direction: Point3D;
+  speed: number;
+}
+
+export interface SensorReading {
+  name: string;
+  value: number;
+  unit?: string;
+  device_id?: string;
+  timestamp?: string;
+}
+
+export interface FaultDiagnosis {
+  fault_id: string;
+  fault_type: string;
+  severity: "info" | "warning" | "critical";
+  confidence: number;
+  description: string;
+  root_cause?: string;
+  remediation?: string;
+}
+
+export interface DiagnosisResponse {
+  diagnoses: FaultDiagnosis[];
+  total: number;
+}
+
+export interface AskResponse {
+  answer: string;
+  confidence: number;
+  model: string;
+  cost_cents: number;
+}
+
+export interface GridStats {
+  total_cells: number;
+  observed_cells: number;
+  free_cells: number;
+  occupied_cells: number;
+  total_sources: number;
+  avg_confidence: number;
+}
+
+export interface SyncStatus {
+  status: string;
+  message?: string;
+  connected?: boolean;
+  latency?: number;
+}
+
+export interface BlackboardEntry {
+  id: string;
+  category: string;
+  key: string;
+  value: string;
+  source: string;
+  confidence?: number;
+  timestamp: string;
+}
+
+export interface CreateDeviceRequest {
+  id?: string;
+  pose?: Pose;
+}
+
+export interface DeviceDiagnoseRequest {
+  readings: SensorReading[];
+}
+
+export interface CreateTaskRequest {
+  type: string;
+  target: Point2D;
+  priority?: number;
+}
+
+export interface ListDevicesResponse {
+  devices: Device[];
+  total: number;
+}
+
+export interface ListTasksResponse {
+  tasks: Task[];
+  total: number;
 }

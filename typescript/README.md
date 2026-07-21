@@ -2,6 +2,8 @@
 
 TypeScript SDK for [Cadreen](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
 
+> **⚠️ Compatibility Advisory:** Version 0.7.0 has known contract mismatches with the server. Version 0.7.0 is unsupported. **Upgrade to 0.7.2.** See [CHANGELOG](#v072) for details.
+
 Cadreen is a cognitive operating system. Send messages describing what you want done, and Cadreen reasons, connects tools, recalls knowledge, governs actions, and escalates to humans when needed. The SDK handles authentication, retries, idempotency, streaming, and error classification.
 
 ## Install
@@ -134,7 +136,7 @@ const response = await cadreen.chat.completions({
 const cadreen = new Cadreen({
   apiKey: "sk_cadreen_...",                       // required
   baseUrl: "https://accomplishanything.today",    // optional, default shown
-  maxRetries: 2,                                  // optional, default 2
+  maxRetries: 3,                                  // optional, default 3
   timeout: 30000,                                 // optional, default 30s
   profile: "lean",                                // optional: "lean" | "audit" | "full" (default "full")
 });
@@ -343,6 +345,7 @@ try {
 | `cadreen.externalAgents.interactions` | `list(aid, cid)` |
 | `cadreen.externalAgents.settings` | `get()`, `update(enabled)`, `listAll()` |
 | `cadreen.responses` | `create(req)`, `get(id)`, `stream(req)` |
+| `cadreen.devices` | `list()`, `create(req)`, `get(id)`, `delete(id)`, `getStatus(id)`, `updateState(id, req)`, `getMap()`, `getMapStats()`, `updateMap(req)`, `listTasks()`, `createTask(req)`, `completeTask(id)`, `assignTasks()`, `detectCollisions()`, `getAvoidance()`, `diagnose(req)`, `ask(q)`, `getModelStats()`, `getCapabilities()`, `getSyncStatus()`, `getSyncPending()`, `getSyncConflicts()`, `getBlackboard()` |
 | `cadreen.listCapabilities()` | List available capabilities |
 | `cadreen.assess(task, domain?)` | Assess task readiness |
 
@@ -351,6 +354,15 @@ try {
 `cadreen.invoke(request)` is an alias for `cadreen.intent.invoke(request)`.
 
 ## Changelog
+
+### v0.7.2
+- Added `DevicesResource` — full device lifecycle (list, create, get, delete, status, state, map, tasks, collisions, avoidance, diagnose, ask, sync, blackboard)
+- Fixed `DiagnoseRequest` type shadowing — renamed to `DeviceDiagnoseRequest` for device-specific diagnosis
+
+### v0.7.1
+- Fix: sandbox mode now throws `CadreenError(404)` for `postStream` and `stream` instead of making network requests
+- Fix: release workflow Homebrew formula update ordering
+- Documented new server-side execution events: `execution_steps_complete`, `mission_completed_with_gaps`
 
 ### v0.7.0
 - **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.

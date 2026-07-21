@@ -2,6 +2,8 @@
 
 Python SDK for [Cadreen](https://accomplishanything.today/infra/docs) — Intelligence as a Service.
 
+> **⚠️ Compatibility Advisory:** Version 0.7.0 has known contract mismatches with the server. Version 0.7.0 is unsupported. **Upgrade to 0.7.2.** See [CHANGELOG](#v072) for details.
+
 Cadreen is a cognitive operating system. Send messages describing what you want done, and Cadreen reasons, connects tools, recalls knowledge, governs actions, and escalates to humans when needed. The SDK handles authentication, retries, idempotency, streaming, and error classification.
 
 ## Install
@@ -428,6 +430,17 @@ async for event in cadreen.responses.stream(ResponseRequest(
 - httpx-sse >= 0.4
 
 ## Changelog
+
+### v0.7.2
+- Added `DevicesResource` — full device lifecycle (list, create, get, delete, status, state, map, tasks, collisions, avoidance, diagnose, ask, sync, blackboard)
+- Fixed `DiagnoseRequest` type shadowing — renamed to `DeviceDiagnoseRequest` for device-specific diagnosis
+- Fixed missing `AsyncIterator` import in `resources/intent.py`
+- Fixed connection pooling — `HttpClient` now reuses a persistent `httpx.AsyncClient`; added async context manager support
+
+### v0.7.1
+- Fix: sandbox mode now raises `CadreenError(404)` for `post_stream` and `stream` instead of making network requests
+- Fix: release workflow Homebrew formula update ordering
+- Documented new server-side execution events: `execution_steps_complete`, `mission_completed_with_gaps`
 
 ### v0.7.0
 - **BREAKING:** Removed `pathways` and `total_pathways` from connection responses. `ConnectionGroup` now returns only `capability` and `status`.

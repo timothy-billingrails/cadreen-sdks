@@ -63,7 +63,7 @@ jobs:
 
             **macOS/Linux (curl):**
             ```
-            curl -fsSL https://raw.githubusercontent.com/timothy-billingrails/cadreen-sdks/main/install.sh | sh
+            curl -fsSL https://raw.githubusercontent.com/timothy-billingrails/cadreen-sdks/master/install.sh | sh
             ```
 
             **Homebrew:**
@@ -92,19 +92,19 @@ jobs:
           AMD64_DARWIN=$(cat go/dist/cadreen_darwin_amd64.sha256 | awk '{print $1}')
           ARM64_LINUX=$(cat go/dist/cadreen_linux_arm64.sha256 | awk '{print $1}')
           AMD64_LINUX=$(cat go/dist/cadreen_linux_amd64.sha256 | awk '{print $1}')
-
-          sed -i "s/PLACEHOLDER_ARM64_DARWIN_SHA256/${ARM64_DARWIN}/" Formula/cadreen.rb
-          sed -i "s/PLACEHOLDER_AMD64_DARWIN_SHA256/${AMD64_DARWIN}/" Formula/cadreen.rb
-          sed -i "s/PLACEHOLDER_ARM64_LINUX_SHA256/${ARM64_LINUX}/" Formula/cadreen.rb
-          sed -i "s/PLACEHOLDER_AMD64_LINUX_SHA256/${AMD64_LINUX}/" Formula/cadreen.rb
-
-          sed -i "s/version \".*\"/version \"${{ steps.version.outputs.VERSION }}\"/" Formula/cadreen.rb
+          VERSION="${{ steps.version.outputs.VERSION }}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git stash
           git checkout master
-          git stash pop
+
+          sed -i "s/^  version .*/  version \"${VERSION}\"/" Formula/cadreen.rb
+          sed -i "/cadreen_darwin_arm64\"/{n;s/sha256 \"[0-9a-f]*\"/sha256 \"${ARM64_DARWIN}\"/}" Formula/cadreen.rb
+          sed -i "/cadreen_darwin_amd64\"/{n;s/sha256 \"[0-9a-f]*\"/sha256 \"${AMD64_DARWIN}\"/}" Formula/cadreen.rb
+          sed -i "/cadreen_linux_arm64\"/{n;s/sha256 \"[0-9a-f]*\"/sha256 \"${ARM64_LINUX}\"/}" Formula/cadreen.rb
+          sed -i "/cadreen_linux_amd64\"/{n;s/sha256 \"[0-9a-f]*\"/sha256 \"${AMD64_LINUX}\"/}" Formula/cadreen.rb
+
           git add Formula/cadreen.rb
-          git diff --cached --quiet || git commit -m "chore: update Homebrew formula SHA256 for v${{ steps.version.outputs.VERSION }}"
+          git diff --cached --quiet || git commit -m "chore: update Homebrew formula SHA256 for v${VERSION}"
           git push origin master
