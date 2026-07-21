@@ -90,7 +90,7 @@ const DEFAULT_BASE_URL = "https://accomplishanything.today";
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_TIMEOUT = 30000;
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
-const IDEMPOTENT_METHODS = new Set<HttpMethod>(["GET", "PUT"]);
+const IDEMPOTENT_METHODS = new Set<HttpMethod>(["GET", "PUT", "PATCH"]);
 
 function generateIdempotencyKey(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
