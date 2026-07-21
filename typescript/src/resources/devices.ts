@@ -5,7 +5,6 @@ import type {
   AskResponse,
   GridStats,
   Task,
-  TaskStats,
   CollisionWarning,
   AvoidanceManeuver,
   SyncStatus,
@@ -16,7 +15,6 @@ import type {
   ListDevicesResponse,
   ListTasksResponse,
   Pose,
-  SensorReading,
 } from "../types";
 import { HttpClient } from "../client";
 
