@@ -42,9 +42,7 @@ AGENT_FIXTURES = {
         "updated_at": "2026-07-09T00:00:00Z",
         "description": "Customer support agent",
         "model": "gpt-4o",
-        "domain": "support",
         "tags": ["support", "billing"],
-        "version": 1,
     },
     "GET /api/v1/cadreen/agents": {
         "agents": [
@@ -75,8 +73,6 @@ AGENT_FIXTURES = {
         "updated_at": "2026-07-09T00:00:00Z",
         "description": "Customer support agent",
         "model": "gpt-4o",
-        "domain": "support",
-        "version": 1,
     },
     "PATCH /api/v1/cadreen/agents/agt_abc": {
         "id": "agt_abc",
@@ -86,14 +82,12 @@ AGENT_FIXTURES = {
         "updated_at": "2026-07-09T01:00:00Z",
         "description": "Updated description",
         "model": "gpt-4o",
-        "version": 2,
     },
     "DELETE /api/v1/cadreen/agents/agt_abc": None,
     "GET /api/v1/cadreen/agents/agt_abc/config": {
+        "agent_id": "agt_abc",
         "model": "gpt-4o",
-        "domain": "support",
-        "config": {"temperature": 0.7},
-        "version": 1,
+        "system_prompt": "You are a support agent",
     },
     "POST /api/v1/cadreen/agents/agt_abc/deploy": {
         "id": "agt_abc",
@@ -101,32 +95,44 @@ AGENT_FIXTURES = {
         "status": "deployed",
         "created_at": "2026-07-09T00:00:00Z",
         "updated_at": "2026-07-09T02:00:00Z",
-        "version": 1,
     },
     "GET /api/v1/cadreen/agents/agt_abc/capabilities": {
+        "agent_id": "agt_abc",
         "tools": ["search_docs", "create_ticket"],
         "connections": ["zendesk", "slack"],
         "knowledge_count": 42,
         "governance_policies": 3,
+        "can_execute": True,
+        "can_federate": False,
+        "can_negotiate": True,
     },
     "POST /api/v1/cadreen/agents/agt_abc/send": {
         "id": "msg_001",
-        "message_type": "user",
+        "from_agent_id": "agt_abc",
+        "to_agent_id": "agt_target",
         "content": "Hello, agent!",
+        "status": "sent",
+        "message_type": "user",
         "created_at": "2026-07-09T03:00:00Z",
     },
     "GET /api/v1/cadreen/agents/agt_abc/messages": {
         "messages": [
             {
                 "id": "msg_001",
-                "message_type": "user",
+                "from_agent_id": "agt_abc",
+                "to_agent_id": "agt_target",
                 "content": "Hello",
+                "status": "sent",
+                "message_type": "user",
                 "created_at": "2026-07-09T03:00:00Z",
             },
             {
                 "id": "msg_002",
-                "message_type": "assistant",
+                "from_agent_id": "agt_target",
+                "to_agent_id": "agt_abc",
                 "content": "Hi! How can I help?",
+                "status": "sent",
+                "message_type": "assistant",
                 "created_at": "2026-07-09T03:00:01Z",
             },
         ],
@@ -136,32 +142,33 @@ AGENT_FIXTURES = {
         "executions": [
             {
                 "id": "exec_001",
+                "agent_id": "agt_abc",
                 "status": "completed",
-                "progress": 1.0,
-                "result": {"output": "done"},
+                "started_at": "2026-07-09T00:00:00Z",
             }
         ],
         "count": 1,
     },
     "POST /api/v1/cadreen/agents/agt_abc/executions": {
         "id": "exec_002",
+        "agent_id": "agt_abc",
         "status": "running",
+        "started_at": "2026-07-09T00:00:00Z",
     },
     "GET /api/v1/cadreen/agents/agt_abc/knowledge": {
         "knowledge": [
             {
                 "id": "know_001",
-                "fact_type": "reference",
+                "factType": "reference",
                 "subject": "Company policy is...",
                 "created_at": "2026-07-09T00:00:00Z",
-                "domain": "support",
             }
         ],
         "count": 1,
     },
     "POST /api/v1/cadreen/agents/agt_abc/knowledge": {
         "id": "know_002",
-        "fact_type": "reference",
+        "factType": "reference",
         "subject": "New knowledge",
         "created_at": "2026-07-09T04:00:00Z",
     },
@@ -169,7 +176,7 @@ AGENT_FIXTURES = {
         "results": [
             {
                 "id": "know_001",
-                "fact_type": "reference",
+                "factType": "reference",
                 "subject": "Matching result",
                 "created_at": "2026-07-09T00:00:00Z",
             }
@@ -182,10 +189,10 @@ AGENT_FIXTURES = {
             {
                 "id": "gov_001",
                 "name": "No PII Exposure",
+                "scope": "agent",
                 "rules": [{"action": "redact_pii", "severity": "high"}],
                 "created_at": "2026-07-09T00:00:00Z",
-                "domain": "support",
-                "priority": 1,
+                "updated_at": "2026-07-09T00:00:00Z",
             }
         ],
         "count": 1,
@@ -193,24 +200,27 @@ AGENT_FIXTURES = {
     "POST /api/v1/cadreen/agents/agt_abc/governance": {
         "id": "gov_002",
         "name": "Spending Limit",
+        "scope": "agent",
         "rules": [{"action": "limit_spend", "max": 1000}],
         "created_at": "2026-07-09T05:00:00Z",
+        "updated_at": "2026-07-09T05:00:00Z",
     },
     "PATCH /api/v1/cadreen/agents/agt_abc/governance/gov_001": {
         "id": "gov_001",
         "name": "Updated Policy",
+        "scope": "agent",
         "rules": [{"action": "redact_pii", "severity": "critical"}],
         "created_at": "2026-07-09T00:00:00Z",
-        "priority": 1,
+        "updated_at": "2026-07-09T00:00:00Z",
     },
     "DELETE /api/v1/cadreen/agents/agt_abc/governance/gov_001": None,
     "GET /api/v1/cadreen/agents/agt_abc/audit": {
         "entries": [
             {
                 "id": "aud_001",
+                "agent_id": "agt_abc",
                 "action": "agent.created",
                 "created_at": "2026-07-09T00:00:00Z",
-                "agent_id": "agt_abc",
                 "details": "Agent created via API",
             }
         ],
@@ -222,6 +232,8 @@ AGENT_FIXTURES = {
         "from_agent_id": "agt_abc",
         "to_agent_id": "agt_xyz",
         "proposal": {"task": "share_knowledge", "scope": "support"},
+        "current_round": 0,
+        "max_rounds": 3,
         "created_at": "2026-07-09T06:00:00Z",
         "updated_at": "2026-07-09T06:00:00Z",
     },
@@ -233,6 +245,8 @@ AGENT_FIXTURES = {
                 "from_agent_id": "agt_abc",
                 "to_agent_id": "agt_xyz",
                 "proposal": {"task": "share_knowledge"},
+                "current_round": 0,
+                "max_rounds": 3,
                 "created_at": "2026-07-09T06:00:00Z",
                 "updated_at": "2026-07-09T06:00:00Z",
             }
@@ -245,6 +259,8 @@ AGENT_FIXTURES = {
         "from_agent_id": "agt_abc",
         "to_agent_id": "agt_xyz",
         "proposal": {"task": "share_knowledge"},
+        "current_round": 1,
+        "max_rounds": 3,
         "created_at": "2026-07-09T06:00:00Z",
         "updated_at": "2026-07-09T07:00:00Z",
         "resolution": {"accepted": True},
@@ -255,6 +271,8 @@ AGENT_FIXTURES = {
         "from_agent_id": "agt_abc",
         "to_agent_id": "agt_xyz",
         "proposal": {"task": "share_knowledge"},
+        "current_round": 1,
+        "max_rounds": 3,
         "created_at": "2026-07-09T06:00:00Z",
         "updated_at": "2026-07-09T07:00:00Z",
         "resolution": {"accepted": True},
@@ -302,6 +320,7 @@ class TestAgentsResource:
         assert isinstance(result, Agent)
         assert result.id == "agt_abc"
         assert result.name == "Support Bot"
+        assert result.model == "gpt-4o"
 
     @pytest.mark.asyncio
     async def test_update(self, agents_client):
@@ -322,6 +341,7 @@ class TestAgentsResource:
         result = await resource.get_config("agt_abc")
         assert isinstance(result, AgentConfig)
         assert result.model == "gpt-4o"
+        assert result.agent_id == "agt_abc"
 
     @pytest.mark.asyncio
     async def test_deploy(self, agents_client):
@@ -339,6 +359,8 @@ class TestAgentsResource:
         assert result.connections == ["zendesk", "slack"]
         assert result.knowledge_count == 42
         assert result.governance_policies == 3
+        assert result.can_execute is True
+        assert result.can_negotiate is True
 
     @pytest.mark.asyncio
     async def test_send_message(self, agents_client):

@@ -84,31 +84,35 @@ FEDERATION_FIXTURES = {
         "updated_at": "2026-07-09T04:00:00Z",
     },
     "GET /api/v1/cadreen/federation/fed_abc/permissions": {
-        "federation_id": "fed_abc",
+        "federation_link_id": "fed_abc",
         "permissions": ["read:knowledge", "write:messages"],
         "updated_at": "2026-07-09T00:00:00Z",
     },
     "PUT /api/v1/cadreen/federation/fed_abc/permissions": {
-        "federation_id": "fed_abc",
+        "federation_link_id": "fed_abc",
         "permissions": ["read:knowledge", "write:messages", "execute:agents"],
         "updated_at": "2026-07-09T05:00:00Z",
     },
     "POST /api/v1/cadreen/federation/fed_abc/agents": {
         "id": "link_001",
-        "localAgentId": "agt_xyz",
-        "federationLinkId": "fed_abc",
+        "local_agent_id": "agt_xyz",
+        "remote_agent_id": "agt_remote",
+        "federation_link_id": "fed_abc",
         "status": "linked",
-        "createdAt": "2026-07-09T06:00:00Z",
+        "created_at": "2026-07-09T06:00:00Z",
+        "updated_at": "2026-07-09T06:00:00Z",
         "capabilities": ["negotiate", "share_knowledge"],
     },
     "GET /api/v1/cadreen/federation/fed_abc/agents": {
         "agents": [
             {
                 "id": "link_001",
-                "localAgentId": "agt_xyz",
-                "federationLinkId": "fed_abc",
+                "local_agent_id": "agt_xyz",
+                "remote_agent_id": "agt_remote",
+                "federation_link_id": "fed_abc",
                 "status": "linked",
-                "createdAt": "2026-07-09T06:00:00Z",
+                "created_at": "2026-07-09T06:00:00Z",
+                "updated_at": "2026-07-09T06:00:00Z",
                 "capabilities": ["negotiate"],
             }
         ],
