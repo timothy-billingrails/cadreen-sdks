@@ -29,7 +29,7 @@ from cadreen.types import (
     ListAgentAuditResponse,
     ListAgentNegotiationsResponse,
     SearchAgentKnowledgeResponse,
-    ExecutionStatus,
+    AgentExecution,
 )
 
 
@@ -105,13 +105,13 @@ AGENT_FIXTURES = {
     },
     "GET /api/v1/cadreen/agents/agt_abc/capabilities": {
         "tools": ["search_docs", "create_ticket"],
-        "integrations": ["zendesk", "slack"],
+        "connections": ["zendesk", "slack"],
         "knowledge_count": 42,
-        "governance_count": 3,
+        "governance_policies": 3,
     },
     "POST /api/v1/cadreen/agents/agt_abc/send": {
         "id": "msg_001",
-        "role": "user",
+        "message_type": "user",
         "content": "Hello, agent!",
         "created_at": "2026-07-09T03:00:00Z",
     },
@@ -119,13 +119,13 @@ AGENT_FIXTURES = {
         "messages": [
             {
                 "id": "msg_001",
-                "role": "user",
+                "message_type": "user",
                 "content": "Hello",
                 "created_at": "2026-07-09T03:00:00Z",
             },
             {
                 "id": "msg_002",
-                "role": "assistant",
+                "message_type": "assistant",
                 "content": "Hi! How can I help?",
                 "created_at": "2026-07-09T03:00:01Z",
             },
@@ -151,8 +151,8 @@ AGENT_FIXTURES = {
         "knowledge": [
             {
                 "id": "know_001",
-                "type": "reference",
-                "content": {"text": "Company policy is..."},
+                "fact_type": "reference",
+                "subject": "Company policy is...",
                 "created_at": "2026-07-09T00:00:00Z",
                 "domain": "support",
             }
@@ -161,16 +161,16 @@ AGENT_FIXTURES = {
     },
     "POST /api/v1/cadreen/agents/agt_abc/knowledge": {
         "id": "know_002",
-        "type": "reference",
-        "content": {"text": "New knowledge"},
+        "fact_type": "reference",
+        "subject": "New knowledge",
         "created_at": "2026-07-09T04:00:00Z",
     },
     "POST /api/v1/cadreen/agents/agt_abc/knowledge/search": {
         "results": [
             {
                 "id": "know_001",
-                "type": "reference",
-                "content": {"text": "Matching result"},
+                "fact_type": "reference",
+                "subject": "Matching result",
                 "created_at": "2026-07-09T00:00:00Z",
             }
         ],
@@ -209,9 +209,9 @@ AGENT_FIXTURES = {
             {
                 "id": "aud_001",
                 "action": "agent.created",
-                "timestamp": "2026-07-09T00:00:00Z",
-                "actor": "user_123",
-                "detail": "Agent created via API",
+                "created_at": "2026-07-09T00:00:00Z",
+                "agent_id": "agt_abc",
+                "details": "Agent created via API",
             }
         ],
         "count": 1,
@@ -219,8 +219,8 @@ AGENT_FIXTURES = {
     "POST /api/v1/cadreen/agents/agt_abc/negotiate": {
         "id": "neg_001",
         "status": "pending",
-        "initiator_agent_id": "agt_abc",
-        "target_agent_id": "agt_xyz",
+        "from_agent_id": "agt_abc",
+        "to_agent_id": "agt_xyz",
         "proposal": {"task": "share_knowledge", "scope": "support"},
         "created_at": "2026-07-09T06:00:00Z",
         "updated_at": "2026-07-09T06:00:00Z",
@@ -230,8 +230,8 @@ AGENT_FIXTURES = {
             {
                 "id": "neg_001",
                 "status": "pending",
-                "initiator_agent_id": "agt_abc",
-                "target_agent_id": "agt_xyz",
+                "from_agent_id": "agt_abc",
+                "to_agent_id": "agt_xyz",
                 "proposal": {"task": "share_knowledge"},
                 "created_at": "2026-07-09T06:00:00Z",
                 "updated_at": "2026-07-09T06:00:00Z",
@@ -242,22 +242,22 @@ AGENT_FIXTURES = {
     "GET /api/v1/cadreen/agents/agt_abc/negotiations/neg_001": {
         "id": "neg_001",
         "status": "accepted",
-        "initiator_agent_id": "agt_abc",
-        "target_agent_id": "agt_xyz",
+        "from_agent_id": "agt_abc",
+        "to_agent_id": "agt_xyz",
         "proposal": {"task": "share_knowledge"},
         "created_at": "2026-07-09T06:00:00Z",
         "updated_at": "2026-07-09T07:00:00Z",
-        "response": {"accepted": True},
+        "resolution": {"accepted": True},
     },
     "POST /api/v1/cadreen/agents/agt_abc/negotiations/neg_001/respond": {
         "id": "neg_001",
         "status": "accepted",
-        "initiator_agent_id": "agt_abc",
-        "target_agent_id": "agt_xyz",
+        "from_agent_id": "agt_abc",
+        "to_agent_id": "agt_xyz",
         "proposal": {"task": "share_knowledge"},
         "created_at": "2026-07-09T06:00:00Z",
         "updated_at": "2026-07-09T07:00:00Z",
-        "response": {"accepted": True},
+        "resolution": {"accepted": True},
     },
 }
 
@@ -276,7 +276,6 @@ class TestAgentsResource:
             name="Support Bot",
             description="Customer support agent",
             model="gpt-4o",
-            domain="support",
             tags=["support", "billing"],
         ))
         assert isinstance(result, Agent)
@@ -284,7 +283,6 @@ class TestAgentsResource:
         assert result.name == "Support Bot"
         assert result.status == "active"
         assert result.model == "gpt-4o"
-        assert result.domain == "support"
         assert result.tags == ["support", "billing"]
 
     @pytest.mark.asyncio
@@ -304,7 +302,6 @@ class TestAgentsResource:
         assert isinstance(result, Agent)
         assert result.id == "agt_abc"
         assert result.name == "Support Bot"
-        assert result.version == 1
 
     @pytest.mark.asyncio
     async def test_update(self, agents_client):
@@ -312,7 +309,6 @@ class TestAgentsResource:
         result = await resource.update("agt_abc", UpdateAgentRequest(name="Updated Bot", description="Updated description"))
         assert isinstance(result, Agent)
         assert result.name == "Updated Bot"
-        assert result.version == 2
 
     @pytest.mark.asyncio
     async def test_delete(self, agents_client):
@@ -326,14 +322,11 @@ class TestAgentsResource:
         result = await resource.get_config("agt_abc")
         assert isinstance(result, AgentConfig)
         assert result.model == "gpt-4o"
-        assert result.domain == "support"
-        assert result.config == {"temperature": 0.7}
-        assert result.version == 1
 
     @pytest.mark.asyncio
     async def test_deploy(self, agents_client):
         resource = AgentsResource(agents_client)
-        result = await resource.deploy("agt_abc")
+        result = await resource.deploy("agt_abc", {"model": "gpt-4o"})
         assert isinstance(result, Agent)
         assert result.status == "deployed"
 
@@ -343,18 +336,18 @@ class TestAgentsResource:
         result = await resource.get_capabilities("agt_abc")
         assert isinstance(result, AgentCapabilities)
         assert result.tools == ["search_docs", "create_ticket"]
-        assert result.integrations == ["zendesk", "slack"]
+        assert result.connections == ["zendesk", "slack"]
         assert result.knowledge_count == 42
-        assert result.governance_count == 3
+        assert result.governance_policies == 3
 
     @pytest.mark.asyncio
     async def test_send_message(self, agents_client):
         resource = AgentsResource(agents_client)
-        result = await resource.send_message("agt_abc", SendMessageRequest(content="Hello, agent!"))
+        result = await resource.send_message("agt_abc", SendMessageRequest(from_agent_id="agt_abc", content="Hello, agent!"))
         assert isinstance(result, AgentMessage)
         assert result.id == "msg_001"
         assert result.content == "Hello, agent!"
-        assert result.role == "user"
+        assert result.message_type == "user"
 
     @pytest.mark.asyncio
     async def test_list_messages(self, agents_client):
@@ -362,8 +355,8 @@ class TestAgentsResource:
         result = await resource.list_messages("agt_abc")
         assert isinstance(result, ListAgentMessagesResponse)
         assert result.count == 2
-        assert result.messages[0].role == "user"
-        assert result.messages[1].role == "assistant"
+        assert result.messages[0].message_type == "user"
+        assert result.messages[1].message_type == "assistant"
 
     @pytest.mark.asyncio
     async def test_list_executions(self, agents_client):
@@ -377,8 +370,8 @@ class TestAgentsResource:
     @pytest.mark.asyncio
     async def test_create_execution(self, agents_client):
         resource = AgentsResource(agents_client)
-        result = await resource.create_execution("agt_abc", CreateExecutionRequest(task="Summarize tickets"))
-        assert isinstance(result, ExecutionStatus)
+        result = await resource.create_execution("agt_abc", CreateExecutionRequest(intent="Summarize tickets"))
+        assert isinstance(result, AgentExecution)
         assert result.id == "exec_002"
         assert result.status == "running"
 
@@ -388,13 +381,13 @@ class TestAgentsResource:
         result = await resource.list_knowledge("agt_abc")
         assert isinstance(result, ListAgentKnowledgeResponse)
         assert result.count == 1
-        assert result.knowledge[0].type == "reference"
+        assert result.knowledge[0].fact_type == "reference"
 
     @pytest.mark.asyncio
     async def test_create_knowledge(self, agents_client):
         resource = AgentsResource(agents_client)
         result = await resource.create_knowledge("agt_abc", CreateAgentKnowledgeRequest(
-            type="reference", content={"text": "New knowledge"},
+            fact_type="reference", subject="New knowledge",
         ))
         assert isinstance(result, AgentKnowledge)
         assert result.id == "know_002"
@@ -425,7 +418,7 @@ class TestAgentsResource:
     async def test_create_governance(self, agents_client):
         resource = AgentsResource(agents_client)
         result = await resource.create_governance("agt_abc", CreateAgentGovernanceRequest(
-            name="Spending Limit", rules=[{"action": "limit_spend", "max": 1000}],
+            name="Spending Limit", scope="agent", rules=[{"action": "limit_spend", "max": 1000}],
         ))
         assert isinstance(result, AgentGovernancePolicy)
         assert result.id == "gov_002"
@@ -452,18 +445,18 @@ class TestAgentsResource:
         assert isinstance(result, ListAgentAuditResponse)
         assert result.count == 1
         assert result.entries[0].action == "agent.created"
-        assert result.entries[0].actor == "user_123"
+        assert result.entries[0].agent_id == "agt_abc"
 
     @pytest.mark.asyncio
     async def test_start_negotiation(self, agents_client):
         resource = AgentsResource(agents_client)
         result = await resource.start_negotiation("agt_abc", StartNegotiationRequest(
-            target_agent_id="agt_xyz", proposal={"task": "share_knowledge", "scope": "support"},
+            to_agent_id="agt_xyz", proposal={"task": "share_knowledge", "scope": "support"},
         ))
         assert isinstance(result, AgentNegotiation)
         assert result.id == "neg_001"
         assert result.status == "pending"
-        assert result.target_agent_id == "agt_xyz"
+        assert result.to_agent_id == "agt_xyz"
 
     @pytest.mark.asyncio
     async def test_list_negotiations(self, agents_client):
@@ -479,13 +472,13 @@ class TestAgentsResource:
         result = await resource.get_negotiation("agt_abc", "neg_001")
         assert isinstance(result, AgentNegotiation)
         assert result.status == "accepted"
-        assert result.response == {"accepted": True}
+        assert result.resolution == {"accepted": True}
 
     @pytest.mark.asyncio
     async def test_respond_to_negotiation(self, agents_client):
         resource = AgentsResource(agents_client)
         result = await resource.respond_to_negotiation("agt_abc", "neg_001", RespondNegotiationRequest(
-            response="accepted",
+            action="accepted",
         ))
         assert isinstance(result, AgentNegotiation)
         assert result.status == "accepted"

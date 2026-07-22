@@ -96,8 +96,6 @@ class AgentsResource:
             body["config"] = request.config
         if request.metadata is not None:
             body["metadata"] = request.metadata
-        if request.status is not None:
-            body["status"] = request.status
         raw = await self._client.patch(f"/api/v1/cadreen/agents/{agent_id}", body)
         return _parse_agent(raw)
 

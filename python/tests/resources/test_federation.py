@@ -195,7 +195,7 @@ class TestFederationResource:
         resource = FederationResource(federation_client)
         result = await resource.get_permissions("fed_abc")
         assert isinstance(result, FederationPermissions)
-        assert result.federation_id == "fed_abc"
+        assert result.federation_link_id == "fed_abc"
         assert result.permissions == ["read:knowledge", "write:messages"]
 
     @pytest.mark.asyncio
@@ -225,7 +225,7 @@ class TestFederationResource:
         result = await resource.list_agents("fed_abc")
         assert isinstance(result, ListFederationAgentsResponse)
         assert result.count == 1
-        assert result.agents[0].agent_id == "agt_xyz"
+        assert result.agents[0].local_agent_id == "agt_xyz"
 
     @pytest.mark.asyncio
     async def test_unlink_agent(self, federation_client):
