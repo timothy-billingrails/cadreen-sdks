@@ -3,6 +3,7 @@ package cadreen
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 // ListWorkspaceUsers returns all users in the current workspace.
@@ -26,7 +27,7 @@ func (c *Client) InviteUser(ctx context.Context, req InviteUserRequest, opts ...
 // UpdateUserRole updates a workspace user's role.
 func (c *Client) UpdateUserRole(ctx context.Context, id string, req UpdateRoleRequest, opts ...RequestOption) (*WorkspaceUser, error) {
 	var result WorkspaceUser
-	if err := c.do(ctx, "PATCH", "/api/v1/cadreen/workspace/users/"+id, req, &result, opts...); err != nil {
+	if err := c.do(ctx, "PATCH", "/api/v1/cadreen/workspace/users/"+url.PathEscape(id), req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("update user role: %w", err)
 	}
 	return &result, nil
@@ -34,7 +35,7 @@ func (c *Client) UpdateUserRole(ctx context.Context, id string, req UpdateRoleRe
 
 // RemoveUser removes a user from the workspace.
 func (c *Client) RemoveUser(ctx context.Context, id string, opts ...RequestOption) error {
-	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/workspace/users/"+id, nil, nil, opts...); err != nil {
+	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/workspace/users/"+url.PathEscape(id), nil, nil, opts...); err != nil {
 		return fmt.Errorf("remove user: %w", err)
 	}
 	return nil

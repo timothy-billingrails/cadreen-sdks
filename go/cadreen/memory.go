@@ -60,7 +60,7 @@ func (c *Client) Search(ctx context.Context, query string, options *SearchMemory
 
 func (c *Client) GetAtom(ctx context.Context, id string, opts ...RequestOption) (*Atom, error) {
 	var result Atom
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/"+id, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/"+url.PathEscape(id), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get atom: %w", err)
 	}
 	return &result, nil
@@ -68,7 +68,7 @@ func (c *Client) GetAtom(ctx context.Context, id string, opts ...RequestOption) 
 
 func (c *Client) Profile(ctx context.Context, userID string, opts ...RequestOption) (*MemoryProfileResponse, error) {
 	var result MemoryProfileResponse
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/profile/"+userID, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/memory/profile/"+url.PathEscape(userID), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("profile: %w", err)
 	}
 	return &result, nil

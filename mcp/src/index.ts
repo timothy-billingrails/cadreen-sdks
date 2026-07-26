@@ -471,7 +471,7 @@ server.resource(
   "agent-card:///{agent_id}",
   async (uri) => {
     const agentId = uri.pathname.split("/").pop();
-    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${agentId}`);
+    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${encodeURIComponent(agentId)}`);
     return {
       contents: [{
         uri: uri.href,

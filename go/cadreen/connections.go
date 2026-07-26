@@ -3,6 +3,7 @@ package cadreen
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 func (c *Client) RegisterOpenAPI(ctx context.Context, req RegisterOpenAPIRequest, opts ...RequestOption) (*RegisterOpenAPIResponse, error) {
@@ -60,7 +61,7 @@ func (c *Client) RegisterMCP(ctx context.Context, req RegisterMCPRequest, opts .
 
 // DeleteConnection removes a connection by ID.
 func (c *Client) DeleteConnection(ctx context.Context, id string, opts ...RequestOption) error {
-	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/connections/"+id, nil, nil, opts...); err != nil {
+	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/connections/"+url.PathEscape(id), nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete connection: %w", err)
 	}
 	return nil

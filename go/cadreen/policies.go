@@ -3,6 +3,7 @@ package cadreen
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 type CreatePolicyRequest struct {
@@ -65,7 +66,7 @@ func (c *Client) ListPolicies(ctx context.Context, opts ...RequestOption) (*List
 
 func (c *Client) GetPolicy(ctx context.Context, id string, opts ...RequestOption) (*PolicyBundle, error) {
 	var result PolicyBundle
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/policies/"+id, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/policies/"+url.PathEscape(id), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get policy: %w", err)
 	}
 	return &result, nil

@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"net/url"
 )
 
 type CreateWebhookRequest struct {
@@ -31,7 +32,7 @@ func (c *Client) ListWebhooks(ctx context.Context, opts ...RequestOption) (*List
 }
 
 func (c *Client) DeleteWebhook(ctx context.Context, id string, opts ...RequestOption) error {
-	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/webhooks/"+id, nil, nil, opts...); err != nil {
+	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/webhooks/"+url.PathEscape(id), nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete webhook: %w", err)
 	}
 	return nil

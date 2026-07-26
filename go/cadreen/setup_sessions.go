@@ -3,6 +3,7 @@ package cadreen
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 type SetupSessionCreateRequest struct {
@@ -69,7 +70,7 @@ func (c *Client) ListSetupSessions(ctx context.Context, opts ...RequestOption) (
 
 func (c *Client) GetSetupSession(ctx context.Context, id string, opts ...RequestOption) (*SetupSession, error) {
 	var result SetupSession
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/setup/sessions/"+id, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/setup/sessions/"+url.PathEscape(id), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get setup session: %w", err)
 	}
 	return &result, nil
@@ -77,7 +78,7 @@ func (c *Client) GetSetupSession(ctx context.Context, id string, opts ...Request
 
 func (c *Client) AddToSetupSession(ctx context.Context, id string, req SetupSessionAddRequest, opts ...RequestOption) (*SetupSession, error) {
 	var result SetupSession
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/setup/sessions/"+id, req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/setup/sessions/"+url.PathEscape(id), req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("add to setup session: %w", err)
 	}
 	return &result, nil
@@ -85,7 +86,7 @@ func (c *Client) AddToSetupSession(ctx context.Context, id string, req SetupSess
 
 func (c *Client) ApplySetupSession(ctx context.Context, id string, req SetupSessionApplyRequest, opts ...RequestOption) (*SetupSessionApplyResult, error) {
 	var result SetupSessionApplyResult
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/setup/sessions/"+id+"/apply", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/setup/sessions/"+url.PathEscape(id)+"/apply", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("apply setup session: %w", err)
 	}
 	return &result, nil
