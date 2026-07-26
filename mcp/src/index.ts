@@ -109,7 +109,7 @@ server.tool(
     agent_id: z.string().describe("Agent ID"),
   },
   async ({ agent_id }) => {
-    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${agent_id}`);
+    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}`);
     return {
       content: [{
         type: "text",
@@ -129,7 +129,7 @@ server.tool(
     query: z.string().describe("What to search for"),
   },
   async ({ agent_id, query }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/knowledge/search`, {
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/knowledge/search`, {
       query,
       limit: 10,
     });
@@ -152,7 +152,7 @@ server.tool(
     type: z.enum(["reference", "procedure", "preference"]).optional().describe("Knowledge type"),
   },
   async ({ agent_id, subject, content, type }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/knowledge`, {
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/knowledge`, {
       subject,
       content,
       type: type || "reference",
@@ -175,7 +175,7 @@ server.tool(
     agent_id: z.string().describe("Agent ID"),
   },
   async ({ agent_id }) => {
-    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${agent_id}/governance`);
+    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/governance`);
     return {
       content: [{
         type: "text",
@@ -195,7 +195,7 @@ server.tool(
     rules: z.array(z.record(z.unknown())).optional().describe("Policy rules"),
   },
   async ({ agent_id, name, description, rules }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/governance`, {
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/governance`, {
       name,
       description,
       rules,
@@ -279,7 +279,7 @@ server.tool(
     agent_id: z.string().describe("Agent ID"),
   },
   async ({ agent_id }) => {
-    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${agent_id}/external`);
+    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external`);
     return {
       content: [{
         type: "text",
@@ -297,7 +297,7 @@ server.tool(
     agent_card_url: z.string().describe("URL to the agent's Agent Card (/.well-known/agent.json)"),
   },
   async ({ agent_id, agent_card_url }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/external`, {
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external`, {
       agentCardUrl: agent_card_url,
     });
     return {
@@ -317,7 +317,7 @@ server.tool(
     connection_id: z.string().describe("Connection ID"),
   },
   async ({ agent_id, connection_id }) => {
-    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${agent_id}/external/${connection_id}`);
+    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external/${encodeURIComponent(connection_id)}`);
     return {
       content: [{
         type: "text",
@@ -335,7 +335,7 @@ server.tool(
     connection_id: z.string().describe("Connection ID"),
   },
   async ({ agent_id, connection_id }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/external/${connection_id}/approve`);
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external/${encodeURIComponent(connection_id)}/approve`);
     return {
       content: [{
         type: "text",
@@ -353,7 +353,7 @@ server.tool(
     connection_id: z.string().describe("Connection ID"),
   },
   async ({ agent_id, connection_id }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/external/${connection_id}/suspend`);
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external/${encodeURIComponent(connection_id)}/suspend`);
     return {
       content: [{
         type: "text",
@@ -371,7 +371,7 @@ server.tool(
     connection_id: z.string().describe("Connection ID"),
   },
   async ({ agent_id, connection_id }) => {
-    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${agent_id}/external/${connection_id}/revoke`);
+    const result = await cadreenRequest("POST", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external/${encodeURIComponent(connection_id)}/revoke`);
     return {
       content: [{
         type: "text",
@@ -389,7 +389,7 @@ server.tool(
     connection_id: z.string().describe("Connection ID"),
   },
   async ({ agent_id, connection_id }) => {
-    await cadreenRequest("DELETE", `/api/v1/cadreen/agents/${agent_id}/external/${connection_id}`);
+    await cadreenRequest("DELETE", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external/${encodeURIComponent(connection_id)}`);
     return {
       content: [{
         type: "text",
@@ -407,7 +407,7 @@ server.tool(
     connection_id: z.string().describe("Connection ID"),
   },
   async ({ agent_id, connection_id }) => {
-    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${agent_id}/external/${connection_id}/interactions`);
+    const result = await cadreenRequest("GET", `/api/v1/cadreen/agents/${encodeURIComponent(agent_id)}/external/${encodeURIComponent(connection_id)}/interactions`);
     return {
       content: [{
         type: "text",

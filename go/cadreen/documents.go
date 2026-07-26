@@ -8,6 +8,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 )
@@ -22,7 +23,7 @@ func (c *Client) ListDocuments(ctx context.Context, opts ...RequestOption) (*Lis
 
 func (c *Client) GetDocument(ctx context.Context, id string, opts ...RequestOption) (*Document, error) {
 	var result Document
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/documents/"+id, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/documents/"+url.PathEscape(id), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get document: %w", err)
 	}
 	return &result, nil

@@ -64,7 +64,7 @@ func (c *Client) ListProposals(ctx context.Context, opts ListProposalsOptions, r
 
 func (c *Client) GetProposal(ctx context.Context, id string, opts ...RequestOption) (*TaskProposal, error) {
 	var result TaskProposal
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/proposals/"+id, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/proposals/"+url.PathEscape(id), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get proposal: %w", err)
 	}
 	return &result, nil
@@ -72,7 +72,7 @@ func (c *Client) GetProposal(ctx context.Context, id string, opts ...RequestOpti
 
 func (c *Client) AcceptProposal(ctx context.Context, id string, opts ...RequestOption) (*AcceptProposalResponse, error) {
 	var result AcceptProposalResponse
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/proposals/"+id+"/accept", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/proposals/"+url.PathEscape(id)+"/accept", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("accept proposal: %w", err)
 	}
 	return &result, nil
@@ -80,7 +80,7 @@ func (c *Client) AcceptProposal(ctx context.Context, id string, opts ...RequestO
 
 func (c *Client) DismissProposal(ctx context.Context, id string, req DismissProposalRequest, opts ...RequestOption) (*DismissProposalResponse, error) {
 	var result DismissProposalResponse
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/proposals/"+id+"/dismiss", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/proposals/"+url.PathEscape(id)+"/dismiss", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("dismiss proposal: %w", err)
 	}
 	return &result, nil

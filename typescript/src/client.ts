@@ -379,29 +379,34 @@ export class HttpClient {
     let buffer = "";
     let currentEvent = "message";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
-      for (const line of lines) {
-        const parsed = parseSSELine(line);
-        if (parsed.event) {
-          currentEvent = parsed.event;
-        }
-        if (parsed.data) {
-          try {
-            const data = JSON.parse(parsed.data) as Record<string, unknown>;
-            yield { type: currentEvent, data };
-          } catch {
-            yield { type: currentEvent, data: { raw: parsed.data } };
+        for (const line of lines) {
+          const parsed = parseSSELine(line);
+          if (parsed.event) {
+            currentEvent = parsed.event;
           }
-          currentEvent = "message";
+          if (parsed.data) {
+            try {
+              const data = JSON.parse(parsed.data) as Record<string, unknown>;
+              yield { type: currentEvent, data };
+            } catch {
+              yield { type: currentEvent, data: { raw: parsed.data } };
+            }
+            currentEvent = "message";
+          }
         }
       }
+    } finally {
+      reader.cancel().catch(() => {});
+      reader.releaseLock();
     }
   }
 }

@@ -147,7 +147,7 @@ func (c *Client) ListAgents(ctx context.Context, params ListAgentsParams, opts .
 
 func (c *Client) GetAgent(ctx context.Context, agentID string, opts ...RequestOption) (*Agent, error) {
 	var result Agent
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+agentID, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+url.PathEscape(agentID), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get agent: %w", err)
 	}
 	return &result, nil
@@ -155,14 +155,14 @@ func (c *Client) GetAgent(ctx context.Context, agentID string, opts ...RequestOp
 
 func (c *Client) UpdateAgent(ctx context.Context, agentID string, req UpdateAgentRequest, opts ...RequestOption) (*Agent, error) {
 	var result Agent
-	if err := c.do(ctx, "PATCH", "/api/v1/cadreen/agents/"+agentID, req, &result, opts...); err != nil {
+	if err := c.do(ctx, "PATCH", "/api/v1/cadreen/agents/"+url.PathEscape(agentID), req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("update agent: %w", err)
 	}
 	return &result, nil
 }
 
 func (c *Client) DeleteAgent(ctx context.Context, agentID string, opts ...RequestOption) error {
-	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/agents/"+agentID, nil, nil, opts...); err != nil {
+	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/agents/"+url.PathEscape(agentID), nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete agent: %w", err)
 	}
 	return nil
@@ -170,7 +170,7 @@ func (c *Client) DeleteAgent(ctx context.Context, agentID string, opts ...Reques
 
 func (c *Client) GetAgentConfig(ctx context.Context, agentID string, opts ...RequestOption) (*AgentConfig, error) {
 	var result AgentConfig
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+agentID+"/config", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/config", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get agent config: %w", err)
 	}
 	return &result, nil
@@ -183,7 +183,7 @@ type DeployAgentRequest struct {
 
 func (c *Client) DeployAgent(ctx context.Context, agentID string, req DeployAgentRequest, opts ...RequestOption) (*Agent, error) {
 	var result Agent
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/deploy", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/deploy", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("deploy agent: %w", err)
 	}
 	return &result, nil
@@ -191,7 +191,7 @@ func (c *Client) DeployAgent(ctx context.Context, agentID string, req DeployAgen
 
 func (c *Client) GetAgentCapabilities(ctx context.Context, agentID string, opts ...RequestOption) (*AgentCapabilitiesResponse, error) {
 	var result AgentCapabilitiesResponse
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+agentID+"/capabilities", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/capabilities", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get agent capabilities: %w", err)
 	}
 	return &result, nil
@@ -199,14 +199,14 @@ func (c *Client) GetAgentCapabilities(ctx context.Context, agentID string, opts 
 
 func (c *Client) SendAgentMessage(ctx context.Context, agentID string, req SendAgentMessageRequest, opts ...RequestOption) (*AgentMessage, error) {
 	var result AgentMessage
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/send", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/send", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("send agent message: %w", err)
 	}
 	return &result, nil
 }
 
 func (c *Client) ListAgentMessages(ctx context.Context, agentID string, params ListAgentMessagesParams, opts ...RequestOption) (*ListAgentMessagesResponse, error) {
-	path := "/api/v1/cadreen/agents/" + agentID + "/messages"
+	path := "/api/v1/cadreen/agents/" + url.PathEscape(agentID) + "/messages"
 	q := url.Values{}
 	if params.Limit > 0 {
 		q.Set("limit", strconv.Itoa(params.Limit))
@@ -225,7 +225,7 @@ func (c *Client) ListAgentMessages(ctx context.Context, agentID string, params L
 }
 
 func (c *Client) ListAgentExecutions(ctx context.Context, agentID string, params ListAgentExecutionsParams, opts ...RequestOption) (*ListAgentExecutionsResponse, error) {
-	path := "/api/v1/cadreen/agents/" + agentID + "/executions"
+	path := "/api/v1/cadreen/agents/" + url.PathEscape(agentID) + "/executions"
 	q := url.Values{}
 	if params.Limit > 0 {
 		q.Set("limit", strconv.Itoa(params.Limit))
@@ -248,14 +248,14 @@ func (c *Client) ListAgentExecutions(ctx context.Context, agentID string, params
 
 func (c *Client) CreateAgentExecution(ctx context.Context, agentID string, req CreateAgentExecutionRequest, opts ...RequestOption) (*AgentExecution, error) {
 	var result AgentExecution
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/executions", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/executions", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("create agent execution: %w", err)
 	}
 	return &result, nil
 }
 
 func (c *Client) ListAgentKnowledge(ctx context.Context, agentID string, params ListAgentKnowledgeParams, opts ...RequestOption) (*ListAgentKnowledgeResponse, error) {
-	path := "/api/v1/cadreen/agents/" + agentID + "/knowledge"
+	path := "/api/v1/cadreen/agents/" + url.PathEscape(agentID) + "/knowledge"
 	q := url.Values{}
 	if params.Limit > 0 {
 		q.Set("limit", strconv.Itoa(params.Limit))
@@ -278,7 +278,7 @@ func (c *Client) ListAgentKnowledge(ctx context.Context, agentID string, params 
 
 func (c *Client) CreateAgentKnowledge(ctx context.Context, agentID string, req CreateAgentKnowledgeRequest, opts ...RequestOption) (*AgentKnowledge, error) {
 	var result AgentKnowledge
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/knowledge", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/knowledge", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("create agent knowledge: %w", err)
 	}
 	return &result, nil
@@ -286,14 +286,14 @@ func (c *Client) CreateAgentKnowledge(ctx context.Context, agentID string, req C
 
 func (c *Client) SearchAgentKnowledge(ctx context.Context, agentID string, req SearchAgentKnowledgeRequest, opts ...RequestOption) (*SearchAgentKnowledgeResponse, error) {
 	var result SearchAgentKnowledgeResponse
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/knowledge/search", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/knowledge/search", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("search agent knowledge: %w", err)
 	}
 	return &result, nil
 }
 
 func (c *Client) DeleteAgentKnowledge(ctx context.Context, agentID, knowledgeID string, opts ...RequestOption) error {
-	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/knowledge/%s", agentID, knowledgeID)
+	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/knowledge/%s", url.PathEscape(agentID), url.PathEscape(knowledgeID))
 	if err := c.do(ctx, "DELETE", path, nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete agent knowledge: %w", err)
 	}
@@ -302,7 +302,7 @@ func (c *Client) DeleteAgentKnowledge(ctx context.Context, agentID, knowledgeID 
 
 func (c *Client) ListAgentGovernance(ctx context.Context, agentID string, opts ...RequestOption) (*ListAgentGovernanceResponse, error) {
 	var result ListAgentGovernanceResponse
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+agentID+"/governance", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/governance", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("list agent governance: %w", err)
 	}
 	return &result, nil
@@ -310,7 +310,7 @@ func (c *Client) ListAgentGovernance(ctx context.Context, agentID string, opts .
 
 func (c *Client) CreateAgentGovernance(ctx context.Context, agentID string, req CreateAgentGovernanceRequest, opts ...RequestOption) (*AgentGovernancePolicy, error) {
 	var result AgentGovernancePolicy
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/governance", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/governance", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("create agent governance: %w", err)
 	}
 	return &result, nil
@@ -318,7 +318,7 @@ func (c *Client) CreateAgentGovernance(ctx context.Context, agentID string, req 
 
 func (c *Client) UpdateAgentGovernance(ctx context.Context, agentID, policyID string, req UpdateAgentGovernanceRequest, opts ...RequestOption) (*AgentGovernancePolicy, error) {
 	var result AgentGovernancePolicy
-	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/governance/%s", agentID, policyID)
+	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/governance/%s", url.PathEscape(agentID), url.PathEscape(policyID))
 	if err := c.do(ctx, "PATCH", path, req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("update agent governance: %w", err)
 	}
@@ -326,7 +326,7 @@ func (c *Client) UpdateAgentGovernance(ctx context.Context, agentID, policyID st
 }
 
 func (c *Client) DeleteAgentGovernance(ctx context.Context, agentID, policyID string, opts ...RequestOption) error {
-	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/governance/%s", agentID, policyID)
+	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/governance/%s", url.PathEscape(agentID), url.PathEscape(policyID))
 	if err := c.do(ctx, "DELETE", path, nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete agent governance: %w", err)
 	}
@@ -334,7 +334,7 @@ func (c *Client) DeleteAgentGovernance(ctx context.Context, agentID, policyID st
 }
 
 func (c *Client) ListAgentAudit(ctx context.Context, agentID string, params ListAgentAuditParams, opts ...RequestOption) (*ListAgentAuditResponse, error) {
-	path := "/api/v1/cadreen/agents/" + agentID + "/audit"
+	path := "/api/v1/cadreen/agents/" + url.PathEscape(agentID) + "/audit"
 	q := url.Values{}
 	if params.Limit > 0 {
 		q.Set("limit", strconv.Itoa(params.Limit))
@@ -357,14 +357,14 @@ func (c *Client) ListAgentAudit(ctx context.Context, agentID string, params List
 
 func (c *Client) StartNegotiation(ctx context.Context, agentID string, req StartNegotiationRequest, opts ...RequestOption) (*AgentNegotiation, error) {
 	var result AgentNegotiation
-	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+agentID+"/negotiate", req, &result, opts...); err != nil {
+	if err := c.do(ctx, "POST", "/api/v1/cadreen/agents/"+url.PathEscape(agentID)+"/negotiate", req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("start negotiation: %w", err)
 	}
 	return &result, nil
 }
 
 func (c *Client) ListNegotiations(ctx context.Context, agentID string, params ListNegotiationsParams, opts ...RequestOption) (*ListNegotiationsResponse, error) {
-	path := "/api/v1/cadreen/agents/" + agentID + "/negotiations"
+	path := "/api/v1/cadreen/agents/" + url.PathEscape(agentID) + "/negotiations"
 	q := url.Values{}
 	if params.Limit > 0 {
 		q.Set("limit", strconv.Itoa(params.Limit))
@@ -387,7 +387,7 @@ func (c *Client) ListNegotiations(ctx context.Context, agentID string, params Li
 
 func (c *Client) GetNegotiation(ctx context.Context, agentID, negotiationID string, opts ...RequestOption) (*AgentNegotiation, error) {
 	var result AgentNegotiation
-	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/negotiations/%s", agentID, negotiationID)
+	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/negotiations/%s", url.PathEscape(agentID), url.PathEscape(negotiationID))
 	if err := c.do(ctx, "GET", path, nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get negotiation: %w", err)
 	}
@@ -396,7 +396,7 @@ func (c *Client) GetNegotiation(ctx context.Context, agentID, negotiationID stri
 
 func (c *Client) RespondToNegotiation(ctx context.Context, agentID, negotiationID string, req RespondToNegotiationRequest, opts ...RequestOption) (*AgentNegotiation, error) {
 	var result AgentNegotiation
-	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/negotiations/%s/respond", agentID, negotiationID)
+	path := fmt.Sprintf("/api/v1/cadreen/agents/%s/negotiations/%s/respond", url.PathEscape(agentID), url.PathEscape(negotiationID))
 	if err := c.do(ctx, "POST", path, req, &result, opts...); err != nil {
 		return nil, fmt.Errorf("respond to negotiation: %w", err)
 	}

@@ -3,6 +3,7 @@ package cadreen
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 type CreateCredentialRequest struct {
@@ -28,7 +29,7 @@ func (c *Client) CreateCredential(ctx context.Context, req CreateCredentialReque
 }
 
 func (c *Client) DeleteCredential(ctx context.Context, id string, opts ...RequestOption) error {
-	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/credentials/"+id, nil, nil, opts...); err != nil {
+	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/credentials/"+url.PathEscape(id), nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete credential: %w", err)
 	}
 	return nil

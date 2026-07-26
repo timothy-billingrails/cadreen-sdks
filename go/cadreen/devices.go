@@ -189,7 +189,7 @@ func (c *Client) ListDevices(ctx context.Context, params ListDevicesParams, opts
 // GetDevice gets a device by ID.
 func (c *Client) GetDevice(ctx context.Context, deviceID string, opts ...RequestOption) (*Device, error) {
 	var result Device
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/devices/"+deviceID, nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/devices/"+url.PathEscape(deviceID), nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get device: %w", err)
 	}
 	return &result, nil
@@ -206,7 +206,7 @@ func (c *Client) CreateDevice(ctx context.Context, req CreateDeviceRequest, opts
 
 // DeleteDevice removes a device.
 func (c *Client) DeleteDevice(ctx context.Context, deviceID string, opts ...RequestOption) error {
-	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/devices/"+deviceID, nil, nil, opts...); err != nil {
+	if err := c.do(ctx, "DELETE", "/api/v1/cadreen/devices/"+url.PathEscape(deviceID), nil, nil, opts...); err != nil {
 		return fmt.Errorf("delete device: %w", err)
 	}
 	return nil
@@ -215,7 +215,7 @@ func (c *Client) DeleteDevice(ctx context.Context, deviceID string, opts ...Requ
 // GetDeviceStatus gets a device's current status.
 func (c *Client) GetDeviceStatus(ctx context.Context, deviceID string, opts ...RequestOption) (*DeviceStatus, error) {
 	var result DeviceStatus
-	if err := c.do(ctx, "GET", "/api/v1/cadreen/devices/"+deviceID+"/status", nil, &result, opts...); err != nil {
+	if err := c.do(ctx, "GET", "/api/v1/cadreen/devices/"+url.PathEscape(deviceID)+"/status", nil, &result, opts...); err != nil {
 		return nil, fmt.Errorf("get device status: %w", err)
 	}
 	return &result, nil
